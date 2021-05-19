@@ -6,21 +6,13 @@ use common\jobs\JobTest;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
-use yii\base\Event;
 use yii\helpers\VarDumper;
 use yii\web\Controller;
 
 class KanbanController extends Controller
 {
-    const EVENT_TEST_BOARD = "demo";
-
     public function actionIndex()
     {
-        $this->layout = 'kanban';
-        // $this->on(self::EVENT_TEST_BOARD, "move", "Something");
-        // $this->trigger(self::EVENT_TEST_BOARD);
-        // $this->off(self::EVENT_TEST_BOARD);
-
         return $this->render('index', [
             'board' => $this->getDump(),
         ]);
@@ -35,27 +27,6 @@ class KanbanController extends Controller
                 ]
             )
         );
-
-
-
-        // $movement = Yii::$app->request->post();
-
-        // VarDumper::dump( $movement);
-        // return "asd";
-        // header("Content-Type: text/event-stream");
-        // header('Cache-Control: no-cache');
-        // header('Connection: keep-alive');
-
-        // // echo "retry: 10000\n";
-
-        // echo "data: the data\n";
-        // flush();
-        // $response = Yii::$app->response;
-        // $response->headers->add("Content-Type","text/event-stream");
-        // $response->headers->add("Cache-Control","no-cache");
-        // $response->headers->add("Connection","keep-alive");
-        // $response->data = "asd";
-        // return $response;
     }
 
     private function getDump()
