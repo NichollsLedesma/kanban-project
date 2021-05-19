@@ -26,7 +26,7 @@ $this->registerJsFile(
 
 <div class="content-wrapper kanban">
     <section class="content pb-3">
-        <div class="container-fluid h-100">
+        <div class="container-fluid h-100" id="kanban-body">
 
             <?php foreach ($board['columns'] as $column) { ?>
                 <div class="card card-row card-secondary">
@@ -58,6 +58,50 @@ $this->registerJsFile(
                 </div>
             <?php } ?>
 
+            <div id="add-list-column" class="card card-row" style="background:transparent; box-shadow: none">
+                <button id="add-list" class="btn btn-primary" style="width:100%">Add another list</button>
+            </div>
+
+            <div class="card card-row card-secondary d-none template">
+                <div class="card-header d-none">
+                    <h3 class="card-title">
+                    </h3>
+                </div>
+                <input type="text" class="form-control list-name-input">
+                <button class="btn btn-primary list-creation-add">Add list</button>
+                <button class="btn btn-danger list-creation-cancel">Cancel</button>
+            </div>
         </div>
     </section>
 </div>
+
+<script
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+
+    $( "#add-list" ).click(function() {
+        $( ".template" ).clone(true).insertBefore( "#add-list-column" ).removeClass('d-none').removeClass('template');
+        $( "#add-list" ).parent().hide();
+    });
+
+    $( ".list-creation-cancel" ).click(function() {
+        $( "#add-list" ).parent().show();
+        $( this).parent().remove();
+    });
+
+    $( ".list-creation-add" ).click(function() {
+        let listName = $(this).parent().children('.list-name-input').val();
+        $(this).parent().children('.list-creation-cancel').remove();
+        $(this).parent().children('.list-name-input').remove();
+        $(this).parent().children('.card-header').removeClass('d-none');
+        $(this).parent().children('.card-header').html(listName);
+        $(this).remove();
+        $( "#add-list" ).parent().show();
+    });
+
+});
+</script>
