@@ -58,3 +58,61 @@ frontend
 vendor/                  contains dependent 3rd-party packages
 environments/            contains environment-based overrides
 ```
+<br>
+<p align="center">
+    <h1 align="center">Yii2 Kanban project</h1>
+</p>
+
+# Trello borad
+https://trello.com/b/9lrpAug0/avodah
+
+# AdminLTE 3
+https://adminlte.io/themes/v3/
+https://www.yiiframework.com/extension/hail812/yii2-adminlte3
+
+# Dragula
+https://bevacqua.github.io/dragula/
+
+# Kanban repo
+https://github.com/NichollsLedesma/kanban-project
+
+## Clone repo
+1. git clone git@github.com:NichollsLedesma/kanban-project.git
+
+## Build containers
+2. sudo docker-compose -f docker-compose.yml up --build
+
+## Install dependencies
+3. cd kanban-project/
+4. sudo docker exec -it yii2_kanban_php bash
+5. composer update
+
+## apply migrations with command 
+6. sudo docker exec -it yii2_kanban_php bash
+7. php init
+
+### Adjust the components['db'] configuration in /path/to/kanban-project/common/config/main-local.php
+8. 'dsn' => 'pgsql:host=pgsql;dbname=kanban_blocknerds'
+ * also check your db's username & password
+
+## apply migrations with command 
+9. sudo docker exec -it yii2_kanban_php bash
+10. php yii migrate
+
+### Change the hosts file to point the domain to your server.
+Windows: c:\Windows\System32\Drivers\etc\hosts
+
+Linux: /etc/hosts
+
+### Add the following lines:
+127.0.0.1   frontend.test
+
+127.0.0.1   backend.test
+
+## Access APP
+http://backend.test
+
+http://frontend.test
+
+## MailHog
+http://frontend.test:8025
