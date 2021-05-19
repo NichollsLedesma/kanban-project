@@ -7,7 +7,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 use yii\helpers\ArrayHelper;
 use yii\web\View;
 
-// $this->registerAssetBundle(AdminLteAsset::class);
+$this->registerAssetBundle(AdminLteAsset::class);
 $this->registerAssetBundle(DragulaAsset::class);
 
 
