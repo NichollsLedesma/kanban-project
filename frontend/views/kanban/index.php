@@ -64,11 +64,11 @@ $this->registerJsFile(
             </div>
 
             <div class="card card-row card-secondary d-none template">
-                <div class="card-header d-none">
-                    <h3 class="card-title">
+                <div class="card-header edit-title">
+                    <h3 class="card-title d-none">
                     </h3>
+                    <input type="text" class="form-control list-name-input title-input">
                 </div>
-                <input type="text" class="form-control list-name-input">
                 <button class="btn btn-primary list-creation-add">Add list</button>
                 <button class="btn btn-danger list-creation-cancel">Cancel</button>
             </div>
@@ -95,10 +95,10 @@ $( document ).ready(function() {
     });
 
     $( ".list-creation-add" ).click(function() {
-        let listName = $(this).parent().children('.list-name-input').val();
+        let listName = $(this).parent().children('.card-header').children('.list-name-input').val();
         $(this).parent().children('.list-creation-cancel').remove();
-        $(this).parent().children('.list-name-input').remove();
-        $(this).parent().children('.card-header').removeClass('d-none');
+        $(this).parent().children('.card-header').children('.list-name-input').addClass('d-none');
+        $(this).parent().children('.card-header').children('.card-title').removeClass('d-none');
         $(this).parent().children('.card-header').children('.card-title').html(listName);
         $(this).remove();
         $( "#add-list" ).parent().show();
@@ -107,13 +107,13 @@ $( document ).ready(function() {
 
     $( ".edit-title" ).click(function() {
         $(this).children('.title-input').removeClass('d-none');
-        $(this).children( ".card-title" ).hide();
+        $(this).children( ".card-title" ).addClass('d-none');
         $(this).children(".title-input").focus();
     });
 
     $( ".title-input" ).blur(function() {
         $(this).addClass('d-none');
-        $(this).parent().children(".card-title" ).show();
+        $(this).parent().children(".card-title" ).removeClass('d-none');
         $(this).parent().children(".card-title").html($( this).val());
     });
 
