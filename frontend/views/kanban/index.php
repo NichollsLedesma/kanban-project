@@ -30,10 +30,11 @@ $this->registerJsFile(
 
             <?php foreach ($board['columns'] as $column) { ?>
                 <div class="card card-row card-secondary">
-                    <div class="card-header">
+                    <div class="card-header edit-title">
                         <h3 class="card-title">
                             <?= $column['name'] ?>
                         </h3>
+                        <input class="form-control d-none title-input" type="text" value="<?= $column['name'] ?>">
                     </div>
 
                     <div class="card-body" id="<?= $column['name'] ?>" data-column-id="<?= $column['id'] ?>">
@@ -101,6 +102,19 @@ $( document ).ready(function() {
         $(this).parent().children('.card-header').children('.card-title').html(listName);
         $(this).remove();
         $( "#add-list" ).parent().show();
+    });
+
+
+    $( ".edit-title" ).click(function() {
+        $(this).children('.title-input').removeClass('d-none');
+        $(this).children( ".card-title" ).hide();
+        $(this).children(".title-input").focus();
+    });
+
+    $( ".title-input" ).blur(function() {
+        $(this).addClass('d-none');
+        $(this).parent().children(".card-title" ).show();
+        $(this).parent().children(".card-title").html($( this).val());
     });
 
 });
