@@ -98,7 +98,7 @@ $( document ).ready(function() {
         $(this).parent().children('.list-creation-cancel').remove();
         $(this).parent().children('.list-name-input').remove();
         $(this).parent().children('.card-header').removeClass('d-none');
-        $(this).parent().children('.card-header').html(listName);
+        $(this).parent().children('.card-header').children('.card-title').html(listName);
         $(this).remove();
         $( "#add-list" ).parent().show();
     });
