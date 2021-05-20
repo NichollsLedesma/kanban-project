@@ -13,8 +13,16 @@ class KanbanController extends Controller
 {
     public function actionIndex()
     {
+        $this->layout = "kanban";
+        $search = Yii::$app->request->post('search');
+
+        $board = ($search) ?
+            $this->getDataDump($search) :
+            $this->getDump();
+
         return $this->render('index', [
-            'board' => $this->getDump(),
+            'board' => $board,
+            "search" => $search
         ]);
     }
 
@@ -64,6 +72,49 @@ class KanbanController extends Controller
                             "name" => "task 5",
                             "description" => "something",
                         ]
+                    ]
+                ],
+                [
+                    "id" => 2,
+                    "name" => "todo",
+                    "tasks" => [
+                        [
+                            "id" => 6,
+                            "name" => "task 6",
+                            "description" => "something",
+                        ]
+                    ]
+                ],
+                [
+                    "id" => 3,
+                    "name" => "doing",
+                    "tasks" => []
+                ],
+                [
+                    "id" => 4,
+                    "name" => "done",
+                    "tasks" => []
+                ],
+            ]
+        ];
+    }
+    private function getDataDump($search)
+    {
+        return [
+            "id" => 1,
+            "name" => "board_name",
+            "columns" => [
+                [
+                    "id" => 1,
+                    "name" => "backlog",
+                    "tasks" => [
+                        [
+                            "id" => 1,
+                            "name" => "task 1",
+                            "description" => "something",
+                        ],
+
+
                     ]
                 ],
                 [

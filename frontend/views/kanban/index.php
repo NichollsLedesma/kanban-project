@@ -12,7 +12,6 @@ $columns = ArrayHelper::getColumn($board['columns'], 'name');
 $this->registerJsVar('columns', $columns, View::POS_END);
 $this->registerJsVar('channelName', $boardCode, View::POS_END);
 
-$this->registerCssFile(Yii::$app->request->BaseUrl .'css/kanban.css');
 $this->registerJsFile(Yii::$app->request->BaseUrl . '/js/mqttws31.min.js', ['position' => View::POS_END]);
 $this->registerJsFile(
     Yii::$app->request->BaseUrl . '/js/dragula-impl.js',
