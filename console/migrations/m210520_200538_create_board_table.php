@@ -1,0 +1,33 @@
+<?php
+
+use yii\db\Migration;
+
+/**
+ * Handles the creation of table `{{%board}}`.
+ */
+class m210520_200538_create_board_table extends Migration
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function safeUp()
+    {
+        $this->createTable('{{%board}}', [
+            'id' => $this->text(36)->unique(),
+            'owner_id' => $this->integer()->notNull(),
+            'title' => $this->string(100)->notNull(),
+            'created_by' => $this->integer()->notNull(),
+            'updated_by' => $this->integer()->notNull(),
+            'created_at' => $this->integer()->notNull(),
+            'updated_at' => $this->integer()->notNull(),
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function safeDown()
+    {
+        $this->dropTable('{{%board}}');
+    }
+}
