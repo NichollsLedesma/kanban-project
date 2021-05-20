@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use app\jobs\CreateLogs;
+use common\jobs\JobRabbitQueue;
 use common\jobs\JobTest;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
@@ -73,16 +74,8 @@ class SiteController extends Controller
 
     public function actionTest()
     {
-        $url = 'https://e00-ar-marca.uecdn.es/claro/assets/multimedia/imagenes/2021/05/09/16205852803700.jpg';
-        $file = 'image.jpg';
-        $seconds = 2;
-        $id = Yii::$app->queue1->push(
-            new JobTest(
-                [
-                    'url' => $url,
-                    'file' => $file,
-                ]
-            )
+        $id = Yii::$app->queue->push(
+            new JobRabbitQueue()
         );
 
         VarDumper::dump($id);

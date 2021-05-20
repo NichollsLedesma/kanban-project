@@ -1,6 +1,12 @@
 <?php
 
+use yii\queue\amqp_interop\Queue;
+use yii\queue\LogBehavior;
+
 return [
+    'bootstrap' => [
+        'queue', // The component registers its own console commands
+    ],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm' => '@vendor/npm-asset',
@@ -19,6 +25,7 @@ return [
           'enableSchemaCache' => true,
           'schemaCacheDuration' => 3600,
           ], */
+          
         'redis' => [
             'class' => \yii\redis\Connection::class,
             'hostname' => 'redis',
@@ -41,11 +48,20 @@ return [
                 'database' => 1,
             ],
         ],
+        // 'queue' => [
+        //     'class' => \yii\queue\redis\Queue::class,
+        //     'redis' => 'redis',
+        //     'channel' => 'queue'/* <-- queue name */,
+        //     'database' => 2,
+        // ],
         'queue' => [
-            'class' => \yii\queue\redis\Queue::class,
-            'redis' => 'redis',
-            'channel' => 'queue'/* <-- queue name */,
-            'database' => 2,
+            'class' => Queue::class,
+            'host' => 'rabbitmq',
+            'port' => 5672,
+            'user' => 'guest',
+            'password' => 'guest',
+            'queueName' => 'queue',
+            'as log' => LogBehavior::class,
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
