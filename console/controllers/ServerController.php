@@ -14,8 +14,7 @@ class ServerController extends Controller
 {
     public function actionStart($port = 15675)
     {
-
-        $connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
+        $connection = new AMQPStreamConnection('rabbitmq', 15675, 'guest', 'guest');
         $channel = $connection->channel();
 
         $channel->exchange_declare('logs', 'fanout', false, false, false);

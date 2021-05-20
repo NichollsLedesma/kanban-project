@@ -19,7 +19,7 @@ class JobTest extends \yii\base\BaseObject implements \yii\queue\JobInterface
      */
     public function execute($queue)
     {
-        $connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
+        $connection = new AMQPStreamConnection('rabbitmq', 15675, 'guest', 'guest');
         $channel = $connection->channel();
     
         $channel->exchange_declare('logs', 'fanout', false, false, false);
