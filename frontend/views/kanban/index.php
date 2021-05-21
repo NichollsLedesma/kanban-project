@@ -2,7 +2,9 @@
 
 use frontend\assets\dragula\DragulaAsset;
 use frontend\assets\pahoMqtt\PahoMqttAsset;
+use yii\bootstrap4\Modal;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\web\View;
 
 $this->registerAssetBundle(DragulaAsset::class);
@@ -39,7 +41,7 @@ $this->registerJsFile(
 
                     <div class="card-body" id="<?= $column['name'] ?>" data-column-id="<?= $column['id'] ?>">
                         <?php foreach ($column['tasks'] as $task) { ?>
-                            <div class="card card-info card-outline task" id="<?= $task['id'] ?>">
+                            <div class="card card-info card-outline task" id="card_<?= $task['id'] ?>">
                                 <div class="card-header">
                                     <h5 class="card-title"><?= $task['name'] ?></h5>
                                     <div class="card-tools">
@@ -62,3 +64,12 @@ $this->registerJsFile(
         </div>
     </section>
 </div>
+
+<? Modal::begin([
+    "id" => "detailModal",
+    "title" => "",
+    "size" => Modal::SIZE_LARGE,
+]); ?>
+<h1 class="title"></h1>
+<p class="content"></p>
+<? Modal::end(); ?>

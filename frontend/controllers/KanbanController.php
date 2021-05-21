@@ -10,6 +10,7 @@ use Yii;
 use yii\helpers\Json;
 use yii\helpers\VarDumper;
 use yii\web\Controller;
+use yii\web\Response;
 
 class KanbanController extends Controller
 {
@@ -30,13 +31,23 @@ class KanbanController extends Controller
 
     public function actionGet()
     {
+        Yii::$app->response->format = Response::FORMAT_JSON;
         $search = Yii::$app->request->get('query');
-        $data = User::find()
-            ->select(['username as value', 'username as  label', 'id as id'])
+        $select = ['username as value', 'username as  label', 'id as id'];
+
+        return User::find()
+            ->select($select)
             ->asArray()
             ->all();
-
-        return Json::encode($data);
+    }
+    public function actionGetOne($id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return [
+            "id" => $id,
+            "name" => "task " . $id,
+            "description" => "something",
+        ];
     }
 
     public function actionMove()

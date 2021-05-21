@@ -40,7 +40,7 @@ $(document).ready(function () {
     );
 
     dragulaComp.on('drop', (component) => {
-        const taskId = $(component).attr("id");
+        const taskId = Number($(component).attr("id").split('_')[1]);
         const targetColumnId = $(component.parentElement).attr('data-column-id')
 
         sendMessage({ taskId, targetColumnId })
@@ -52,8 +52,8 @@ $(document).ready(function () {
         source: (request, response) => {
             $.get("kanban/get", {
                 query: request.term
-            }, (data) => {
-                response(JSON.parse(data));
+            }, (options) => {
+                response(options);
             });
         },
         select: (event, ui) => {
@@ -61,4 +61,15 @@ $(document).ready(function () {
         }
     });
 
+    $(".task").on("click", (e) => {
+        const id = Number($(e.currentTarget).attr("id").split('_')[1]);
+        $.get("kanban/get-one",
+            { id },
+            (task) => {
+                const modal = $('#detailModal'); 
+                modal.modal('show')
+                modal.find(".modal-title").html(task.name);
+                modal.find(".content").html(task.description)
+            });
+    })
 });
