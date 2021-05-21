@@ -30,11 +30,17 @@ $this->registerJsFile(
 
             <?php foreach ($board['columns'] as $column) { ?>
                 <div class="card card-row card-secondary">
-                    <div class="card-header edit-title">
-                        <h3 class="card-title">
+                    <div class="card-header">
+                        <h3 class="card-title edit-title" style="width: 90%">
                             <?= $column['name'] ?>
                         </h3>
-                        <input class="form-control d-none title-input" type="text" value="<?= $column['name'] ?>">
+                        <input class="form-control d-none title-input" type="text" value="<?= $column['name'] ?>"style="width: 90%; display: inline-block;">
+                        <div class="dropdown" style="float: right;">
+                            <button class="dropbtn">...</button>
+                            <div class="dropdown-content">
+                                <a>Archive</a>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="card-body" id="<?= $column['name'] ?>" data-column-id="<?= $column['id'] ?>">
@@ -64,10 +70,16 @@ $this->registerJsFile(
             </div>
 
             <div class="card card-row card-secondary d-none template">
-                <div class="card-header edit-title">
-                    <h3 class="card-title d-none">
+                <div class="card-header">
+                    <h3 class="card-title edit-title d-none" style="width: 90%">
                     </h3>
-                    <input type="text" class="form-control list-name-input title-input">
+                    <input type="text" class="form-control list-name-input title-input" style="width: 90%; display: inline-block;">
+                    <div class="dropdown" style="float: right;">
+                      <button class="dropbtn">...</button>
+                      <div class="dropdown-content">
+                        <a>Archive</a>
+                      </div>
+                    </div>
                 </div>
                 <button class="btn btn-primary list-creation-add">Add list</button>
                 <button class="btn btn-danger list-creation-cancel">Cancel</button>
@@ -106,9 +118,9 @@ $( document ).ready(function() {
 
 
     $( ".edit-title" ).click(function() {
-        $(this).children('.title-input').removeClass('d-none');
-        $(this).children( ".card-title" ).addClass('d-none');
-        $(this).children(".title-input").focus();
+        $(this).parent().children('.title-input').removeClass('d-none');
+        $(this).addClass('d-none');
+        $(this).parent().children(".title-input").focus();
     });
 
     $( ".title-input" ).blur(function() {
@@ -117,5 +129,58 @@ $( document ).ready(function() {
         $(this).parent().children(".card-title").html($( this).val());
     });
 
+    $('.dropbtn').click(function() {
+        $(this).next('.dropdown-content').addClass('show');
+    });
+
+    $(window).click(function(e) {
+        if (!e.target.matches('.dropbtn')) {
+            $('.dropdown-content').removeClass('show');
+        }
+    });
+
 });
+
+
 </script>
+
+<style type="text/css">
+
+.dropbtn {
+  background-color: transparent;
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 0px;
+}
+
+.dropbtn:hover, .dropbtn:focus {
+  background-color: #5c646b;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  color: black;
+}
+
+.dropdown-content a {
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  color: black!important;
+}
+
+.dropdown-content a:hover {background-color: #ddd}
+
+.show {display:block;}
+</style>
