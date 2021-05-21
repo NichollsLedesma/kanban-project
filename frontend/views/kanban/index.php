@@ -38,7 +38,7 @@ $this->registerJsFile(
                         <div class="dropdown" style="float: right;">
                             <button class="dropbtn">...</button>
                             <div class="dropdown-content">
-                                <a>Archive</a>
+                                <a class="archive-btn">Archive</a>
                             </div>
                         </div>
                     </div>
@@ -77,7 +77,7 @@ $this->registerJsFile(
                     <div class="dropdown" style="float: right;">
                       <button class="dropbtn">...</button>
                       <div class="dropdown-content">
-                        <a>Archive</a>
+                        <a class="archive-btn">Archive</a>
                       </div>
                     </div>
                 </div>
@@ -131,6 +131,10 @@ $( document ).ready(function() {
 
     $('.dropbtn').click(function() {
         $(this).next('.dropdown-content').addClass('show');
+    });
+
+    $('.archive-btn').click(function() {
+        $(this).parent().parent().parent().parent().remove();
     });
 
     $(window).click(function(e) {
