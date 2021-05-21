@@ -3,9 +3,11 @@
 namespace frontend\controllers;
 
 use common\jobs\JobTest;
+use common\models\User;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
+use yii\helpers\Json;
 use yii\helpers\VarDumper;
 use yii\web\Controller;
 
@@ -24,6 +26,17 @@ class KanbanController extends Controller
             'board' => $board,
             "search" => $search
         ]);
+    }
+
+    public function actionGet()
+    {
+        $search = Yii::$app->request->get('query');
+        $data = User::find()
+            ->select(['username as value', 'username as  label', 'id as id'])
+            ->asArray()
+            ->all();
+
+        return Json::encode($data);
     }
 
     public function actionMove()

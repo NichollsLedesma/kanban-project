@@ -7,7 +7,7 @@ $(document).ready(function () {
         "/ws",
         "myclientid_" + parseInt(Math.random() * 100, 10)
     );
-    
+
     client.onConnectionLost = function (responseObject) {
         console.log("CONNECTION LOST - " + responseObject.errorMessage);
     };
@@ -29,10 +29,10 @@ $(document).ready(function () {
         client.send(message);
     }
 
-    function moveCard(data){
+    function moveCard(data) {
         card = $(`#${data.taskId}`)
         set = $(`div[data-column-id=${data.targetColumnId}]`)
-        set.append( card );
+        set.append(card);
     }
 
     const dragulaComp = dragula(
@@ -45,4 +45,20 @@ $(document).ready(function () {
 
         sendMessage({ taskId, targetColumnId })
     })
+
+    $('#search').autocomplete({
+        type: "POST",
+        minLength: 3,
+        source: (request, response) => {
+            $.get("kanban/get", {
+                query: request.term
+            }, (data) => {
+                response(JSON.parse(data));
+            });
+        },
+        select: (event, ui) => {
+            console.log(ui)
+        }
+    });
+
 });

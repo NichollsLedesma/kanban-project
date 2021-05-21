@@ -1,7 +1,10 @@
 <?php
 
+use common\models\User;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\jui\AutoComplete;
+use yii\web\JsExpression;
 
 ?>
 <!-- Navbar -->
@@ -54,17 +57,25 @@ use yii\helpers\Url;
     </ul>
 
     <!-- SEARCH FORM -->
-    <?= Html::beginForm('kanban', 'POST', ['class' => "form-inline ml-3"]); ?>
-    <?= Html::textInput('search', Yii::$app->request->post("search"), [
-        'class' => "form-control form-control-navbar",
-        'type' => "search",
-        'placeholder' => "Search",
-        'aria-label' => "Search",
-    ]); ?>
-    <div class="input-group-append">
-        <?= Html::submitButton('<i class="fas fa-search"></i>', ['class' => 'btn btn-navbar']) ?>
+    <div class="form-inline ml-3">
+        <?= AutoComplete::widget([
+            'name' => 'search',
+            'id' => 'search',
+            'options' => [
+                'class' => "form-control form-control-navbar",
+                'type' => "search",
+                'placeholder' => "Search",
+                'aria-label' => "Search",
+            ],
+            'clientOptions' => [
+                'autoFill' => true,
+                'minLength' => '2',
+            ],
+        ]);
+        ?>
+        <?= Html::button('<i class="fas fa-search"></i>', ['class' => 'btn btn-navbar']) ?>
     </div>
-    <?= Html::endForm(); ?>
+
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
