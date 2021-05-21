@@ -50,9 +50,7 @@ $(document).ready(function () {
         type: "POST",
         minLength: 3,
         source: (request, response) => {
-            $.get("kanban/get", {
-                query: request.term
-            }, (options) => {
+            $.get("get/"+request.term, (options) => {
                 response(options);
             });
         },
@@ -63,8 +61,7 @@ $(document).ready(function () {
 
     $(".task").on("click", (e) => {
         const id = Number($(e.currentTarget).attr("id").split('_')[1]);
-        $.get("kanban/get-one",
-            { id },
+        $.get("get-one/"+id,
             (task) => {
                 const modal = $('#detailModal'); 
                 modal.modal('show')

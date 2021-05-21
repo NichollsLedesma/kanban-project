@@ -44,7 +44,9 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                'board/<uuid>'=>'kanban/board',
+                'kanban/get/<query>'=>'kanban/get',
+                'kanban/get-one/<id>'=>'kanban/get-one',
+                'kanban/<uuid>'=>'kanban/board',
             ],
         ],
 
