@@ -16,16 +16,23 @@ class KanbanController extends Controller
 {
     public function actionIndex()
     {
-        $this->layout = "kanban";
-        $search = Yii::$app->request->post('search');
-
-        $board = ($search) ?
-            $this->getDataDump($search) :
-            $this->getDump();
+        $boards = $this->getBoardsDump();
 
         return $this->render('index', [
-            'board' => $board,
-            "search" => $search
+            "boards" => $boards
+        ]);
+    }
+    public function actionBoard($uuid)
+    {
+        $this->layout = "kanban";
+        // $search = Yii::$app->request->post('search');
+
+        // $board = ($search) ?
+        //     $this->getDataDump($search) :
+        //     $this->getDump();
+
+        return $this->render('board', [
+            'board' => $this->getDump(),
         ]);
     }
 
@@ -43,6 +50,7 @@ class KanbanController extends Controller
     public function actionGetOne($id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
+        
         return [
             "id" => $id,
             "name" => "task " . $id,
@@ -61,11 +69,26 @@ class KanbanController extends Controller
         );
     }
 
-    private function getDump()
+    private function getBoardsDump()
     {
         return [
-            "id" => 1,
-            "name" => "board_name",
+            $this->getDump(1),
+            $this->getDump(2),
+            $this->getDump(3),
+            $this->getDump(4),
+            $this->getDump(5),
+            $this->getDump(6),
+            $this->getDump(7),
+            $this->getDump(8),
+        ];
+    }
+
+    private function getDump($id = 1)
+    {
+        return [
+            "id" => $id,
+            "uuid" => "randomuuid_$id",
+            "name" => "board_name_$id",
             "columns" => [
                 [
                     "id" => 1,
