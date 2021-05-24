@@ -7,6 +7,7 @@ use common\models\User;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
+use yii\filters\AccessControl;
 use yii\helpers\Json;
 use yii\helpers\VarDumper;
 use yii\web\Controller;
@@ -14,6 +15,22 @@ use yii\web\Response;
 
 class KanbanController extends Controller
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                "class" => AccessControl::class,
+                "only" => ['index', 'board', 'logout'],
+                "rules" => [
+                    [
+                        'allow' => true,
+                        'roles' => ["@"],
+                    ]
+                ],
+            ],
+        ];
+    }
+
     public function actionIndex()
     {
         $boards = $this->getBoardsDump();
@@ -50,7 +67,7 @@ class KanbanController extends Controller
     public function actionGetOne($id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        
+
         return [
             "id" => $id,
             "name" => "task " . $id,
