@@ -9,19 +9,23 @@ $(document).ready(function () {
     );
 
     client.onConnectionLost = function (responseObject) {
-        console.log("CONNECTION LOST - " + responseObject.errorMessage);
+        connect();
     };
 
     client.onMessageArrived = function (message) {
         const objData = JSON.parse(message.payloadString);
         moveCard(objData);
     };
+    connect();
 
-    client.connect({
-        onSuccess: () => {
-            client.subscribe(channelName);
-        }
-    });
+    ////////////
+    function connect() {
+        client.connect({
+            onSuccess: () => {
+                client.subscribe(channelName);
+            }
+        });
+    }
 
     function sendMessage(objData) {
         message = new Paho.MQTT.Message(JSON.stringify(objData));
@@ -50,7 +54,7 @@ $(document).ready(function () {
         type: "POST",
         minLength: 3,
         source: (request, response) => {
-            $.get("get/"+request.term, (options) => {
+            $.get("get/" + request.term, (options) => {
                 response(options);
             });
         },
@@ -61,9 +65,9 @@ $(document).ready(function () {
 
     $(".task").on("click", (e) => {
         const id = Number($(e.currentTarget).attr("id").split('_')[1]);
-        $.get("get-one/"+id,
+        $.get("get-one/" + id,
             (task) => {
-                const modal = $('#detailModal'); 
+                const modal = $('#detailModal');
                 modal.modal('show')
                 modal.find(".modal-title").html(task.name);
                 modal.find(".content").html(task.description)
