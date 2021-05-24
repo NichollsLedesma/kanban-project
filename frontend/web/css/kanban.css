@@ -3,15 +3,5 @@
   margin: 0 auto !important;
 }
 
-/* Board list */
-.wrapper {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  grid-auto-rows: minmax(100px, auto);
-}
 
-.board {
-  max-width: 20rem;
-  min-height: 10rem;
-}
+
