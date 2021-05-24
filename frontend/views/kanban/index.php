@@ -8,5 +8,8 @@ $this->registerCssFile(
 ?>
 
 <?= ListBoardWidget::widget(
-    ['boards' => $boards]
+    [
+        'boards' => $boards,
+        "title" => ""
+    ]
 ) ?>

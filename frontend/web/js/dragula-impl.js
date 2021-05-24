@@ -54,17 +54,23 @@ $(document).ready(function () {
         type: "POST",
         minLength: 3,
         source: (request, response) => {
+            $('.ui-autocomplete').css('z-index', 9999);
             $.get("get/" + request.term, (options) => {
                 response(options);
             });
         },
         select: (event, ui) => {
-            console.log(ui)
+            const { id } = ui.item;
+            getInfoAndOpenModal(id);
         }
     });
 
     $(".task").on("click", (e) => {
         const id = Number($(e.currentTarget).attr("id").split('_')[1]);
+        getInfoAndOpenModal(id);
+    });
+
+    function getInfoAndOpenModal(id) {
         $.get("get-one/" + id,
             (task) => {
                 const modal = $('#detailModal');
@@ -72,5 +78,5 @@ $(document).ready(function () {
                 modal.find(".modal-title").html(task.name);
                 modal.find(".content").html(task.description)
             });
-    })
+    }
 });

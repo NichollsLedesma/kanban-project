@@ -11,6 +11,7 @@ class ListBoardWidget extends Widget
 {
 
     public $boards = [];
+    public $title = '';
 
     public function init()
     {
@@ -22,9 +23,15 @@ class ListBoardWidget extends Widget
         if (count($this->boards) === 0) {
             return "<h1>Nothing to show</h1>";
         }
-        
+
         ListBoardWidgetAsset::register($this->getView());
 
-        return $this->render('_board', ['boards' => $this->boards]);
+        return $this->render(
+            '_board',
+            [
+                'boards' => $this->boards,
+                'title' => $this->title,
+            ]
+        );
     }
 }
