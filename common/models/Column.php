@@ -7,30 +7,27 @@ use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 
 /**
- * This is the model class for table "board".
+ * This is the model class for table "column".
  *
  * @property int $id
  * @property string|null $uuid
- * @property int $entity_id
+ * @property int $board_id
  * @property int $owner_id
  * @property string $title
+ * @property int $order
  * @property int $created_by
  * @property int $updated_by
  * @property int $created_at
  * @property int $updated_at
- *
- * @property UserEntity[] $userEntity
- * @property UserBoard[] $userBoards
- * @property User[] $users
  */
-class Board extends \yii\db\ActiveRecord
+class Column extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'board';
+        return 'column';
     }
 
     public function behaviors()
@@ -50,12 +47,11 @@ class Board extends \yii\db\ActiveRecord
             ['uuid', 'string', 'max' => 36],
             ['uuid', 'unique'],
             ['uuid', 'thamtech\uuid\validators\UuidValidator'],
-            [['entity_id', 'owner_id', 'title'], 'required'],
-            [['entity_id', 'owner_id', 'created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
-            ['entity_id', 'exist', 'targetClass' => Entity::class, 'targetAttribute' => ['entity_id' => 'id']],
+            [['board_id', 'owner_id', 'order', 'title'], 'required'],
+            [['board_id', 'owner_id', 'order', 'created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
+            ['board_id', 'exist', 'targetClass' => Board::class, 'targetAttribute' => ['board_id' => 'id']],
             ['owner_id', 'exist', 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
-            [['entity_id', 'owner_id'], 'exist', 'targetClass' => UserEntity::class, 'targetAttribute' => ['entity_id' => 'entity_id', 'owner_id' => 'user_id']],
-            ['title', 'string', 'max' => 100],
+            [['title'], 'string', 'max' => 100],
             ['title', 'match', 'pattern' => '/^[A-Za-z !.]{1,100}$/'],
         ];
     }
@@ -68,9 +64,10 @@ class Board extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'uuid' => 'Uuid',
-            'entity_id' => 'Entity ID',
+            'board_id' => 'Board ID',
             'owner_id' => 'Owner ID',
             'title' => 'Title',
+            'order' => 'Order',
             'created_by' => 'Created By',
             'updated_by' => 'Updated By',
             'created_at' => 'Created At',
@@ -78,34 +75,14 @@ class Board extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * Gets query for [[UserBoards]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUserBoards()
+    public function getBoard()
     {
-        return $this->hasMany(UserBoard::className(), ['board_id' => 'id']);
+        return $this->hasOne(Board::class, ['id' => 'board_id']);
     }
 
-    /**
-     * Gets query for [[Users]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUsers()
+    public function getCars()
     {
-        return $this->hasMany(User::className(), ['id' => 'user_id'])->viaTable('user_board', ['board_id' => 'id']);
-    }
-
-    public function getEntity()
-    {
-        return $this->hasOne(Entity::class, ['id' => 'entity_id']);
-    }
-
-    public function getColumns()
-    {
-        return $this->hasMany(Column::class, ['column_id' => 'id']);
+        return $this->hasMany(Card::class, ['card_id' => 'id']);
     }
 
     public function afterSave($insert, $changedAttributes)
