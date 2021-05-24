@@ -13,8 +13,9 @@ class m210520_201609_create_column_table extends Migration
     public function safeUp()
     {
         $this->createTable('{{%column}}', [
-            'id' => $this->text(36)->unique(),
-            'board_id' => $this->text(36)->notNull(),
+            'id' => $this->primaryKey(),
+            'uuid' => $this->string(36)->unique(),
+            'board_id' => $this->integer()->notNull(),
             'owner_id' => $this->integer()->notNull(),
             'title' => $this->string(100)->notNull(),
             'order' => $this->integer()->notNull()->defaultValue(0),

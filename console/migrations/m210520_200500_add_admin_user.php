@@ -20,6 +20,7 @@ class m210520_200500_add_admin_user extends Migration
             'password' => '12345678',
             'email'    => 'admin@@example.com',
             'status' => 10,
+            'verification_token' =>  Yii::$app->getSecurity()->generateRandomString(),
             'is_admin' => 1,
         ]);
         $user->insert();

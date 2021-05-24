@@ -3,24 +3,20 @@
 use yii\db\Migration;
 
 /**
- * Handles the creation of table `{{%card}}`.
+ * Handles the creation of table `{{%entity}}`.
  */
-class m210520_201653_create_card_table extends Migration
+class m210520_200517_create_entity_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('{{%card}}', [
+        $this->createTable('{{%entity}}', [
             'id' => $this->primaryKey(),
             'uuid' => $this->string(36)->unique(),
-            'column_id' => $this->integer()->notNull(),
             'owner_id' => $this->integer()->notNull(),
-            'title' => $this->string(100)->notNull(),
-            'description' => $this->string()->notNull(),
-            'order' => $this->integer()->notNull()->defaultValue(0),
-            'color' => $this->string(6)->defaultValue('FFFFFF'),
+            'name' => $this->string(100)->notNull(),
             'created_by' => $this->integer()->notNull(),
             'updated_by' => $this->integer()->notNull(),
             'created_at' => $this->integer()->notNull(),
@@ -33,6 +29,6 @@ class m210520_201653_create_card_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('{{%card}}');
+        $this->dropTable('{{%entity}}');
     }
 }

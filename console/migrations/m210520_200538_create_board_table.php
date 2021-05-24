@@ -13,7 +13,9 @@ class m210520_200538_create_board_table extends Migration
     public function safeUp()
     {
         $this->createTable('{{%board}}', [
-            'id' => $this->text(36)->unique(),
+            'id' => $this->primaryKey(),
+            'uuid' => $this->string(36)->unique(),
+            'entity_id' => $this->integer()->notNull(),
             'owner_id' => $this->integer()->notNull(),
             'title' => $this->string(100)->notNull(),
             'created_by' => $this->integer()->notNull(),

@@ -18,7 +18,7 @@ class m210520_201054_create_junction_table_for_user_and_board_tables extends Mig
     {
         $this->createTable('{{%user_board}}', [
             'user_id' => $this->integer(),
-            'board_id' => $this->text(36),
+            'board_id' => $this->integer(),
             'PRIMARY KEY(user_id, board_id)',
         ]);
 
