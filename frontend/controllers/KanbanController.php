@@ -7,11 +7,13 @@ use common\models\User;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
+use yii\elasticsearch\QueryBuilder;
 use yii\filters\AccessControl;
 use yii\helpers\Json;
 use yii\helpers\VarDumper;
 use yii\web\Controller;
 use yii\web\Response;
+
 
 class KanbanController extends Controller
 {
@@ -52,6 +54,8 @@ class KanbanController extends Controller
             'board' => $this->getDump(),
         ]);
     }
+
+
 
     public function actionGet()
     {
