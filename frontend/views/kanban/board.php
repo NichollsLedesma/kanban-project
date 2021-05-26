@@ -29,7 +29,7 @@ $this->registerJsFile(
 
 <div class="content-wrapper kanban">
     <section class="content pb-3">
-        <div class="container-fluid h-100">
+        <div class="container-fluid h-100" id="kanban-board">
 
             <?php foreach ($board['columns'] as $column) { ?>
                 <div class="card card-row card-secondary">
@@ -64,7 +64,6 @@ $this->registerJsFile(
                             </div>
                         <?php } ?>
                     </div>
-
                 </div>
             <?php } ?>
             <div id="add-list-column" class="card card-row" style="background:transparent; box-shadow: none">

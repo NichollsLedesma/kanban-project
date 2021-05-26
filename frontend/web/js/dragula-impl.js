@@ -43,11 +43,14 @@ $(document).ready(function () {
         columns.map(column => document.getElementById(column))
     );
 
-    dragulaComp.on('drop', (component) => {
-        const taskId = Number($(component).attr("id").split('_')[1]);
-        const targetColumnId = $(component.parentElement).attr('data-column-id')
+    dragulaComp.containers.push(document.getElementById('kanban-board'));
 
-        sendMessage({ taskId, targetColumnId })
+    dragulaComp.on('drop', (component) => {
+        if ($(component).hasClass('task')) {
+            const taskId = Number($(component).attr("id").split('_')[1]);
+            const targetColumnId = $(component.parentElement).attr('data-column-id')
+            sendMessage({ taskId, targetColumnId })
+        }
     })
 
     $('#search').autocomplete({
