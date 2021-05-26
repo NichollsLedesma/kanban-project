@@ -14,6 +14,9 @@ $this->registerAssetBundle(PahoMqttAsset::class);
 
 $boardCode = "channelName";
 //$columns = ArrayHelper::getColumn($board['columns'], 'name');
+$this->registerCssFile(
+    Yii::$app->request->getBaseUrl() . '/css/column.css'
+);
 $this->registerJsVar('channelName', $boardCode, View::POS_END);
 // $this->registerJsVar('cards', $board['columns'], View::POS_END);
 
@@ -38,6 +41,7 @@ $this->registerJsFile(
             <?php
 //            var_dump(get_class_methods($board->all()), 10, true);
 //            die;
+            $columnsName = [];
             foreach ($boardColumns->all() as $column) {
                 $cards = [];
                 $columnsName[] = $column->title;
@@ -48,6 +52,7 @@ $this->registerJsFile(
                 }
                 echo BoardColumn::widget(['id' => $column->id, 'name' => $column->title, 'cards' => $cards]);
             }
+            echo BoardColumn::widget(['id' => "create", 'name' => "test", 'enableCardCreation'=> false, 'enableColumnCreation' => true, 'withHeader' => false]);
             $this->registerJsVar('columns', $columnsName, View::POS_END);
             ?>
         </div>
