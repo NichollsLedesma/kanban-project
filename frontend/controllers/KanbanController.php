@@ -7,6 +7,7 @@ use common\models\User;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
+use yii\filters\AccessControl;
 use yii\helpers\Json;
 use yii\helpers\VarDumper;
 use yii\web\Controller;
@@ -14,6 +15,21 @@ use yii\web\Response;
 
 class KanbanController extends Controller
 {
+
+    public function behaviors() {
+        return [
+            'access' => [
+                "class" => AccessControl::class,
+                "only" => ['index', 'board', 'logout'],
+                "rules" => [
+                    [
+                        'allow' => true,
+                        'roles' => ["@"],
+                    ]
+                ],
+            ],
+        ];
+    }
 
     public function actionIndex() {
         $boards = $this->getBoardsDump();
@@ -25,9 +41,16 @@ class KanbanController extends Controller
 
     public function actionBoard($uuid) {
 
+        $userBoard = \common\models\BoardRepository::getUserBoard(Yii::$app->getUser()->getId(), 1); //boardId must be changed by method uuid param
+        $boardColumns = \common\models\Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['order' => SORT_ASC]);
+//        $boardCards = \common\models\Card::find()->where(['column_id' => $boardColumns->select(['id'])])->orderBy(['order' => SORT_ASC]);
         if ($this->request->isAjax) {
-            return $this->handleBoardElement();
+            return $this->handleBoardCardElement();
         }
+
+//        VarDumper::dump($res->asArray()->all(), 10, true);
+
+
         $this->layout = "kanban";
         // $search = Yii::$app->request->post('search');
         // $board = ($search) ?
@@ -35,12 +58,26 @@ class KanbanController extends Controller
         //     $this->getDump();
 
         return $this->render('board', [
-                    'board' => $this->getDump(),
+                    'board' => $userBoard,
+                    'boardColumns' => $boardColumns,
+//                    'boardCards' => $boardCards
         ]);
     }
 
-    protected function handleBoardElement() {
-        return $this->renderAjax('_handleBoardElementCard');
+    protected function handleBoardCardElement() {
+        $model = new \common\models\Card();
+        $model->column_id = $this->request->get('columnId');
+        if ($this->request->post('_csrf-frontend')) {
+            $model->load($this->request->post());
+            $model->validate();
+            $model->getErrors();
+            VarDumper::dump($model->getErrors());
+//            \yii\widgets\ActiveForm::validate($model);
+//            VarDumper::dump($va);
+//            VarDumper::dump($this->request->post());
+            die;
+        }
+        return $this->renderAjax('_handleBoardCardElement', ['model' => $model]);
     }
 
     public function actionGet() {

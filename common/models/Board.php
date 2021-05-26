@@ -3,38 +3,41 @@
 namespace common\models;
 
 use Yii;
-use yii\base\Model;
-use yii\base\NotSupportedException;
+use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
-use yii\db\ActiveRecord;
-use yii\web\IdentityInterface;
 
 /**
- * User model
+ * This is the model class for table "board".
  *
- * @property integer $id
- * @property string $username
- * @property string $password_hash
- * @property string $password_reset_token
- * @property string $verification_token
- * @property string $email
- * @property string $auth_key
- * @property integer $status
- * @property integer $created_at
- * @property integer $updated_at
- * @property string $password write-only password
+ * @property int $id
+ * @property string|null $uuid
+ * @property int $entity_id
+ * @property int $owner_id
+ * @property string $title
+ * @property int $created_by
+ * @property int $updated_by
+ * @property int $created_at
+ * @property int $updated_at
+ *
+ * @property UserEntity[] $userEntity
+ * @property UserBoard[] $userBoards
+ * @property User[] $users
  */
-class Board extends Model
+class Board extends \yii\db\ActiveRecord
 {
-
-    const EVENT_TEST = "channel";
     /**
      * {@inheritdoc}
      */
+    public static function tableName()
+    {
+        return 'board';
+    }
+
     public function behaviors()
     {
         return [
-            // TimestampBehavior::class,
+            TimestampBehavior::class,
+            BlameableBehavior::class
         ];
     }
 
@@ -43,24 +46,75 @@ class Board extends Model
      */
     public function rules()
     {
-        return [];
+        return [
+            ['uuid', 'string', 'max' => 36],
+            ['uuid', 'unique'],
+            ['uuid', 'thamtech\uuid\validators\UuidValidator'],
+            [['entity_id', 'owner_id', 'title'], 'required'],
+            [['entity_id', 'owner_id', 'created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
+            ['entity_id', 'exist', 'targetClass' => Entity::class, 'targetAttribute' => ['entity_id' => 'id']],
+            ['owner_id', 'exist', 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
+            [['entity_id', 'owner_id'], 'exist', 'targetClass' => UserEntity::class, 'targetAttribute' => ['entity_id' => 'entity_id', 'owner_id' => 'user_id']],
+            ['title', 'string', 'max' => 100],
+            ['title', 'match', 'pattern' => '/^[A-Za-z !.]{1,100}$/'],
+        ];
     }
 
-    // this should be inside User.php class.
-    public function init()
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
     {
-
-        $this->on(self::EVENT_TEST, [$this, 'move']);
-
-        // first parameter is the name of the event and second is the handler. 
-        // For handlers I use methods sendMail and notification
-        // from $this class.
-        parent::init(); // DON'T Forget to call the parent method.
+        return [
+            'id' => 'ID',
+            'uuid' => 'Uuid',
+            'entity_id' => 'Entity ID',
+            'owner_id' => 'Owner ID',
+            'title' => 'Title',
+            'created_by' => 'Created By',
+            'updated_by' => 'Updated By',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
+        ];
     }
 
-    // say, whenever new user registers, below method will send an email.
-    public function move($event)
+    /**
+     * Gets query for [[UserBoards]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserBoards()
     {
-        Yii::info($event->data);
+        return $this->hasMany(UserBoard::className(), ['board_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Users]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUsers()
+    {
+        return $this->hasMany(User::className(), ['id' => 'user_id'])->viaTable('user_board', ['board_id' => 'id']);
+    }
+
+    public function getEntity()
+    {
+        return $this->hasOne(Entity::class, ['id' => 'entity_id']);
+    }
+
+    public function getColumns()
+    {
+        return $this->hasMany(Column::class, ['column_id' => 'id']);
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($insert) {
+            $this->uuid = \thamtech\uuid\helpers\UuidHelper::uuid();
+            $this->save();
+        }
+
+        return true;
     }
 }

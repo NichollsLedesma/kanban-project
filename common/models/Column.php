@@ -82,7 +82,7 @@ class Column extends \yii\db\ActiveRecord
 
     public function getCards()
     {
-        return $this->hasMany(Card::class, ['card_id' => 'id']);
+        return $this->hasMany(Card::class, ['column_id' => 'id']);
     }
 
     public function afterSave($insert, $changedAttributes)
