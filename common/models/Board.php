@@ -5,6 +5,7 @@ namespace common\models;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii2tech\ar\softdelete\SoftDeleteBehavior;
 
 /**
  * This is the model class for table "board".
@@ -37,7 +38,14 @@ class Board extends \yii\db\ActiveRecord
     {
         return [
             TimestampBehavior::class,
-            BlameableBehavior::class
+            BlameableBehavior::class,
+            'softDeleteBehavior' => [
+                'class' => SoftDeleteBehavior::class,
+                'softDeleteAttributeValues' => [
+                    'is_deleted' => true
+                ],
+                'replaceRegularDelete' => true // mutate native `delete()` method
+            ],
         ];
     }
 
@@ -105,7 +113,7 @@ class Board extends \yii\db\ActiveRecord
 
     public function getColumns()
     {
-        return $this->hasMany(Column::class, ['column_id' => 'id']);
+        return $this->hasMany(Column::class, ['board_id' => 'id']);
     }
 
     public function afterSave($insert, $changedAttributes)
@@ -116,5 +124,27 @@ class Board extends \yii\db\ActiveRecord
         }
 
         return true;
+    }
+
+    public function beforeDelete()
+    {
+        $columns = $this->columns;
+
+        foreach ($columns as $column) {
+            $column->delete();
+        }
+
+        return parent::beforeDelete();
+    }
+
+    public function beforeSoftDelete()
+    {
+        $this->deleted_at = time(); // log the deletion date
+        return true;
+    }
+
+    public function beforeRestore()
+    {
+        return $this->deleted_at > (time() - 3600); // allow restoration only for the records, being deleted during last hour
     }
 }

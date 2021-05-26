@@ -5,6 +5,7 @@ namespace common\models;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii2tech\ar\softdelete\SoftDeleteBehavior;
 
 /**
  * This is the model class for table "entity".
@@ -35,7 +36,14 @@ class Entity extends \yii\db\ActiveRecord
     {
         return [
             TimestampBehavior::class,
-            BlameableBehavior::class
+            BlameableBehavior::class,
+            'softDeleteBehavior' => [
+                'class' => SoftDeleteBehavior::class,
+                'softDeleteAttributeValues' => [
+                    'is_deleted' => true
+                ],
+                'replaceRegularDelete' => true // mutate native `delete()` method
+            ],
         ];
     }
 
@@ -106,5 +114,27 @@ class Entity extends \yii\db\ActiveRecord
         }
 
         return true;
+    }
+
+    public function beforeDelete()
+    {
+        $boards = $this->boards;
+
+        foreach ($boards as $board) {
+            $board->delete();
+        }
+
+        return parent::beforeDelete();
+    }
+
+    public function beforeSoftDelete()
+    {
+        $this->deleted_at = time(); // log the deletion date
+        return true;
+    }
+
+    public function beforeRestore()
+    {
+        return $this->deleted_at > (time() - 3600); // allow restoration only for the records, being deleted during last hour
     }
 }
