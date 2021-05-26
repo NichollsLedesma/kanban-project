@@ -5,6 +5,8 @@ namespace frontend\controllers;
 use app\jobs\CreateLogs;
 use common\jobs\JobRabbitQueue;
 use common\jobs\JobTest;
+use common\models\Column;
+use common\models\ColumnQuery;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -18,6 +20,9 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
+use yii\elasticsearch\Query;
+// use yii\elasticsearch\Query;
+// use yii\elasticsearch\QueryBuilder;
 use yii\helpers\VarDumper;
 
 /**
@@ -74,11 +79,20 @@ class SiteController extends Controller
 
     public function actionTest()
     {
-        $id = Yii::$app->queue->push(
-            new JobRabbitQueue()
-        );
+        // $column = new Column();
+        // $column->board_id = 1;
+        // $column->owner_id = 1;
+        // $column->title = "title";
+        // $column->order = 0;
+        // $column->save();
 
-        VarDumper::dump($id);
+
+        // $query = ColumnQuery::name("title");
+        $result = Column::find()->all();
+
+        echo "<pre>";
+        VarDumper::dump($result);
+        echo "</pre>";
         die;
     }
 
