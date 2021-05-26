@@ -1,4 +1,7 @@
 <?php
+
+use yii\web\UrlRule;
+
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
     require __DIR__ . '/../../common/config/params-local.php',
@@ -36,14 +39,17 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        
+
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'kanban/get/<query>'=>'kanban/get',
+                'kanban/get-one/<id>'=>'kanban/get-one',
+                'kanban/<uuid>'=>'kanban/board',
             ],
         ],
-        
+
     ],
     'params' => $params,
 ];

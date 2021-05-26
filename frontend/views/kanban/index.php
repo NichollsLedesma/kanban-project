@@ -1,34 +1,17 @@
 <?php
 
-use frontend\assets\DragulaAsset;
-use yii\helpers\ArrayHelper;
-use yii\web\View;
+use common\widgets\listBoard\ListBoardWidget;
 
-$this->registerAssetBundle(DragulaAsset::class);
-
-
-$boardCode = "logs";
-$columns = ArrayHelper::getColumn($board['columns'], 'name');
-$this->registerJsVar('columns', $columns, View::POS_END);
-$this->registerJsVar('channelName', $boardCode, View::POS_END);
-
-$this->registerCssFile(Yii::$app->request->BaseUrl .'css/kanban.css');
-$this->registerJsFile(Yii::$app->request->BaseUrl . '/js/mqttws31.min.js', ['position' => View::POS_END]);
-$this->registerJsFile(
-    Yii::$app->request->BaseUrl . '/js/dragula-impl.js',
-    [
-        'depends' => "yii\web\JqueryAsset",
-        'position' => View::POS_END
-    ]
+$this->registerCssFile(
+    Yii::$app->request->getBaseUrl() . '/css/kanban.css'
 );
-
 ?>
 
 <div class="content-wrapper kanban">
     <section class="content pb-3">
         <div class="container-fluid h-100" id="kanban-body">
 
-            <?php foreach ($board['columns'] as $column) { ?>
+            <?php foreach ($boards['columns'] as $column) { ?>
                 <div class="card card-row card-secondary">
                     <div class="card-header">
                         <h3 class="card-title edit-title" style="width: 90%">
@@ -187,4 +170,10 @@ $( document ).ready(function() {
 .dropdown-content a:hover {background-color: #ddd}
 
 .show {display:block;}
-</style>
+
+<?= ListBoardWidget::widget(
+    [
+        'boards' => $boards,
+        "title" => ""
+    ]
+) ?>

@@ -1,0 +1,32 @@
+.wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  grid-auto-rows: minmax(100px, auto);
+  overflow: auto;
+  padding: 1%;
+}
+
+.card-board {
+  background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJCcrK9wJiGpBUdQKsIOhu2Ke2ffSixx9soQ&usqp=CAU") !important;
+  max-width: 20rem;
+  min-height: 10rem;
+}
+
+a.link-board {
+  color: #fafafa !important;
+  text-decoration: none !important;
+  text-align: center;
+  outline: none;
+  display: inline-block;
+  font-size: large;
+}
+
+a.link-board:hover {
+  font-size: xx-large;
+  transform: scale(1.05);
+}
+
+.card-title {
+  font-size: xx-large;
+}

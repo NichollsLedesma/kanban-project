@@ -2,20 +2,20 @@
 
 namespace console\controllers;
 
-use console\daemons\EchoServer;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
 // use Ratchet\Http\HttpServer;
 // use Ratchet\Server\IoServer;
 // use Ratchet\WebSocket\WsServer;
+
+
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpMqtt\Client\MqttClient;
 use yii\console\Controller;
-use yii\helpers\VarDumper;
 
 class ServerController extends Controller
 {
     public function actionStart($port = 15675)
     {
-
-        $connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
+        $connection = new AMQPStreamConnection('rabbitmq', 15675, 'guest', 'guest');
         $channel = $connection->channel();
 
         $channel->exchange_declare('logs', 'fanout', false, false, false);
@@ -40,4 +40,23 @@ class ServerController extends Controller
         $channel->close();
         $connection->close();
     }
+
+    public function actionMqttListener($port = 1883) {
+
+        $server = 'rabbitmq';
+        $clientId = 'server';
+
+        $mqtt = new MqttClient($server, $port, $clientId);
+        $mqtt->connect();
+        $mqtt->subscribe('board/udpate', function ($topic, $message) {
+            echo sprintf("Received message on topic [%s]: %s\n", $topic, $message);
+        }, 0);
+        $mqtt->subscribe('board/create', function ($topic, $message) {
+            echo sprintf("Received message on topic [%s]: %s\n", $topic, $message);
+        }, 0);
+
+        $mqtt->loop(true);
+        $mqtt->disconnect();
+    }
+
 }

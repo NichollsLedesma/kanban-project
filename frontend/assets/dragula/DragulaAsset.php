@@ -1,6 +1,6 @@
 <?php
 
-namespace frontend\assets;
+namespace frontend\assets\dragula;
 
 use yii\web\AssetBundle;
 
