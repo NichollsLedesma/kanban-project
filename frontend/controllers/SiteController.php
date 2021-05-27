@@ -6,8 +6,10 @@ use app\jobs\CreateLogs;
 use common\jobs\JobRabbitQueue;
 use common\jobs\JobTest;
 use common\models\Board;
+use common\models\Card;
 use common\models\Column;
 use common\models\elastic\Board as ElasticBoard;
+use common\models\elastic\Card as ElasticCard;
 use common\models\elastic\Column as ElasticColumn;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
@@ -107,6 +109,26 @@ class SiteController extends Controller
         echo "<pre>";
         VarDumper::dump($boardES->searchingAllMatches($title));
         // VarDumper::dump($newBoard);
+        echo "</pre>";
+        die;
+    }
+
+    public function actionTestCard()
+    {
+        $title = "elasticsearch";
+        // $newCard = new Card();
+        // $newCard->column_id = 1;
+        // $newCard->owner_id = 1;
+        // $newCard->title = $title;
+        // $newCard->description = "somethign descript";
+        // $newCard->color = "fafafa";
+        // $newCard->order = 0;
+        // $newCard->save();
+        $cardES = new ElasticCard();
+        
+        echo "<pre>";
+        VarDumper::dump($cardES->searchingAllMatches($title));
+        // VarDumper::dump($newCard);
         echo "</pre>";
         die;
     }

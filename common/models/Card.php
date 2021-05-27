@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\models\elastic\Card as ElasticCard;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
@@ -92,6 +93,17 @@ class Card extends \yii\db\ActiveRecord
         if ($insert) {
             $this->uuid = \thamtech\uuid\helpers\UuidHelper::uuid();
             $this->save();
+            $card = new ElasticCard();
+            
+            $card->saving([
+                "title" => $this->title,
+                "uuid" => $this->uuid,
+                "owner_id" => $this->owner_id,
+                "column_id" => $this->column_id,
+                "description" => $this->description,
+                "color" => $this->color,
+                "order" => $this->order,
+            ]);
         }
 
         return true;
