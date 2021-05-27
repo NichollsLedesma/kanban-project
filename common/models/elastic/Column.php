@@ -33,6 +33,13 @@ class Column extends \yii\elasticsearch\ActiveRecord
         ])->all();
     }
 
+    public function deleteDocument()
+    {
+        $this->delete([
+            'index' => static::index(),
+            'id'    => $this->_id,
+        ]);
+    }
     // /**
     //  * @return array This model's mapping
     //  */

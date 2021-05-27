@@ -97,11 +97,11 @@ class Column extends \yii\db\ActiveRecord
     public function afterSave($insert, $changedAttributes)
     {
         if ($insert) {
-           
+
             $this->uuid = \thamtech\uuid\helpers\UuidHelper::uuid();
             $this->save();
             $column = new ElasticColumn();
-            
+
             $column->saving([
                 "title" => $this->title,
                 "uuid" => $this->uuid,
@@ -126,9 +126,13 @@ class Column extends \yii\db\ActiveRecord
 
     public function beforeSoftDelete()
     {
+        $column = ElasticColumn::find()->query(['match' => ["uuid" => $this->uuid]])->one();
+        $column->deleteDocument();
+
         $this->deleted_at = time(); // log the deletion date
         return true;
     }
+
 
     public function beforeRestore()
     {

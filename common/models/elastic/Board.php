@@ -9,7 +9,7 @@ class Board extends \yii\elasticsearch\ActiveRecord
 {
     public function attributes()
     {
-    return ['title', "uuid", "owner_id", "entity_id"];
+        return ['title', "uuid", "owner_id", "entity_id"];
     }
 
     public function saving($data)
@@ -24,7 +24,7 @@ class Board extends \yii\elasticsearch\ActiveRecord
 
     public function searchingAllMatches($value)
     {
-        return Board::find()->query([
+        return $this::find()->query([
             'bool' => [
                 'must' => [
                     BoardQuery::title($value)
@@ -33,4 +33,11 @@ class Board extends \yii\elasticsearch\ActiveRecord
         ])->all();
     }
 
+    public function deleteDocument()
+    {
+        $this->delete([
+            'index' => static::index(),
+            'id'    => $this->_id,
+        ]);
+    }
 }

@@ -36,4 +36,12 @@ class Card extends \yii\elasticsearch\ActiveRecord
         ])->all();
     }
 
+    public function deleteDocument()
+    {
+        $this->delete([
+            'index' => static::index(),
+            'id'    => $this->_id,
+        ]);
+    }
+
 }

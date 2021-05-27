@@ -119,6 +119,9 @@ class Card extends \yii\db\ActiveRecord
 
     public function beforeSoftDelete()
     {
+        $card = ElasticCard::find()->query(['match' => ["uuid" => $this->uuid]])->one();
+        $card->deleteDocument();
+        
         $this->deleted_at = time(); // log the deletion date
         return true;
     }

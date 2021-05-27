@@ -7,6 +7,7 @@ use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii2tech\ar\softdelete\SoftDeleteBehavior;
+use yii\helpers\VarDumper;
 
 /**
  * This is the model class for table "board".
@@ -124,7 +125,7 @@ class Board extends \yii\db\ActiveRecord
             $this->save();
 
             $board = new ElasticBoard();
-            
+
             $board->saving([
                 "title" => $this->title,
                 "uuid" => $this->uuid,
@@ -151,6 +152,12 @@ class Board extends \yii\db\ActiveRecord
     {
         $this->deleted_at = time(); // log the deletion date
         return true;
+    }
+
+    public function afterSoftDelete()
+    {
+        $board = ElasticBoard::find()->query(['match' => ["uuid" => $this->uuid]])->one();
+        $board->deleteDocument();
     }
 
     public function beforeRestore()

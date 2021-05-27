@@ -11,6 +11,7 @@ use common\models\Column;
 use common\models\elastic\Board as ElasticBoard;
 use common\models\elastic\Card as ElasticCard;
 use common\models\elastic\Column as ElasticColumn;
+use common\models\Entity;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -20,6 +21,7 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use common\models\LoginForm;
+use common\models\UserEntity;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
@@ -81,33 +83,69 @@ class SiteController extends Controller
     public function actionTestColumn()
     {
         $title = "backlog";
-        // $newColumn = new Column();
-        // $newColumn->board_id =1;
-        // $newColumn->owner_id = 1;
-        // $newColumn->order = 0;
-        // $newColumn->title = $title;
-        // $newColumn->save();
-        $columnES = new ElasticColumn();
-        
+        $board = Board::findOne(8);
+        $newColumn = new Column();
+        $newColumn->board_id = $board->id;
+        $newColumn->owner_id = Yii::$app->user->id;
+        $newColumn->order = 0;
+        $newColumn->title = $title;
+        $newColumn->save();
+        // $columnES = new ElasticColumn();
+
         echo "<pre>";
-        VarDumper::dump($columnES->searchingAllMatches($title));
-        // VarDumper::dump($newColumn);
+        // VarDumper::dump($columnES->searchingAllMatches($title));
+        VarDumper::dump($newColumn);
+        echo "</pre>";
+        die;
+    }
+
+    public function actionTestEntity()
+    {
+        $entity = new Entity();
+        $entity->name = 'This is a name';
+        $entity->owner_id = Yii::$app->user->id;
+        $entity->save();
+
+        echo "<pre>";
+        VarDumper::dump($entity);
+        echo "</pre>";
+        die;
+    }
+
+    public function actionDeleteBoard()
+    {
+        $board = Board::findOne(8);
+
+        if (!$board) {
+            die("No board");
+        }
+
+        $board->delete();
+
+        echo "<pre>";
+        VarDumper::dump($board);
         echo "</pre>";
         die;
     }
 
     public function actionTestBoard()
     {
-        $title = "new Board name";
+        $entity = Entity::findOne(1);
+        // $userEntity = new UserEntity();
+        // $userEntity->entity_id = $entity->id;
+        // $userEntity->user_id = $entity->owner_id;
+        // $userEntity->save();
+
+        $title = "last test";
         // $newBoard = new Board();
-        // $newBoard->entity_id = 1;
-        // $newBoard->owner_id = 1;
+        // $newBoard->entity_id = $entity->id;
+        // $newBoard->owner_id = Yii::$app->user->id;
         // $newBoard->title = $title;
         // $newBoard->save();
         $boardES = new ElasticBoard();
-        
+
         echo "<pre>";
-        VarDumper::dump($boardES->searchingAllMatches($title));
+        VarDumper::dump($boardES->find()->all());
         // VarDumper::dump($newBoard);
         echo "</pre>";
         die;
@@ -125,7 +163,7 @@ class SiteController extends Controller
         // $newCard->order = 0;
         // $newCard->save();
         $cardES = new ElasticCard();
-        
+
         echo "<pre>";
         VarDumper::dump($cardES->searchingAllMatches($title));
         // VarDumper::dump($newCard);
