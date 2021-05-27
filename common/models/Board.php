@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\models\elastic\Board as ElasticBoard;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
@@ -113,6 +114,15 @@ class Board extends \yii\db\ActiveRecord
         if ($insert) {
             $this->uuid = \thamtech\uuid\helpers\UuidHelper::uuid();
             $this->save();
+
+            $board = new ElasticBoard();
+            
+            $board->saving([
+                "title" => $this->title,
+                "uuid" => $this->uuid,
+                "owner_id" => $this->owner_id,
+                "entity_id" => $this->entity_id,
+            ]);
         }
 
         return true;

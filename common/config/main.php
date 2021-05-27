@@ -1,6 +1,7 @@
 <?php
 
 use yii\elasticsearch\Connection;
+use yii\log\FileTarget;
 use yii\queue\amqp_interop\Queue;
 use yii\queue\LogBehavior;
 
@@ -25,6 +26,15 @@ return [
           'enableSchemaCache' => true,
           'schemaCacheDuration' => 3600,
           ], */
+        "log" => [
+            "traceLevel" => YII_DEBUG ? 3 : 0,
+            "targets" => [
+                [
+                    "class" => FileTarget::class,
+                    "levels" => ["error", "warning"]
+                ]
+            ],
+        ],
         'elasticsearch' => [
             'class' => 'yii\elasticsearch\Connection',
             "autodetectCluster" => true,

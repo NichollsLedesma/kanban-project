@@ -5,6 +5,12 @@ namespace frontend\controllers;
 use app\jobs\CreateLogs;
 use common\jobs\JobRabbitQueue;
 use common\jobs\JobTest;
+use common\models\Board;
+use common\models\Card;
+use common\models\Column;
+use common\models\elastic\Board as ElasticBoard;
+use common\models\elastic\Card as ElasticCard;
+use common\models\elastic\Column as ElasticColumn;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -72,13 +78,58 @@ class SiteController extends Controller
         ];
     }
 
-    public function actionTest()
+    public function actionTestColumn()
     {
-        $id = Yii::$app->queue->push(
-            new JobRabbitQueue()
-        );
+        $title = "backlog";
+        // $newColumn = new Column();
+        // $newColumn->board_id =1;
+        // $newColumn->owner_id = 1;
+        // $newColumn->order = 0;
+        // $newColumn->title = $title;
+        // $newColumn->save();
+        $columnES = new ElasticColumn();
+        
+        echo "<pre>";
+        VarDumper::dump($columnES->searchingAllMatches($title));
+        // VarDumper::dump($newColumn);
+        echo "</pre>";
+        die;
+    }
 
-        VarDumper::dump($id);
+    public function actionTestBoard()
+    {
+        $title = "new Board name";
+        // $newBoard = new Board();
+        // $newBoard->entity_id = 1;
+        // $newBoard->owner_id = 1;
+        // $newBoard->title = $title;
+        // $newBoard->save();
+        $boardES = new ElasticBoard();
+        
+        echo "<pre>";
+        VarDumper::dump($boardES->searchingAllMatches($title));
+        // VarDumper::dump($newBoard);
+        echo "</pre>";
+        die;
+    }
+
+    public function actionTestCard()
+    {
+        $title = "elasticsearch";
+        // $newCard = new Card();
+        // $newCard->column_id = 1;
+        // $newCard->owner_id = 1;
+        // $newCard->title = $title;
+        // $newCard->description = "somethign descript";
+        // $newCard->color = "fafafa";
+        // $newCard->order = 0;
+        // $newCard->save();
+        $cardES = new ElasticCard();
+        
+        echo "<pre>";
+        VarDumper::dump($cardES->searchingAllMatches($title));
+        // VarDumper::dump($newCard);
+        echo "</pre>";
         die;
     }
 
