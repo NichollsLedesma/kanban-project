@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\models\elastic\Board as ElasticBoard;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
@@ -52,9 +53,9 @@ class Board extends \yii\db\ActiveRecord
             ['uuid', 'thamtech\uuid\validators\UuidValidator'],
             [['entity_id', 'owner_id', 'title'], 'required'],
             [['entity_id', 'owner_id', 'created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
-            ['entity_id', 'exist', 'targetClass' => Entity::class, 'targetAttribute' => ['entity_id' => 'id']],
+            // ['entity_id', 'exist', 'targetClass' => Entity::class, 'targetAttribute' => ['entity_id' => 'id']],
             ['owner_id', 'exist', 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
-            [['entity_id', 'owner_id'], 'exist', 'targetClass' => UserEntity::class, 'targetAttribute' => ['entity_id' => 'entity_id', 'owner_id' => 'user_id']],
+            // [['entity_id', 'owner_id'], 'exist', 'targetClass' => UserEntity::class, 'targetAttribute' => ['entity_id' => 'entity_id', 'owner_id' => 'user_id']],
             ['title', 'string', 'max' => 100],
             ['title', 'match', 'pattern' => '/^[A-Za-z !.]{1,100}$/'],
         ];
@@ -113,6 +114,15 @@ class Board extends \yii\db\ActiveRecord
         if ($insert) {
             $this->uuid = \thamtech\uuid\helpers\UuidHelper::uuid();
             $this->save();
+
+            $board = new ElasticBoard();
+            
+            $board->saving([
+                "title" => $this->title,
+                "uuid" => $this->uuid,
+                "owner_id" => $this->owner_id,
+                "entity_id" => $this->entity_id,
+            ]);
         }
 
         return true;

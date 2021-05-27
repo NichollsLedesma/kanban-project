@@ -5,7 +5,9 @@ namespace frontend\controllers;
 use app\jobs\CreateLogs;
 use common\jobs\JobRabbitQueue;
 use common\jobs\JobTest;
+use common\models\Board;
 use common\models\Column;
+use common\models\elastic\Board as ElasticBoard;
 use common\models\elastic\Column as ElasticColumn;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
@@ -76,7 +78,7 @@ class SiteController extends Controller
 
     public function actionTestColumn()
     {
-        $title = "testeando";
+        $title = "backlog";
         // $newColumn = new Column();
         // $newColumn->board_id =1;
         // $newColumn->owner_id = 1;
@@ -92,20 +94,19 @@ class SiteController extends Controller
         die;
     }
 
-    public function actionTest()
+    public function actionTestBoard()
     {
-        $title = "testeando";
-        // $newColumn = new Column();
-        // $newColumn->board_id =1;
-        // $newColumn->owner_id = 1;
-        // $newColumn->order = 0;
-        // $newColumn->title = $search;
-        // $newColumn->save();
-        $columnES = new ElasticColumn();
+        $title = "new Board name";
+        // $newBoard = new Board();
+        // $newBoard->entity_id = 1;
+        // $newBoard->owner_id = 1;
+        // $newBoard->title = $title;
+        // $newBoard->save();
+        $boardES = new ElasticBoard();
         
         echo "<pre>";
-        VarDumper::dump($columnES->searchingAllMatches($title));
-        // VarDumper::dump($newColumn);
+        VarDumper::dump($boardES->searchingAllMatches($title));
+        // VarDumper::dump($newBoard);
         echo "</pre>";
         die;
     }
