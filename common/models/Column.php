@@ -2,9 +2,11 @@
 
 namespace common\models;
 
+use common\models\elastic\Column as ElasticColumn;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\VarDumper;
 
 /**
  * This is the model class for table "column".
@@ -20,7 +22,7 @@ use yii\behaviors\TimestampBehavior;
  * @property int $created_at
  * @property int $updated_at
  */
-class Column extends \yii\elasticsearch\ActiveRecord
+class Column extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
@@ -36,65 +38,6 @@ class Column extends \yii\elasticsearch\ActiveRecord
             TimestampBehavior::class,
             BlameableBehavior::class
         ];
-    }
-
-    /**
-     * @return array This model's mapping
-     */
-    public static function mapping()
-    {
-        return [
-            // Field types: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#field-datatypes
-            'properties' => [
-                'uuid'          => ['type' => 'keyword'],
-                'board_id'      => ['type' => 'integer'],
-                'owner_id'      => ['type' => 'integer'],
-                'title'         => ['type' => 'text'],
-                'order'         => ['type' => 'integer'],
-                'created_by'    => ['type' => 'integer'],
-                'updated_by'    => ['type' => 'integer'],
-                'created_at'    => ['type' => 'integer'],
-                'updated_at'    => ['type' => 'integer'],
-            ]
-        ];
-    }
-    
-    public function attributes()
-    {
-        return ['uuid', 'board_id', 'owner_id', 'title', 'order', 'created_by', 'updated_by', 'created_at', "updated_at"];
-    }
-    /**
-     * Set (update) mappings for this model
-     */
-    public static function updateMapping()
-    {
-        $db = static::getDb();
-        $command = $db->createCommand();
-        $command->setMapping(static::index(), static::type(), static::mapping());
-    }
-
-    /**
-     * Create this model's index
-     */
-    public static function createIndex()
-    {
-        $db = static::getDb();
-        $command = $db->createCommand();
-        $command->createIndex(static::index(), [
-            //'aliases' => [ /* ... */ ],
-            'mappings' => static::mapping(),
-            //'settings' => [ /* ... */ ],
-        ]);
-    }
-
-    /**
-     * Delete this model's index
-     */
-    public static function deleteIndex()
-    {
-        $db = static::getDb();
-        $command = $db->createCommand();
-        $command->deleteIndex(static::index(), static::type());
     }
 
     /**
@@ -147,8 +90,17 @@ class Column extends \yii\elasticsearch\ActiveRecord
     public function afterSave($insert, $changedAttributes)
     {
         if ($insert) {
+           
             $this->uuid = \thamtech\uuid\helpers\UuidHelper::uuid();
             $this->save();
+            $column = new ElasticColumn();
+            
+            $column->saving([
+                "title" => $this->title,
+                "uuid" => $this->uuid,
+                "owner_id" => $this->owner_id,
+                "board_id" => $this->board_id,
+            ]);
         }
 
         return true;

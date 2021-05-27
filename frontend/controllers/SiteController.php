@@ -6,7 +6,7 @@ use app\jobs\CreateLogs;
 use common\jobs\JobRabbitQueue;
 use common\jobs\JobTest;
 use common\models\Column;
-use common\models\ColumnQuery;
+use common\models\elastic\Column as ElasticColumn;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -20,9 +20,6 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
-use yii\elasticsearch\Query;
-// use yii\elasticsearch\Query;
-// use yii\elasticsearch\QueryBuilder;
 use yii\helpers\VarDumper;
 
 /**
@@ -77,21 +74,38 @@ class SiteController extends Controller
         ];
     }
 
+    public function actionTestColumn()
+    {
+        $title = "testeando";
+        // $newColumn = new Column();
+        // $newColumn->board_id =1;
+        // $newColumn->owner_id = 1;
+        // $newColumn->order = 0;
+        // $newColumn->title = $title;
+        // $newColumn->save();
+        $columnES = new ElasticColumn();
+        
+        echo "<pre>";
+        VarDumper::dump($columnES->searchingAllMatches($title));
+        // VarDumper::dump($newColumn);
+        echo "</pre>";
+        die;
+    }
+
     public function actionTest()
     {
-        // $column = new Column();
-        // $column->board_id = 1;
-        // $column->owner_id = 1;
-        // $column->title = "title";
-        // $column->order = 0;
-        // $column->save();
-
-
-        // $query = ColumnQuery::name("title");
-        $result = Column::find()->all();
-
+        $title = "testeando";
+        // $newColumn = new Column();
+        // $newColumn->board_id =1;
+        // $newColumn->owner_id = 1;
+        // $newColumn->order = 0;
+        // $newColumn->title = $search;
+        // $newColumn->save();
+        $columnES = new ElasticColumn();
+        
         echo "<pre>";
-        VarDumper::dump($result);
+        VarDumper::dump($columnES->searchingAllMatches($title));
+        // VarDumper::dump($newColumn);
         echo "</pre>";
         die;
     }
