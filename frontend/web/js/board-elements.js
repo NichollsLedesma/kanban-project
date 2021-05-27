@@ -1,7 +1,7 @@
 
 function handleCardElement(columnId, data = '') {
     $.post({
-        url: location.hostname + '?columnId=' + columnId,
+        url: location.hostname + '?columnId=' + columnId + '&type=card',
         data: data,
         cache: false,
         success: function (data) {
@@ -10,6 +10,23 @@ function handleCardElement(columnId, data = '') {
     });
 
 }
+
+function handleColumnElement(boardId, data = '') {
+    $.post({
+        url: location.hostname + '?boardId=' + boardId + '&type=column',
+        data: data,
+        cache: false,
+        success: function (data) {
+            addColumnElement(boardId, data);
+        }
+    });
+}
+
+function addColumnElement(boardId, data) {
+    $('#test').append(data);
+    $('#add-list').hide();
+}
+
 function addCardElement(columnId, data) {
     removeCardElement(columnId);
     $(data).insertBefore($('.add-card', '[data-column-id="' + columnId + '"]'));
@@ -45,12 +62,15 @@ function cancelCardElement(columnId) {
     removeCardElement(columnId, true);
 }
 
+function cancelColumnElement(e) {
+    $(e).parent().remove();
+    $('#add-list').show();
+}
 
 function isAddingCard(columnId)
 {
     return $('form', '[data-column-id="' + columnId + '"]').length;
 }
-
 
 $(document).ready(function () {
     $('.add-card').click(function (e) {
@@ -59,5 +79,9 @@ $(document).ready(function () {
             return;
         }
         handleCardElement(columnId);
+    });
+
+    $('#add-list').click(function (e) {
+        handleColumnElement(1);
     });
 });

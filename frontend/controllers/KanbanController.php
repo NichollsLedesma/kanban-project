@@ -45,8 +45,14 @@ class KanbanController extends Controller
         $boardColumns = \common\models\Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['order' => SORT_ASC]);
 //        $boardCards = \common\models\Card::find()->where(['column_id' => $boardColumns->select(['id'])])->orderBy(['order' => SORT_ASC]);
         if ($this->request->isAjax) {
-            return $this->handleBoardCardElement();
+            if ($this->request->get('type') === 'card') {
+                return $this->handleBoardCardElement();
+            }
+            if ($this->request->get('type') === 'column') {
+                return $this->handleBoardColumnElement();
+            }
         }
+
 
 //        VarDumper::dump($res->asArray()->all(), 10, true);
 
@@ -78,6 +84,22 @@ class KanbanController extends Controller
             die;
         }
         return $this->renderAjax('_handleBoardCardElement', ['model' => $model]);
+    }
+
+    protected function handleBoardColumnElement() {
+        $model = new \common\models\Column();
+        $model->board_id = $this->request->get('boardId');
+        if ($this->request->post('_csrf-frontend')) {
+            $model->load($this->request->post());
+            $model->validate();
+            $model->getErrors();
+            VarDumper::dump($model->getErrors());
+//            \yii\widgets\ActiveForm::validate($model);
+//            VarDumper::dump($va);
+//            VarDumper::dump($this->request->post());
+            die;
+        }
+        return $this->renderAjax('_handleBoardColumnElement', ['model' => $model]);
     }
 
     public function actionGet() {
