@@ -12,7 +12,7 @@ use yii\web\View;
 $this->registerAssetBundle(DragulaAsset::class);
 $this->registerAssetBundle(PahoMqttAsset::class);
 
-$boardCode = "channelName";
+$boardCode = "board/create";
 //$columns = ArrayHelper::getColumn($board['columns'], 'name');
 $this->registerJsVar('channelName', $boardCode, View::POS_END);
 // $this->registerJsVar('cards', $board['columns'], View::POS_END);
@@ -36,13 +36,9 @@ $this->registerJsFile(
     <section class="content pb-3">
         <div class="container-fluid h-100">
             <?php
-//            var_dump(get_class_methods($board->all()), 10, true);
-//            die;
             foreach ($boardColumns->all() as $column) {
                 $cards = [];
                 $columnsName[] = $column->title;
-//                var_dump(get_class_methods($column->getCards()),$column->getCards()->all());
-//                die;
                 foreach ($column->getCards()->all() as $task) {
                     $cards[] = BoardCard::widget(['id' => $task->id, 'title' => $task->title, 'content' => $task->description]);
                 }

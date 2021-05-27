@@ -24,12 +24,20 @@ use yii\behaviors\TimestampBehavior;
  */
 class Card extends \yii\db\ActiveRecord
 {
+    const SCENARIO_AJAX_CREATE = 'ajax_create';
+    
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
         return 'card';
+    }
+    
+     public function scenarios() {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_AJAX_CREATE] = ['title', 'description'];
+        return $scenarios;
     }
 
     public function behaviors()

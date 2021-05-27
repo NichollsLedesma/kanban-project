@@ -3,12 +3,13 @@
 namespace frontend\controllers;
 
 use common\jobs\JobTest;
+use common\models\BoardRepository;
+use common\models\Card;
+use common\models\Column;
+use common\models\ElementCreateCardForm;
 use common\models\User;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
 use yii\filters\AccessControl;
-use yii\helpers\Json;
 use yii\helpers\VarDumper;
 use yii\web\Controller;
 use yii\web\Response;
@@ -40,10 +41,9 @@ class KanbanController extends Controller
     }
 
     public function actionBoard($uuid) {
-
-        $userBoard = \common\models\BoardRepository::getUserBoard(Yii::$app->getUser()->getId(), 1); //boardId must be changed by method uuid param
-        $boardColumns = \common\models\Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['order' => SORT_ASC]);
-//        $boardCards = \common\models\Card::find()->where(['column_id' => $boardColumns->select(['id'])])->orderBy(['order' => SORT_ASC]);
+        $userBoard = BoardRepository::getUserBoard(Yii::$app->getUser()->getId(), 1); //boardId must be changed by method uuid param
+        $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['order' => 'ASC']);
+        /* ajax create card request */
         if ($this->request->isAjax) {
             return $this->handleBoardCardElement();
         }
@@ -60,22 +60,16 @@ class KanbanController extends Controller
         return $this->render('board', [
                     'board' => $userBoard,
                     'boardColumns' => $boardColumns,
-//                    'boardCards' => $boardCards
         ]);
     }
 
     protected function handleBoardCardElement() {
-        $model = new \common\models\Card();
+        $model = new ElementCreateCardForm(['scenario' => Card::SCENARIO_AJAX_CREATE]);
         $model->column_id = $this->request->get('columnId');
-        if ($this->request->post('_csrf-frontend')) {
-            $model->load($this->request->post());
-            $model->validate();
-            $model->getErrors();
-            VarDumper::dump($model->getErrors());
-//            \yii\widgets\ActiveForm::validate($model);
-//            VarDumper::dump($va);
-//            VarDumper::dump($this->request->post());
-            die;
+        if ($this->request->post('_csrf-frontend') && $model->load($this->request->post()) && $model->validate()) {
+            $model->cardCreated();
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return true;
         }
         return $this->renderAjax('_handleBoardCardElement', ['model' => $model]);
     }

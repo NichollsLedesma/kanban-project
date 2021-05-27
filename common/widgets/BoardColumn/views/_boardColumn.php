@@ -5,7 +5,7 @@
             <?= $name ?>
         </h3>
     </div>
-    <div class="card-body" id="<?= $name ?>" data-column-id="<?= $id ?>">
+    <div class="card-body" id="column-id_<?= $id ?>" data-column-id="<?= $id ?>">
         <?php
         if (!empty($cards)) {
             foreach ($cards as $card) {
