@@ -9,7 +9,7 @@ class Column extends \yii\elasticsearch\ActiveRecord
 {
     public function attributes()
     {
-    return ['title', "uuid", "owner_id", "board_id"];
+        return ['title', "uuid", "owner_id", "board_id"];
     }
 
     public function saving($data)
@@ -17,14 +17,14 @@ class Column extends \yii\elasticsearch\ActiveRecord
         $this->title = $data['title'];
         $this->uuid = $data['uuid'];
         $this->owner_id = $data['owner_id'];
-        $this->owner_id = $data['board_id'];
+        $this->board_id = $data['board_id'];
 
         return $this->insert();
     }
 
     public function searchingAllMatches($value)
     {
-        return Column::find()->query([
+        return $this::find()->query([
             'bool' => [
                 'must' => [
                     ColumnQuery::title($value)
