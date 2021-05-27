@@ -44,6 +44,7 @@ $(document).ready(function () {
     );
 
     dragulaComp.on('drop', (component) => {
+        console.log(taskId)
         const taskId = Number($(component).attr("id").split('_')[1]);
         const targetColumnId = $(component.parentElement).attr('data-column-id')
 

@@ -5,6 +5,10 @@ function handleCardElement(columnId, data = '') {
         data: data,
         cache: false,
         success: function (data) {
+            if (data === true) {
+                cancelCardElement(columnId);
+                return;
+            }
             addCardElement(columnId, data);
         }
     });
