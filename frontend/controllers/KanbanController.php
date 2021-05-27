@@ -2,13 +2,14 @@
 
 namespace frontend\controllers;
 
+use Yii;
 use common\jobs\JobTest;
 use common\models\BoardRepository;
 use common\models\Card;
 use common\models\Column;
 use common\models\ElementCreateCardForm;
+use common\models\ElementCreateColumnForm;
 use common\models\User;
-use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\VarDumper;
 use yii\web\Controller;
@@ -81,17 +82,12 @@ class KanbanController extends Controller
     }
 
     protected function handleBoardColumnElement() {
-        $model = new \common\models\Column();
+        $model = new ElementCreateColumnForm(['scenario' => Column::SCENARIO_AJAX_CREATE]);
         $model->board_id = $this->request->get('boardId');
-        if ($this->request->post('_csrf-frontend')) {
-            $model->load($this->request->post());
-            $model->validate();
-            $model->getErrors();
-            VarDumper::dump($model->getErrors());
-//            \yii\widgets\ActiveForm::validate($model);
-//            VarDumper::dump($va);
-//            VarDumper::dump($this->request->post());
-            die;
+        if ($this->request->post('_csrf-frontend') && $model->load($this->request->post()) && $model->validate()) {
+            $model->columnCreated();
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return true;
         }
         return $this->renderAjax('_handleBoardColumnElement', ['model' => $model]);
     }

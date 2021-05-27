@@ -25,9 +25,18 @@ class Column extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
+
+    const SCENARIO_AJAX_CREATE = 'ajax_create';
+
     public static function tableName()
     {
         return 'column';
+    }
+
+    public function scenarios() {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_AJAX_CREATE] = ['title'];
+        return $scenarios;
     }
 
     public function behaviors()

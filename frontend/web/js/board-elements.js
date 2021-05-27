@@ -21,14 +21,24 @@ function handleColumnElement(boardId, data = '') {
         data: data,
         cache: false,
         success: function (data) {
-            addColumnElement(boardId, data);
+            if (data === true) {
+                // cancelColumnElement(columnId);
+                return;
+            }
+            addColumnElement(1, data);
         }
     });
 }
 
 function addColumnElement(boardId, data) {
-    $('#test').append(data);
+    $('#column-id_create').append(data);
     $('#add-list').hide();
+    $('#column-id_create').children('form').on('beforeSubmit', function (e) {
+        e.preventDefault();
+        handleColumnElement(1, $(e.currentTarget).serialize());
+        return false;
+    });
+    // bindCardElement(columnId);
 }
 
 function addCardElement(columnId, data) {
@@ -61,6 +71,19 @@ function bindCardElement(columnId, bind = true) {
         return false;
     });
 }
+
+// function bindColumnElement(columnId, bind = true) {
+//     if (bind === false) {
+//         $('form', '[data-column-id="' + columnId + '"]').unbind('beforeSubmit');
+//         return;
+//     }
+//     $('.add-card', '[data-column-id="' + columnId + '"]').hide();
+//     $('form', '[data-column-id="' + columnId + '"]').on('beforeSubmit', function (e) {
+//         e.preventDefault();
+//         handleCardElement(columnId, $(e.currentTarget).serialize());
+//         return false;
+//     });
+// }
 
 function cancelCardElement(columnId) {
     removeCardElement(columnId, true);
