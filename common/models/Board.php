@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\models\elastic\Board as ElasticBoard;
+use common\models\elastic\ElasticHelper;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
@@ -118,21 +119,43 @@ class Board extends \yii\db\ActiveRecord
         return $this->hasMany(Column::class, ['board_id' => 'id']);
     }
 
-    public function afterSave($insert, $changedAttributes)
+    public function beforeSave($insert)
     {
         if ($insert) {
             $this->uuid = \thamtech\uuid\helpers\UuidHelper::uuid();
-            $this->save();
-
-            $board = new ElasticBoard();
-
-            $board->saving([
-                "title" => $this->title,
-                "uuid" => $this->uuid,
-                "owner_id" => $this->owner_id,
-                "entity_id" => $this->entity_id,
-            ]);
         }
+
+        return parent::beforeSave($insert);
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($insert) {
+            return  $this->createElasticDocument();
+        }
+        $doc = ElasticHelper::search(ElasticBoard::class, ["uuid" => $this->uuid]);
+
+        if (!$doc) {
+            return  $this->createElasticDocument();
+        }
+
+        $doc->setAttributes([
+            'title' => $this->title,
+        ], false);
+        $doc->save();
+
+
+        return true;
+    }
+
+    private function createElasticDocument()
+    {
+        ElasticHelper::create(ElasticBoard::class, [
+            "title" => $this->title,
+            "uuid" => $this->uuid,
+            "owner_id" => $this->owner_id,
+            "entity_id" => $this->entity_id,
+        ]);
 
         return true;
     }
@@ -156,8 +179,7 @@ class Board extends \yii\db\ActiveRecord
 
     public function afterSoftDelete()
     {
-        $board = ElasticBoard::find()->query(['match' => ["uuid" => $this->uuid]])->one();
-        $board->deleteDocument();
+        ElasticHelper::remove(ElasticBoard::class, ["uuid" => $this->uuid]);
     }
 
     public function beforeRestore()
