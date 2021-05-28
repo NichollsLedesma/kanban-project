@@ -1,4 +1,4 @@
-<div class="card card-row card-secondary <?php if($enableColumnCreation) echo 'transparent' ?>" >
+<div <?php if($enableColumnCreation) echo 'id="creation-column"' ?> class="card card-row card-secondary <?php if($enableColumnCreation) echo 'transparent' ?>" >
     <?php if($withHeader) : ?>
         <div class="card-header">
             <h3 class="card-title">

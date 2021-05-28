@@ -18,6 +18,7 @@ $this->registerCssFile(
     Yii::$app->request->getBaseUrl() . '/css/column.css'
 );
 $this->registerJsVar('channelName', $boardCode, View::POS_END);
+$this->registerJsVar('boardId', $boardId, View::POS_END);
 // $this->registerJsVar('cards', $board['columns'], View::POS_END);
 
 $this->registerJsFile(
@@ -37,7 +38,7 @@ $this->registerJsFile(
 ?>
 <div class="content-wrapper kanban">
     <section class="content pb-3">
-        <div class="container-fluid h-100">
+        <div class="container-fluid h-100" id="kanban-body">
             <?php
             foreach ($boardColumns->all() as $column) {
                 $cards = [];

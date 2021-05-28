@@ -43,7 +43,8 @@ class KanbanController extends Controller
 
     public function actionBoard($uuid) {
         $userBoard = BoardRepository::getUserBoard(Yii::$app->getUser()->getId(), 1); //boardId must be changed by method uuid param
-        $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['order' => 'ASC']);
+        $boardId = $userBoard->select(['id'])->limit(1)->one()->id;
+        $boardColumns = Column::find()->where(['board_id' => $boardId])->orderBy(['order' => 'ASC']);
         /* ajax create card request */
         if ($this->request->isAjax) {
             if ($this->request->get('type') === 'card') {
@@ -65,6 +66,7 @@ class KanbanController extends Controller
         //     $this->getDump();
 
         return $this->render('board', [
+                    'boardId' => $boardId,
                     'board' => $userBoard,
                     'boardColumns' => $boardColumns,
         ]);

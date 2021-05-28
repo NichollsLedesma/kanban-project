@@ -15,30 +15,25 @@ function handleCardElement(columnId, data = '') {
 
 }
 
-function handleColumnElement(boardId, data = '') {
+function handleColumnElement(data = '') {
     $.post({
         url: location.hostname + '?boardId=' + boardId + '&type=column',
         data: data,
         cache: false,
         success: function (data) {
             if (data === true) {
-                // cancelColumnElement(columnId);
+                cancelColumnElement();
                 return;
             }
-            addColumnElement(1, data);
+            addColumnElement(data);
         }
     });
 }
 
-function addColumnElement(boardId, data) {
-    $('#column-id_create').append(data);
-    $('#add-list').hide();
-    $('#column-id_create').children('form').on('beforeSubmit', function (e) {
-        e.preventDefault();
-        handleColumnElement(1, $(e.currentTarget).serialize());
-        return false;
-    });
-    // bindCardElement(columnId);
+function addColumnElement(data) {
+    removeColumnElement();
+    $(data).insertBefore($('#add-list'));
+    bindColumnElement();
 }
 
 function addCardElement(columnId, data) {
@@ -56,7 +51,18 @@ function removeCardElement(columnId, reset = false) {
 
     if (reset === true) {
         $('.add-card', '[data-column-id="' + columnId + '"]').show();
+    }
 }
+
+function removeColumnElement(reset = false) {
+    if ($('#creation-column form').length) {
+        $('#creation-column form').remove();
+        bindColumnElement(false);
+    }
+
+    if (reset === true) {
+        $('#add-list').show();
+    }
 }
 
 function bindCardElement(columnId, bind = true) {
@@ -72,31 +78,35 @@ function bindCardElement(columnId, bind = true) {
     });
 }
 
-// function bindColumnElement(columnId, bind = true) {
-//     if (bind === false) {
-//         $('form', '[data-column-id="' + columnId + '"]').unbind('beforeSubmit');
-//         return;
-//     }
-//     $('.add-card', '[data-column-id="' + columnId + '"]').hide();
-//     $('form', '[data-column-id="' + columnId + '"]').on('beforeSubmit', function (e) {
-//         e.preventDefault();
-//         handleCardElement(columnId, $(e.currentTarget).serialize());
-//         return false;
-//     });
-// }
+function bindColumnElement(bind = true) {
+    if (bind === false) {
+        $('#creation-column form').unbind('beforeSubmit');
+        return;
+    }
+    $('#add-list').hide();
+    $('#creation-column form').on('beforeSubmit', function (e) {
+        e.preventDefault();
+        handleColumnElement($(e.currentTarget).serialize());
+        return false;
+    });
+}
 
 function cancelCardElement(columnId) {
     removeCardElement(columnId, true);
 }
 
-function cancelColumnElement(e) {
-    $(e).parent().remove();
-    $('#add-list').show();
+function cancelColumnElement() {
+    removeColumnElement(true);
 }
 
 function isAddingCard(columnId)
 {
     return $('form', '[data-column-id="' + columnId + '"]').length;
+}
+
+function isAddingColumn()
+{
+    return $('#creation-column form').length;
 }
 
 $(document).ready(function () {
@@ -109,6 +119,9 @@ $(document).ready(function () {
     });
 
     $('#add-list').click(function (e) {
-        handleColumnElement(1);
+        if (isAddingColumn()) {
+            return;
+        }
+        handleColumnElement();
     });
 });

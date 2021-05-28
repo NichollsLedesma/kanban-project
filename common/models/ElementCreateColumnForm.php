@@ -2,6 +2,8 @@
 
 namespace common\models;
 
+use common\widgets\BoardColumn\BoardColumn;
+
 /**
  * Description of elementCardForm
  *
@@ -17,7 +19,10 @@ class ElementCreateColumnForm extends Column
 
         $mqtt = new \PhpMqtt\Client\MqttClient($server, 1883, $clientId);
         $mqtt->connect(null, true);
-        $mqtt->publish('board/create', 'new column');
+        $arr = array(
+        	'type'=>'New Column',
+        	'html'=> BoardColumn::widget([]));
+        $mqtt->publish('board/create', json_encode($arr));
         $mqtt->disconnect();
     }
 
