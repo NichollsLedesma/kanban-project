@@ -15,7 +15,7 @@ $(document).ready(function () {
     client.onMessageArrived = function (message) {
         const objData = JSON.parse(message.payloadString);
         if (objData.type === 'New Column') {
-            $('#creation-column').before(objData.html);
+            addNewColumn(objData.html);
         };
         moveCard(objData);
     };

@@ -35,6 +35,15 @@ $this->registerJsFile(
             'position' => View::POS_END
         ]
 );
+
+$this->registerJsFile(
+        Yii::$app->request->BaseUrl . '/js/columns.js',
+        [
+            'depends' => "/js/board-elements.js",
+            'position' => View::POS_END
+        ]
+);
+
 ?>
 <div class="content-wrapper kanban">
     <section class="content pb-3">
