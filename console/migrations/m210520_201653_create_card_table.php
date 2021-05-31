@@ -25,11 +25,8 @@ class m210520_201653_create_card_table extends Migration
             'updated_by' => $this->integer()->notNull(),
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
-<<<<<<< HEAD
-=======
             'is_deleted' => $this->boolean()->notNull()->defaultValue(false),
             'deleted_at' => $this->integer()->defaultValue(null),
->>>>>>> develop
         ]);
     }
 

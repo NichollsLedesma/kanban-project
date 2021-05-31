@@ -21,11 +21,8 @@ class m210520_200517_create_entity_table extends Migration
             'updated_by' => $this->integer()->notNull(),
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
-<<<<<<< HEAD
-=======
-            'is_deleted' => $this->boolean()->notNull()->defaultValue(false),
+           'is_deleted' => $this->boolean()->notNull()->defaultValue(false),
             'deleted_at' => $this->integer()->defaultValue(null),
->>>>>>> develop
         ]);
     }
 
