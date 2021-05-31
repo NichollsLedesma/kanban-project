@@ -15,7 +15,7 @@
         ?>
         <p>
             <?=
-            yii\helpers\Html::a('+ add card', "/kanban/uu1?addCard={$id}");
+            yii\helpers\Html::a('+ add card', \yii\helpers\Url::to(["/kanban/board", 'uuid' => $boardUuid, 'addCard' => $id]));
             ?>
         </p>
             <!--<p class="add-card">+ add card</p>-->

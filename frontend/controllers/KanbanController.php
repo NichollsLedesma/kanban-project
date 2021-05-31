@@ -12,6 +12,7 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\Url;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class KanbanController extends Controller
@@ -41,15 +42,24 @@ class KanbanController extends Controller
     }
 
     public function actionBoard($uuid) {
-        $userBoard = BoardRepository::getUserBoard(Yii::$app->getUser()->getId(), 1); //boardId must be changed by method uuid param
+        $userBoard = BoardRepository::getUserBoard(Yii::$app->getUser()->getId(), $uuid);
         $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['order' => 'ASC']);
+        if ($userBoard->count() == 0) {
+            throw new NotFoundHttpException('board not found');
+        }
 
         if ($this->request->isPjax && $this->request->get('addCard')) {
 
             $newCardModel = new CreateCardForm(['scenario' => Card::SCENARIO_AJAX_CREATE]);
-            $newCardModel->column_id = $this->request->get('addCard');
+            $columnUuid = clone $boardColumns;
+            $columnUuid->filterWhere(['uuid' => $this->request->get('addCard')])->select(['id'])->limit(1);
+            if ($columnUuid->count() == 0) {
+                throw new NotFoundHttpException(printf("Column %s doesn't exists", $this->request->get('addCard')));
+            }
+
+            $newCardModel->column_id = $columnUuid->scalar();
             if ($this->request->isPost && $newCardModel->load($this->request->post()) && $newCardModel->validate() && $newCardModel->createCard()) {
-                $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/index']));
+                $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
                 unset($newCardModel);
             }
         }
@@ -61,7 +71,7 @@ class KanbanController extends Controller
         //     $this->getDump();
 
         return $this->render('board', [
-                    'board' => $userBoard,
+                    'boardUuid' => $uuid,
                     'boardColumns' => $boardColumns,
                     'newCardModel' => $newCardModel ?? null,
         ]);

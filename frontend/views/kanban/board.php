@@ -49,14 +49,14 @@ $this->registerJsFile(
             Pjax::begin(['id' => 'board-container']);
             foreach ($boardColumns->all() as $column) {
                 $cards = [];
-                $columnsId[] = $boardColumnIdPrefix . $column->id;
+                $columnsId[] = $boardColumnIdPrefix . $column->uuid;
                 foreach ($column->getCards()->all() as $task) {
-                    $cards[] = BoardCard::widget(['id' => $task->id, 'title' => $task->title, 'content' => $task->description]);
+                    $cards[] = BoardCard::widget(['id' => $task->uuid, 'title' => $task->title, 'content' => $task->description]);
                 }
                 if ($newCardModel && $newCardModel->column_id == $column->id) {
-                    $cards[] = $this->render('_newCard', ['model' => $newCardModel, 'columnId' => $newCardModel->column_id]);
+                    $cards[] = $this->render('_newCard', ['model' => $newCardModel, 'columnId' => $column->uuid, 'boardUuid' => $boardUuid]);
                 }
-                echo BoardColumn::widget(['id' => $column->id, 'idPrefix' => $boardColumnIdPrefix, 'name' => $column->title, 'cards' => $cards]);
+                echo BoardColumn::widget(['id' => $column->uuid, 'idPrefix' => $boardColumnIdPrefix, 'name' => $column->title, 'boardUuid' => $boardUuid, 'cards' => $cards]);
             }
             $this->registerJsVar('columns', $columnsId, View::POS_END);
             Pjax::end();
