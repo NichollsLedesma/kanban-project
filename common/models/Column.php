@@ -61,6 +61,7 @@ class Column extends \yii\db\ActiveRecord
             [['board_id', 'owner_id', 'order', 'created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
             ['board_id', 'exist', 'targetClass' => Board::class, 'targetAttribute' => ['board_id' => 'id']],
             ['owner_id', 'exist', 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
+            [['board_id', 'owner_id'], 'exist', 'targetClass' => UserBoard::class, 'targetAttribute' => ['board_id' => 'board_id', 'owner_id' => 'user_id']],
             [['title'], 'string', 'max' => 100],
             ['title', 'match', 'pattern' => '/^[A-Za-z !.]{1,100}$/'],
         ];
