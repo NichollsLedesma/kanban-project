@@ -91,15 +91,15 @@ class SiteController extends Controller
     {
         return $this->render('index');
     }
-    // public function actionTestGet()
-    // {
-    //     // search
-    //     $boardES = ElasticHelper::getAll(ElasticColumn::class);
-    //     echo "<pre>";
-    //     VarDumper::dump($boardES);
-    //     echo "</pre>";
-    //     die;
-    // }
+    public function actionTestGet()
+    {
+        // search
+        $boardES = ElasticHelper::getAll(ElasticBoard::class);
+        echo "<pre>";
+        VarDumper::dump($boardES);
+        echo "</pre>";
+        die;
+    }
 
     // public function actionTest()
     // {

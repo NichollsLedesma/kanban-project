@@ -8,7 +8,9 @@ class ListBoardWidgetAsset extends AssetBundle
 {
     public $sourcePath = '@common/widgets/listBoard/assets';
 
-    public $js = [];
+    public $js = [
+        'js/main.js',
+    ];
 
     public $css = [
         'css/main.css',

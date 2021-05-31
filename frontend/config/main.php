@@ -47,6 +47,7 @@ return [
                 'kanban/get/<query>'=>'kanban/get',
                 'kanban/get-one/<id>'=>'kanban/get-one',
                 'kanban/<uuid>'=>'kanban/board',
+                'kanban/board/create'=>'kanban/board-create',
             ],
         ],
 
