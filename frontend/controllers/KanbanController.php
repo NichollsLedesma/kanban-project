@@ -7,18 +7,22 @@ use common\jobs\JobTest;
 use common\models\BoardRepository;
 use common\models\Card;
 use common\models\Column;
-use common\models\ElementCreateCardForm;
-use common\models\ElementCreateColumnForm;
 use common\models\User;
+use frontend\models\CreateCardForm;
+use yii\elasticsearch\QueryBuilder;
 use yii\filters\AccessControl;
+use yii\helpers\Json;
+use yii\helpers\Url;
 use yii\helpers\VarDumper;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
+
 
 class KanbanController extends Controller
 {
-
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             'access' => [
                 "class" => AccessControl::class,
@@ -33,7 +37,8 @@ class KanbanController extends Controller
         ];
     }
 
-    public function actionIndex() {
+    public function actionIndex()
+    {
         $boards = $this->getBoardsDump();
 
         return $this->render('index', [
@@ -42,22 +47,27 @@ class KanbanController extends Controller
     }
 
     public function actionBoard($uuid) {
-        $userBoard = BoardRepository::getUserBoard(Yii::$app->getUser()->getId(), 1); //boardId must be changed by method uuid param
-        $boardId = $userBoard->select(['id'])->limit(1)->one()->id;
-        $boardColumns = Column::find()->where(['board_id' => $boardId])->orderBy(['order' => 'ASC']);
-        /* ajax create card request */
-        if ($this->request->isAjax) {
-            if ($this->request->get('type') === 'card') {
-                return $this->handleBoardCardElement();
-            }
-            if ($this->request->get('type') === 'column') {
-                return $this->handleBoardColumnElement();
-            }
+        $userBoard = BoardRepository::getUserBoard(Yii::$app->getUser()->getId(), $uuid);
+        $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['order' => 'ASC']);
+        if ($userBoard->count() == 0) {
+            throw new NotFoundHttpException('board not found');
         }
 
+        if ($this->request->isPjax && $this->request->get('addCard')) {
 
-//        VarDumper::dump($res->asArray()->all(), 10, true);
+            $newCardModel = new CreateCardForm(['scenario' => Card::SCENARIO_AJAX_CREATE]);
+            $columnUuid = clone $boardColumns;
+            $columnUuid->filterWhere(['uuid' => $this->request->get('addCard')])->select(['id'])->limit(1);
+            if ($columnUuid->count() == 0) {
+                throw new NotFoundHttpException(printf("Column %s doesn't exists", $this->request->get('addCard')));
+            }
 
+            $newCardModel->column_id = $columnUuid->scalar();
+            if ($this->request->isPost && $newCardModel->load($this->request->post()) && $newCardModel->validate() && $newCardModel->createCard()) {
+                $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
+                unset($newCardModel);
+            }
+        }
 
         $this->layout = "kanban";
         // $search = Yii::$app->request->post('search');
@@ -66,35 +76,16 @@ class KanbanController extends Controller
         //     $this->getDump();
 
         return $this->render('board', [
-                    'boardId' => $boardId,
-                    'board' => $userBoard,
+                    'boardUuid' => $uuid,
                     'boardColumns' => $boardColumns,
+                    'newCardModel' => $newCardModel ?? null,
         ]);
     }
 
-    protected function handleBoardCardElement() {
-        $model = new ElementCreateCardForm(['scenario' => Card::SCENARIO_AJAX_CREATE]);
-        $model->column_id = $this->request->get('columnId');
-        if ($this->request->post('_csrf-frontend') && $model->load($this->request->post()) && $model->validate()) {
-            $model->cardCreated();
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            return true;
-        }
-        return $this->renderAjax('_handleBoardCardElement', ['model' => $model]);
-    }
 
-    protected function handleBoardColumnElement() {
-        $model = new ElementCreateColumnForm(['scenario' => Column::SCENARIO_AJAX_CREATE]);
-        $model->board_id = $this->request->get('boardId');
-        if ($this->request->post('_csrf-frontend') && $model->load($this->request->post()) && $model->validate()) {
-            $model->columnCreated();
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            return true;
-        }
-        return $this->renderAjax('_handleBoardColumnElement', ['model' => $model]);
-    }
 
-    public function actionGet() {
+    public function actionGet()
+    {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $search = Yii::$app->request->get('query');
         $select = ['username as value', 'username as  label', 'id as id'];

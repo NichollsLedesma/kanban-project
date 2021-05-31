@@ -1,5 +1,7 @@
 <?php
 
+use yii\elasticsearch\Connection;
+use yii\log\FileTarget;
 use yii\queue\amqp_interop\Queue;
 use yii\queue\LogBehavior;
 
@@ -11,8 +13,7 @@ return [
         '@bower' => '@vendor/bower-asset',
         '@npm' => '@vendor/npm-asset',
     ],
-    'modules' => [
-    ],
+    'modules' => [],
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
     'components' => [
         /* add above db config into your common/main-local */
@@ -25,7 +26,25 @@ return [
           'enableSchemaCache' => true,
           'schemaCacheDuration' => 3600,
           ], */
-          
+        "log" => [
+            "traceLevel" => YII_DEBUG ? 3 : 0,
+            "targets" => [
+                [
+                    "class" => FileTarget::class,
+                    "levels" => ["error", "warning"]
+                ]
+            ],
+        ],
+        'elasticsearch' => [
+            'class' => 'yii\elasticsearch\Connection',
+            "autodetectCluster" => true,
+            'nodes' => [
+                [
+                    'http_address' => 'elk:9200',
+                ],
+            ],
+            'dslVersion' => 7,
+        ],
         'redis' => [
             'class' => \yii\redis\Connection::class,
             'hostname' => 'redis',
@@ -72,8 +91,8 @@ return [
                 'host' => 'mail'
             ],
             // send all mails to a file by default. You have to set
-// 'useFileTransport' to false and configure a transport
-// for the mailer to send real emails.
+            // 'useFileTransport' to false and configure a transport
+            // for the mailer to send real emails.
             'useFileTransport' => false,
         ],
     ],

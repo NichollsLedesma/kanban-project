@@ -17,9 +17,10 @@ class BoardCard extends Widget
     public $content = '';
     public $isForm = false;
     public $columnId = null;
+    public $boardUuid = null;
 
     public function run(): string {
-        return $this->render('_boardCard', ['id' => $this->id ?? null, 'title' => $this->title, 'content' => $this->content ?? null, 'isForm' => $this->isForm, 'columnId' => $this->columnId]);
+        return $this->render('_boardCard', ['id' => $this->id ?? null, 'title' => $this->title, 'content' => $this->content ?? null, 'isForm' => $this->isForm, 'boardUuid' => $this->boardUuid, 'columnId' => $this->columnId]);
     }
 
 }

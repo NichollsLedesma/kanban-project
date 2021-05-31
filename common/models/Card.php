@@ -2,9 +2,13 @@
 
 namespace common\models;
 
+use common\models\elastic\Card as ElasticCard;
+use common\models\elastic\ElasticHelper;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii2tech\ar\softdelete\SoftDeleteBehavior;
+use yii\helpers\VarDumper;
 
 /**
  * This is the model class for table "card".
@@ -44,7 +48,14 @@ class Card extends \yii\db\ActiveRecord
     {
         return [
             TimestampBehavior::class,
-            BlameableBehavior::class
+            BlameableBehavior::class,
+            'softDeleteBehavior' => [
+                'class' => SoftDeleteBehavior::class,
+                'softDeleteAttributeValues' => [
+                    'is_deleted' => true
+                ],
+                'replaceRegularDelete' => true // mutate native `delete()` method
+            ],
         ];
     }
 
@@ -95,13 +106,65 @@ class Card extends \yii\db\ActiveRecord
         return $this->hasOne(Column::class, ['id' => 'column_id']);
     }
 
-    public function afterSave($insert, $changedAttributes)
+    public function beforeSave($insert)
     {
         if ($insert) {
             $this->uuid = \thamtech\uuid\helpers\UuidHelper::uuid();
-            $this->save();
         }
 
+        return parent::beforeSave($insert);
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($insert) {
+            return $this->createElasticDocument();
+        }
+
+        $doc = ElasticHelper::search(ElasticCard::class, ["uuid" => $this->uuid]);
+
+        if (!$doc) {
+            return $this->createElasticDocument();
+        }
+
+        $doc->setAttributes([
+            'title' => $this->title,
+            'order' => $this->order,
+            'description' => $this->description,
+            'column_id' => $this->column_id,
+            'color' => $this->color,
+            'owner_id' => $this->owner_id,
+        ], false);
+        $doc->save();
+
         return true;
+    }
+
+    private function createElasticDocument()
+    {
+        ElasticHelper::create(ElasticCard::class, [
+            "title" => $this->title,
+            "uuid" => $this->uuid,
+            "owner_id" => $this->owner_id,
+            "column_id" => $this->column_id,
+            "description" => $this->description,
+            "color" => $this->color,
+            "order" => $this->order,
+        ]);
+
+        return true;
+    }
+
+    public function beforeSoftDelete()
+    {
+        ElasticHelper::remove(ElasticCard::class, ["uuid" => $this->uuid]);
+
+        $this->deleted_at = time(); // log the deletion date
+        return true;
+    }
+
+    public function beforeRestore()
+    {
+        return $this->deleted_at > (time() - 3600); // allow restoration only for the records, being deleted during last hour
     }
 }

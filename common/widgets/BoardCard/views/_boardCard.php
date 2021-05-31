@@ -20,6 +20,6 @@ use yii\bootstrap4\Html;
     </div>
     <?php if ($isForm): ?>
 
-        <div class="card-footer"><?= Html::submitButton('save', ['class' => 'btn btn-primary', 'name' => 'save-card-button']) ?> <?= Html::button('Cancel', ['class' => 'btn btn-danger', 'name' => 'cancel-card-button', 'onclick' => 'cancelCardElement(' . $columnId . ')']) ?></div>
+        <div class="card-footer"><?= Html::submitButton('save', ['class' => 'btn btn-primary', 'name' => 'save-card-button']) ?> <?= Html::a('Cancel', yii\helpers\Url::to(['/kanban/board', 'uuid' => $boardUuid]), ['class' => 'btn btn-danger', 'name' => 'cancel-card-button']) ?></div>
     <?php endif; ?>
 </div>

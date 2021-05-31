@@ -14,6 +14,8 @@ class BoardColumn extends Widget
 
     public $name = '';
     public $id = null;
+    public $idPrefix = '';
+    public $boardUuid = '';
     public $cards = [];
     public $enableCardCreation = true;
     public $enableColumnCreation = false;
@@ -25,6 +27,8 @@ class BoardColumn extends Widget
         	[
         		'name' => $this->name,
         		'id' => $this->id,
+                'idPrefix' => $this->idPrefix,
+                'boardUuid' => $this->boardUuid,
         		'withHeader' => $this->withHeader,
         		'enableCardCreation' => $this->enableCardCreation,
         		'enableColumnCreation' => $this->enableColumnCreation,

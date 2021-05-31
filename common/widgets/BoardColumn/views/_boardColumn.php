@@ -1,12 +1,11 @@
-<div <?php if($enableColumnCreation) echo 'id="creation-column"' ?> class="card card-row card-secondary <?php if($enableColumnCreation) echo 'transparent' ?>" >
-    <?php if($withHeader) : ?>
-        <div class="card-header">
-            <h3 class="card-title">
-                <?= $name ?>
-            </h3>
-        </div>
-    <?php endif; ?>
-    <div class="card-body" id="column-id_<?= $id ?>" data-column-id="<?= $id ?>">
+
+<div class="card card-row card-secondary">
+    <div class="card-header">
+        <h3 class="card-title">
+            <?= $name ?>
+        </h3>
+    </div>
+    <div class="card-body" id="<?= $idPrefix . $id ?>" data-column-id="<?= $id ?>">
         <?php
         if (!empty($cards)) {
             foreach ($cards as $card) {
@@ -14,11 +13,11 @@
             }
         }
         ?>
-        <?php if($enableCardCreation) : ?>
-            <p class="add-card">+ add card</p>
-        <?php endif; ?>
-        <?php if($enableColumnCreation) : ?>
-            <button id="add-list" class="btn btn-primary w-100">Add another list</button>
-        <?php endif; ?>
+        <p>
+            <?=
+            yii\helpers\Html::a('+ add card', \yii\helpers\Url::to(["/kanban/board", 'uuid' => $boardUuid, 'addCard' => $id]));
+            ?>
+        </p>
+            <!--<p class="add-card">+ add card</p>-->
     </div>
 </div>
