@@ -14,10 +14,11 @@ class BoardColumn extends Widget
 
     public $name = '';
     public $id = null;
+    public $idPrefix = '';
     public $cards = [];
 
     public function run(): string {
-        return $this->render('_boardColumn', ['name' => $this->name, 'id' => $this->id, 'cards' => $this->cards]);
+        return $this->render('_boardColumn', ['name' => $this->name, 'id' => $this->id, 'idPrefix' => $this->idPrefix, 'cards' => $this->cards]);
     }
 
 }
