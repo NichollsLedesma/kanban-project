@@ -14,23 +14,14 @@ class Board extends \yii\elasticsearch\ActiveRecord
 
     public function saving($data)
     {
-        $this->title = $data['title'];
-        $this->uuid = $data['uuid'];
-        $this->owner_id = $data['owner_id'];
-        $this->entity_id = $data['entity_id'];
+        $properties = array_keys($data);
 
-        return $this->insert();
-    }
+        foreach ($properties as $property) {
+            $this->$property = $data[$property];
+        }
 
-    public function searchingAllMatches($value)
-    {
-        return $this::find()->query([
-            'bool' => [
-                'must' => [
-                    BoardQuery::title($value)
-                ],
-            ],
-        ])->all();
+
+        $this->insert();
     }
 
     public function deleteDocument()
@@ -39,5 +30,16 @@ class Board extends \yii\elasticsearch\ActiveRecord
             'index' => static::index(),
             'id'    => $this->_id,
         ]);
+
+        return true;
+    }
+
+    public function updating($data)
+    {
+        $this->setAttributes([
+            'title' => $data['title'],
+        ], false);
+
+        return true;
     }
 }
