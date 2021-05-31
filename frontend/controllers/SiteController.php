@@ -5,6 +5,14 @@ namespace frontend\controllers;
 use app\jobs\CreateLogs;
 use common\jobs\JobRabbitQueue;
 use common\jobs\JobTest;
+use common\models\Board;
+use common\models\Card;
+use common\models\Column;
+use common\models\elastic\Board as ElasticBoard;
+use common\models\elastic\Card as ElasticCard;
+use common\models\elastic\Column as ElasticColumn;
+use common\models\elastic\ElasticHelper;
+use common\models\Entity;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -14,6 +22,7 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use common\models\LoginForm;
+use common\models\UserEntity;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
@@ -72,15 +81,6 @@ class SiteController extends Controller
         ];
     }
 
-    public function actionTest()
-    {
-        $id = Yii::$app->queue->push(
-            new JobRabbitQueue()
-        );
-
-        VarDumper::dump($id);
-        die;
-    }
 
     /**
      * Displays homepage.
@@ -91,6 +91,31 @@ class SiteController extends Controller
     {
         return $this->render('index');
     }
+    // public function actionTestGet()
+    // {
+    //     // search
+    //     $boardES = ElasticHelper::getAll(ElasticColumn::class);
+    //     echo "<pre>";
+    //     VarDumper::dump($boardES);
+    //     echo "</pre>";
+    //     die;
+    // }
+
+    // public function actionTest()
+    // {
+    //     $board = Board::findOne(17);
+    //     $doc = new Column();
+    //     $doc->board_id = $board->id;
+    //     $doc->owner_id = Yii::$app->user->id;
+    //     $doc->order = 0;
+    //     $doc->title = "asdasd";
+    //     $doc->save();
+
+    //     echo "<pre>";
+    //     VarDumper::dump($doc);
+    //     echo "</pre>";
+    //     die;
+    // }
 
     /**
      * Logs in a user.
