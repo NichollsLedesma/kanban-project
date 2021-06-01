@@ -7,10 +7,12 @@ use common\models\Board;
 use common\models\BoardRepository;
 use common\models\Card;
 use common\models\Column;
+use common\models\Entity;
 use common\models\User;
 use frontend\models\CreateCardForm;
 use Yii;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -40,9 +42,15 @@ class KanbanController extends Controller
         $boards = Board::find()
             ->where(["owner_id" => Yii::$app->getUser()->getId()])
             ->all();
+        $entities =  ArrayHelper::map(
+            Yii::$app->getUser()->getIdentity()->entities,
+            'id',
+            'name'
+        );
 
         return $this->render('index', [
-            "boards" => $boards
+            "boards" => $boards,
+            "entities" => $entities
         ]);
     }
 
