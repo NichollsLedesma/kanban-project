@@ -3,7 +3,10 @@
 namespace frontend\controllers;
 
 use common\jobs\JobTest;
+use common\models\Board;
+use common\models\Entity;
 use common\models\User;
+use common\models\UserEntity;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
@@ -35,7 +38,9 @@ class KanbanController extends Controller
 
     public function actionIndex()
     {
-        $boards = $this->getBoardsDump();
+        $boards = Board::find()
+            ->where(["owner_id" => Yii::$app->getUser()->getId()])
+            ->all();
 
         return $this->render('index', [
             "boards" => $boards
@@ -54,7 +59,6 @@ class KanbanController extends Controller
             'board' => $this->getDump(),
         ]);
     }
-
 
 
     public function actionGet()
