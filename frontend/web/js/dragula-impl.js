@@ -14,12 +14,15 @@ $(document).ready(function () {
 
     client.onMessageArrived = function (message) {
         const objData = JSON.parse(message.payloadString);
+        if (objData.type === 'New Column') {
+            addNewColumn(objData.html);
+        };
+        moveCard(objData);
         if (objData.type === 'card' && objData.action === 'new') {
             if ($('div#column-id_' + objData.params.columnId).length > 0) {
                 $('div#column-id_' + objData.params.columnId).append(objData.params.html);
             }
         }
-        //moveCard(objData);
     };
     connect();
 
