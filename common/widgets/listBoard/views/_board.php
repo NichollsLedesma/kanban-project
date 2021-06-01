@@ -36,7 +36,7 @@ use yii\widgets\ActiveForm;
     "size" => Modal::SIZE_DEFAULT,
 ]); ?>
 
-<?= Html::beginForm('/kanban/board/create', 'POST', [
+<?= Html::beginForm('/board/create', 'POST', [
     'class' => 'form-inline',
     "id" => "board-form"
 ]); ?>
