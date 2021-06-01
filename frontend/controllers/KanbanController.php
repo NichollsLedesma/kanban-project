@@ -2,16 +2,21 @@
 
 namespace frontend\controllers;
 
+use Yii;
 use common\jobs\JobTest;
+use common\models\Board;
 use common\models\BoardRepository;
 use common\models\Card;
 use common\models\Column;
+use common\models\CreateColumnForm;
 use common\models\User;
 use common\widgets\BoardCard\BoardCard;
 use frontend\models\CreateCardForm;
-use Yii;
+use yii\elasticsearch\QueryBuilder;
 use yii\filters\AccessControl;
+use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\helpers\VarDumper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -19,7 +24,8 @@ use yii\web\Response;
 class KanbanController extends Controller
 {
 
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             'access' => [
                 "class" => AccessControl::class,
@@ -34,17 +40,21 @@ class KanbanController extends Controller
         ];
     }
 
-    public function actionIndex() {
-        $boards = $this->getBoardsDump();
+    public function actionIndex()
+    {
+        $boards = Board::find()
+            ->where(["owner_id" => Yii::$app->getUser()->getId()])
+            ->all();
 
         return $this->render('index', [
-                    "boards" => $boards
+            "boards" => $boards
         ]);
     }
 
-    public function actionBoard($uuid) {
+    public function actionBoard($uuid)
+    {
         $userBoard = BoardRepository::getUserBoard(Yii::$app->getUser()->getId(), $uuid);
-        $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['order' => 'ASC']);
+        $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['id' => 'ASC']);
         if ($userBoard->count() == 0) {
             throw new NotFoundHttpException('board not found');
         }
@@ -67,6 +77,17 @@ class KanbanController extends Controller
             }
         }
 
+        if ($this->request->isPjax && $this->request->get('addColumn')) {
+
+            $newColumnModel = new CreateColumnForm(['scenario' => Column::SCENARIO_AJAX_CREATE]);
+            $newColumnModel->board_id = $userBoard->select(['id'])->limit(1)->one()->id;
+            if ($this->request->isPost && $newColumnModel->load($this->request->post()) && $newColumnModel->validate() && $newColumnModel->createColumn()) {
+                $newColumnModel->columnCreated(Url::to(['kanban/board', 'uuid' => $uuid]));
+                $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
+                unset($newColumnModel);
+            }
+        }
+
         $this->layout = "kanban";
         // $search = Yii::$app->request->post('search');
         // $board = ($search) ?
@@ -74,24 +95,27 @@ class KanbanController extends Controller
         //     $this->getDump();
 
         return $this->render('board', [
-                    'boardUuid' => $uuid,
-                    'boardColumns' => $boardColumns,
-                    'newCardModel' => $newCardModel ?? null,
+            'boardUuid' => $uuid,
+            'boardColumns' => $boardColumns,
+            'newCardModel' => $newCardModel ?? null,
+            'newColumnModel' => $newColumnModel ?? null,
         ]);
     }
 
-    public function actionGet() {
+    public function actionGet()
+    {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $search = Yii::$app->request->get('query');
         $select = ['username as value', 'username as  label', 'id as id'];
 
         return User::find()
-                        ->select($select)
-                        ->asArray()
-                        ->all();
+            ->select($select)
+            ->asArray()
+            ->all();
     }
 
-    public function actionGetOne($id) {
+    public function actionGetOne($id)
+    {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         return [
@@ -101,17 +125,19 @@ class KanbanController extends Controller
         ];
     }
 
-    public function actionMove() {
+    public function actionMove()
+    {
         $id = Yii::$app->queue->push(
-                new JobTest(
-                        [
+            new JobTest(
+                [
                     "message" => "Hi job"
-                        ]
-                )
+                ]
+            )
         );
     }
 
-    private function getBoardsDump() {
+    private function getBoardsDump()
+    {
         return [
             $this->getDump(1),
             $this->getDump(2),
@@ -124,7 +150,8 @@ class KanbanController extends Controller
         ];
     }
 
-    private function getDump($id = 1) {
+    private function getDump($id = 1)
+    {
         return [
             "id" => $id,
             "uuid" => "randomuuid_$id",
@@ -186,7 +213,8 @@ class KanbanController extends Controller
         ];
     }
 
-    private function getDataDump($search) {
+    private function getDataDump($search)
+    {
         return [
             "id" => 1,
             "name" => "board_name",
@@ -226,5 +254,4 @@ class KanbanController extends Controller
             ]
         ];
     }
-
 }

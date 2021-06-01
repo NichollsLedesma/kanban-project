@@ -9,8 +9,16 @@
 
 .card-board {
   background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJCcrK9wJiGpBUdQKsIOhu2Ke2ffSixx9soQ&usqp=CAU") !important;
+  
+}
+.card-size-board{
   max-width: 20rem;
   min-height: 10rem;
+}
+.card-size-board:hover {
+  font-size: x-large;
+  background-color: silver;
+  /* transform: scale(1.03); */
 }
 
 a.link-board {

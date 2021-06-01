@@ -15,7 +15,11 @@ $this->registerAssetBundle(PahoMqttAsset::class);
 
 $boardCode = \yii\helpers\Url::to(['kanban/board', 'uuid' => $boardUuid]);
 $boardColumnIdPrefix = "column-id_";
+$this->registerCssFile(
+    Yii::$app->request->getBaseUrl() . '/css/column.css'
+);
 //$columns = ArrayHelper::getColumn($board['columns'], 'name');
+
 $this->registerJsVar('channelName', $boardCode, View::POS_END);
 // $this->registerJsVar('cards', $board['columns'], View::POS_END);
 
@@ -23,6 +27,14 @@ $this->registerJsFile(
         Yii::$app->request->BaseUrl . '/js/dragula-impl.js',
         [
             'depends' => "yii\web\JqueryAsset",
+            'position' => View::POS_END
+        ]
+);
+
+$this->registerJsFile(
+        Yii::$app->request->BaseUrl . '/js/columns.js',
+        [
+            'depends' => "/js/dragula-impl.js",
             'position' => View::POS_END
         ]
 );
@@ -44,9 +56,9 @@ $this->registerJsFile(
 ?>
 <div class="content-wrapper kanban">
     <section class="content pb-3">
-        <div class="container-fluid h-100" id="board-container">
             <?php
             Pjax::begin(['id' => 'board-container']);
+            echo '<div class="container-fluid h-100">';
             foreach ($boardColumns->all() as $column) {
                 $cards = [];
                 $columnsId[] = $boardColumnIdPrefix . $column->uuid;
@@ -58,10 +70,15 @@ $this->registerJsFile(
                 }
                 echo BoardColumn::widget(['id' => $column->uuid, 'idPrefix' => $boardColumnIdPrefix, 'name' => $column->title, 'boardUuid' => $boardUuid, 'cards' => $cards]);
             }
+
+            $cardCreationForm = [];
+            if ($newColumnModel) {
+                $cardCreationForm[] = $this->render('_newColumn', ['model' => $newColumnModel, 'boardUuid' => $boardUuid]);
+            }
+            echo BoardColumn::widget([ 'enableColumnCreation' => true, 'withHeader' => false, 'boardUuid' => $boardUuid, 'cards' => $cardCreationForm]);
+            echo '</div>';
             $this->registerJsVar('columns', $columnsId, View::POS_END);
             Pjax::end();
             ?>
-        </div>
     </section>
 </div>
-
