@@ -2,16 +2,20 @@
 
 namespace frontend\controllers;
 
+use Yii;
 use common\jobs\JobTest;
 use common\models\Board;
 use common\models\BoardRepository;
 use common\models\Card;
 use common\models\Column;
+use common\models\CreateColumnForm;
 use common\models\User;
 use frontend\models\CreateCardForm;
-use Yii;
+use yii\elasticsearch\QueryBuilder;
 use yii\filters\AccessControl;
+use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\helpers\VarDumper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -49,7 +53,7 @@ class KanbanController extends Controller
     public function actionBoard($uuid)
     {
         $userBoard = BoardRepository::getUserBoard(Yii::$app->getUser()->getId(), $uuid);
-        $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['order' => 'ASC']);
+        $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['id' => 'ASC']);
         if ($userBoard->count() == 0) {
             throw new NotFoundHttpException('board not found');
         }
@@ -70,6 +74,17 @@ class KanbanController extends Controller
             }
         }
 
+        if ($this->request->isPjax && $this->request->get('addColumn')) {
+
+            $newColumnModel = new CreateColumnForm(['scenario' => Column::SCENARIO_AJAX_CREATE]);
+            $newColumnModel->board_id = $userBoard->select(['id'])->limit(1)->one()->id;
+            if ($this->request->isPost && $newColumnModel->load($this->request->post()) && $newColumnModel->validate() && $newColumnModel->createColumn()) {
+                $newColumnModel->columnCreated(Url::to(['kanban/board', 'uuid' => $uuid]));
+                $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
+                unset($newColumnModel);
+            }
+        }
+
         $this->layout = "kanban";
         // $search = Yii::$app->request->post('search');
         // $board = ($search) ?
@@ -80,6 +95,7 @@ class KanbanController extends Controller
             'boardUuid' => $uuid,
             'boardColumns' => $boardColumns,
             'newCardModel' => $newCardModel ?? null,
+            'newColumnModel' => $newColumnModel ?? null,
         ]);
     }
 
