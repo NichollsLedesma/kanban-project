@@ -15,7 +15,6 @@ class CreateCardForm extends Card
 {
 
     public function __construct($config = []) {
-        $this->color = "fff";
         parent::__construct($config);
     }
 
