@@ -4,17 +4,19 @@ namespace frontend\controllers;
 
 use common\jobs\JobTest;
 use common\models\Board;
-use common\models\Entity;
+use common\models\BoardRepository;
+use common\models\Card;
+use common\models\Column;
 use common\models\User;
-use common\models\UserEntity;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
+use frontend\models\CreateCardForm;
 use Yii;
 use yii\elasticsearch\QueryBuilder;
 use yii\filters\AccessControl;
 use yii\helpers\Json;
+use yii\helpers\Url;
 use yii\helpers\VarDumper;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 
@@ -43,20 +45,43 @@ class KanbanController extends Controller
             ->all();
 
         return $this->render('index', [
-            "boards" => $boards
+                    "boards" => $boards
         ]);
     }
-    public function actionBoard($uuid)
-    {
+
+    public function actionBoard($uuid) {
+        $userBoard = BoardRepository::getUserBoard(Yii::$app->getUser()->getId(), $uuid);
+        $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['order' => 'ASC']);
+        if ($userBoard->count() == 0) {
+            throw new NotFoundHttpException('board not found');
+        }
+
+        if ($this->request->isPjax && $this->request->get('addCard')) {
+
+            $newCardModel = new CreateCardForm(['scenario' => Card::SCENARIO_AJAX_CREATE]);
+            $columnUuid = clone $boardColumns;
+            $columnUuid->filterWhere(['uuid' => $this->request->get('addCard')])->select(['id'])->limit(1);
+            if ($columnUuid->count() == 0) {
+                throw new NotFoundHttpException(printf("Column %s doesn't exists", $this->request->get('addCard')));
+            }
+
+            $newCardModel->column_id = $columnUuid->scalar();
+            if ($this->request->isPost && $newCardModel->load($this->request->post()) && $newCardModel->validate() && $newCardModel->createCard()) {
+                $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
+                unset($newCardModel);
+            }
+        }
+
         $this->layout = "kanban";
         // $search = Yii::$app->request->post('search');
-
         // $board = ($search) ?
         //     $this->getDataDump($search) :
         //     $this->getDump();
 
         return $this->render('board', [
-            'board' => $this->getDump(),
+                    'boardUuid' => $uuid,
+                    'boardColumns' => $boardColumns,
+                    'newCardModel' => $newCardModel ?? null,
         ]);
     }
 
@@ -68,12 +93,12 @@ class KanbanController extends Controller
         $select = ['username as value', 'username as  label', 'id as id'];
 
         return User::find()
-            ->select($select)
-            ->asArray()
-            ->all();
+                        ->select($select)
+                        ->asArray()
+                        ->all();
     }
-    public function actionGetOne($id)
-    {
+
+    public function actionGetOne($id) {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         return [
@@ -83,19 +108,17 @@ class KanbanController extends Controller
         ];
     }
 
-    public function actionMove()
-    {
+    public function actionMove() {
         $id = Yii::$app->queue->push(
-            new JobTest(
-                [
+                new JobTest(
+                        [
                     "message" => "Hi job"
-                ]
-            )
+                        ]
+                )
         );
     }
 
-    private function getBoardsDump()
-    {
+    private function getBoardsDump() {
         return [
             $this->getDump(1),
             $this->getDump(2),
@@ -108,8 +131,7 @@ class KanbanController extends Controller
         ];
     }
 
-    private function getDump($id = 1)
-    {
+    private function getDump($id = 1) {
         return [
             "id" => $id,
             "uuid" => "randomuuid_$id",
@@ -170,8 +192,8 @@ class KanbanController extends Controller
             ]
         ];
     }
-    private function getDataDump($search)
-    {
+
+    private function getDataDump($search) {
         return [
             "id" => 1,
             "name" => "board_name",
@@ -185,8 +207,6 @@ class KanbanController extends Controller
                             "name" => "task 1",
                             "description" => "something",
                         ],
-
-
                     ]
                 ],
                 [
@@ -213,4 +233,5 @@ class KanbanController extends Controller
             ]
         ];
     }
+
 }
