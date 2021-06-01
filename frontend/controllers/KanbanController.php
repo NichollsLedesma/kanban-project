@@ -2,16 +2,23 @@
 
 namespace frontend\controllers;
 
+use Yii;
 use common\jobs\JobTest;
 use common\models\Board;
 use common\models\BoardRepository;
 use common\models\Card;
 use common\models\Column;
+use common\models\Entity;
+use common\models\CreateColumnForm;
 use common\models\User;
+use common\widgets\BoardCard\BoardCard;
 use frontend\models\CreateCardForm;
-use Yii;
+use yii\elasticsearch\QueryBuilder;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\helpers\VarDumper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -40,16 +47,22 @@ class KanbanController extends Controller
         $boards = Board::find()
             ->where(["owner_id" => Yii::$app->getUser()->getId()])
             ->all();
+        $entities =  ArrayHelper::map(
+            Yii::$app->getUser()->getIdentity()->entities,
+            'id',
+            'name'
+        );
 
         return $this->render('index', [
-            "boards" => $boards
+            "boards" => $boards,
+            "entities" => $entities
         ]);
     }
 
     public function actionBoard($uuid)
     {
         $userBoard = BoardRepository::getUserBoard(Yii::$app->getUser()->getId(), $uuid);
-        $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['order' => 'ASC']);
+        $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['id' => 'ASC']);
         if ($userBoard->count() == 0) {
             throw new NotFoundHttpException('board not found');
         }
@@ -64,9 +77,22 @@ class KanbanController extends Controller
             }
 
             $newCardModel->column_id = $columnUuid->scalar();
-            if ($this->request->isPost && $newCardModel->load($this->request->post()) && $newCardModel->validate() && $newCardModel->createCard(Url::to(['kanban/board', 'uuid' => $uuid]), $this->request->get('addCard'))) {
+            if ($this->request->isPost && $newCardModel->load($this->request->post()) && $newCardModel->validate() && $newCardModel->createCard()) {
+                $obj = ['type' => 'card', 'action' => 'new', 'params' => ['columnId' => $this->request->get('addCard'), 'order' => 'last', 'html' => BoardCard::widget(['id' => $newCardModel->uuid, 'title' => $newCardModel->title, 'content' => $newCardModel->description])]];
+                Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => $uuid]), $obj);
                 $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
                 unset($newCardModel);
+            }
+        }
+
+        if ($this->request->isPjax && $this->request->get('addColumn')) {
+
+            $newColumnModel = new CreateColumnForm(['scenario' => Column::SCENARIO_AJAX_CREATE]);
+            $newColumnModel->board_id = $userBoard->select(['id'])->limit(1)->one()->id;
+            if ($this->request->isPost && $newColumnModel->load($this->request->post()) && $newColumnModel->validate() && $newColumnModel->createColumn()) {
+                $newColumnModel->columnCreated(Url::to(['kanban/board', 'uuid' => $uuid]));
+                $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
+                unset($newColumnModel);
             }
         }
 
@@ -80,6 +106,7 @@ class KanbanController extends Controller
             'boardUuid' => $uuid,
             'boardColumns' => $boardColumns,
             'newCardModel' => $newCardModel ?? null,
+            'newColumnModel' => $newColumnModel ?? null,
         ]);
     }
 
@@ -115,124 +142,5 @@ class KanbanController extends Controller
                 ]
             )
         );
-    }
-
-    private function getBoardsDump()
-    {
-        return [
-            $this->getDump(1),
-            $this->getDump(2),
-            $this->getDump(3),
-            $this->getDump(4),
-            $this->getDump(5),
-            $this->getDump(6),
-            $this->getDump(7),
-            $this->getDump(8),
-        ];
-    }
-
-    private function getDump($id = 1)
-    {
-        return [
-            "id" => $id,
-            "uuid" => "randomuuid_$id",
-            "name" => "board_name_$id",
-            "columns" => [
-                [
-                    "id" => 1,
-                    "name" => "backlog",
-                    "tasks" => [
-                        [
-                            "id" => 1,
-                            "name" => "task 1",
-                            "description" => "something",
-                        ],
-                        [
-                            "id" => 2,
-                            "name" => "task 2",
-                            "description" => "something",
-                        ],
-                        [
-                            "id" => 3,
-                            "name" => "task 3",
-                            "description" => "something",
-                        ],
-                        [
-                            "id" => 4,
-                            "name" => "task 4",
-                            "description" => "something",
-                        ],
-                        [
-                            "id" => 5,
-                            "name" => "task 5",
-                            "description" => "something",
-                        ]
-                    ]
-                ],
-                [
-                    "id" => 2,
-                    "name" => "todo",
-                    "tasks" => [
-                        [
-                            "id" => 6,
-                            "name" => "task 6",
-                            "description" => "something",
-                        ]
-                    ]
-                ],
-                [
-                    "id" => 3,
-                    "name" => "doing",
-                    "tasks" => []
-                ],
-                [
-                    "id" => 4,
-                    "name" => "done",
-                    "tasks" => []
-                ],
-            ]
-        ];
-    }
-
-    private function getDataDump($search)
-    {
-        return [
-            "id" => 1,
-            "name" => "board_name",
-            "columns" => [
-                [
-                    "id" => 1,
-                    "name" => "backlog",
-                    "tasks" => [
-                        [
-                            "id" => 1,
-                            "name" => "task 1",
-                            "description" => "something",
-                        ],
-                    ]
-                ],
-                [
-                    "id" => 2,
-                    "name" => "todo",
-                    "tasks" => [
-                        [
-                            "id" => 6,
-                            "name" => "task 6",
-                            "description" => "something",
-                        ]
-                    ]
-                ],
-                [
-                    "id" => 3,
-                    "name" => "doing",
-                    "tasks" => []
-                ],
-                [
-                    "id" => 4,
-                    "name" => "done",
-                    "tasks" => []
-                ],
-            ]
-        ];
     }
 }

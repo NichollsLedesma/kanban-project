@@ -12,6 +12,7 @@ use yii\helpers\VarDumper;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\UnprocessableEntityHttpException;
 
 class BoardController extends Controller
 {
@@ -22,7 +23,21 @@ class BoardController extends Controller
 
     public function actionCreate()
     {
-        $entity = $this->getEntity();
+        $entity_id = Yii::$app->request->post('entity_id');
+        $entity = Entity::find()
+            ->where(["id" => $entity_id])
+            ->where([
+                "in", "id", UserEntity::find()->select(["entity_id"])
+                    ->where([
+                        "user_id" => Yii::$app->getUser()->getId(),
+                        "entity_id" => $entity_id,
+                    ]),
+            ])
+            ->limit(1)->one();
+
+        if (!$entity) {
+            return throw new UnprocessableEntityHttpException("entity not belong to the user.");
+        }
 
         $newBoard = new Board();
         $newBoard->title = Yii::$app->request->post('name');
