@@ -13,7 +13,7 @@ use yii\widgets\Pjax;
 $this->registerAssetBundle(DragulaAsset::class);
 $this->registerAssetBundle(PahoMqttAsset::class);
 
-$boardCode = "board/create";
+$boardCode = "/kanban/123";
 $boardColumnIdPrefix = "column-id_";
 //$columns = ArrayHelper::getColumn($board['columns'], 'name');
 $this->registerJsVar('channelName', $boardCode, View::POS_END);

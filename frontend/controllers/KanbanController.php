@@ -9,19 +9,16 @@ use common\models\Column;
 use common\models\User;
 use frontend\models\CreateCardForm;
 use Yii;
-use yii\elasticsearch\QueryBuilder;
 use yii\filters\AccessControl;
-use yii\helpers\Json;
-use yii\helpers\VarDumper;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
-
 class KanbanController extends Controller
 {
-    public function behaviors()
-    {
+
+    public function behaviors() {
         return [
             'access' => [
                 "class" => AccessControl::class,
@@ -36,8 +33,7 @@ class KanbanController extends Controller
         ];
     }
 
-    public function actionIndex()
-    {
+    public function actionIndex() {
         $boards = $this->getBoardsDump();
 
         return $this->render('index', [
@@ -62,7 +58,7 @@ class KanbanController extends Controller
             }
 
             $newCardModel->column_id = $columnUuid->scalar();
-            if ($this->request->isPost && $newCardModel->load($this->request->post()) && $newCardModel->validate() && $newCardModel->createCard()) {
+            if ($this->request->isPost && $newCardModel->load($this->request->post()) && $newCardModel->validate() && $newCardModel->createCard(Url::to(['kanban/board', 'uuid' => $uuid]), $this->request->get('addCard'))) {
                 $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
                 unset($newCardModel);
             }
@@ -81,10 +77,7 @@ class KanbanController extends Controller
         ]);
     }
 
-
-
-    public function actionGet()
-    {
+    public function actionGet() {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $search = Yii::$app->request->get('query');
         $select = ['username as value', 'username as  label', 'id as id'];
