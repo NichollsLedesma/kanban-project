@@ -18,15 +18,10 @@ class CreateCardForm extends Card
         parent::__construct($config);
     }
 
-    public function createCard(string $mqttTopic, string $columnUuid) {
+    public function createCard() {
         $this->order = 1;
         $this->owner_id = Yii::$app->getUser()->getId();
-        if (!$this->save()) {
-            return false;
-        }
-        $obj = ['type' => 'card', 'action' => 'new', 'params' => ['columnId' => $columnUuid, 'order' => 'last', 'html' => \common\widgets\BoardCard\BoardCard::widget(['id' => $this->uuid, 'title' => $this->title, 'content' => $this->title])]];
-        Yii::$app->mqtt->sendMessage($mqttTopic, $obj);
-        return true;
+        return $this->save();
     }
 
 }

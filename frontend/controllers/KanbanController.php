@@ -7,6 +7,7 @@ use common\models\BoardRepository;
 use common\models\Card;
 use common\models\Column;
 use common\models\User;
+use common\widgets\BoardCard\BoardCard;
 use frontend\models\CreateCardForm;
 use Yii;
 use yii\filters\AccessControl;
@@ -58,7 +59,9 @@ class KanbanController extends Controller
             }
 
             $newCardModel->column_id = $columnUuid->scalar();
-            if ($this->request->isPost && $newCardModel->load($this->request->post()) && $newCardModel->validate() && $newCardModel->createCard(Url::to(['kanban/board', 'uuid' => $uuid]), $this->request->get('addCard'))) {
+            if ($this->request->isPost && $newCardModel->load($this->request->post()) && $newCardModel->validate() && $newCardModel->createCard()) {
+                $obj = ['type' => 'card', 'action' => 'new', 'params' => ['columnId' => $this->request->get('addCard'), 'order' => 'last', 'html' => BoardCard::widget(['id' => $newCardModel->uuid, 'title' => $newCardModel->title, 'content' => $newCardModel->description])]];
+                Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => $uuid]), $obj);
                 $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
                 unset($newCardModel);
             }
