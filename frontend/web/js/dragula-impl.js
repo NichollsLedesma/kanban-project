@@ -2,11 +2,11 @@ $(document).ready(function () {
     const wsbroker = "localhost";  // mqtt websocket enabled broker
     const wsport = 15675; // port for above
     const client = new Paho.MQTT.Client(
-        wsbroker,
-        wsport,
-        "/ws",
-        "myclientid_" + parseInt(Math.random() * 100, 10)
-    );
+            wsbroker,
+            wsport,
+            "/ws",
+            "myclientid_" + parseInt(Math.random() * 100, 10)
+            );
 
     client.onConnectionLost = function (responseObject) {
         connect();
@@ -14,7 +14,12 @@ $(document).ready(function () {
 
     client.onMessageArrived = function (message) {
         const objData = JSON.parse(message.payloadString);
-        moveCard(objData);
+        if (objData.type === 'card' && objData.action === 'new') {
+            if ($('div#column-id_' + objData.params.columnId).length > 0) {
+                $('div#column-id_' + objData.params.columnId).append(objData.params.html);
+            }
+        }
+        //moveCard(objData);
     };
     connect();
 
@@ -40,17 +45,17 @@ $(document).ready(function () {
     }
 
     const dragulaComp = dragula(
-        columns.map(column => document.getElementById(column))
-    );
+            columns.map(column => document.getElementById(column))
+            );
 
     dragulaComp.on('drop', (component) => {
         const taskId = Number($(component).attr("id").split('_')[1]);
         const targetColumnId = $(component.parentElement).attr('data-column-id')
 
-        sendMessage({ taskId, targetColumnId })
+        sendMessage({taskId, targetColumnId})
     })
-    
-    
+
+
 
     $('#search').autocomplete({
         type: "POST",
@@ -62,7 +67,7 @@ $(document).ready(function () {
             });
         },
         select: (event, ui) => {
-            const { id } = ui.item;
+            const {id} = ui.item;
             getInfoAndOpenModal(id);
         }
     });
@@ -74,11 +79,11 @@ $(document).ready(function () {
 
     function getInfoAndOpenModal(id) {
         $.get("get-one/" + id,
-            (task) => {
-                const modal = $('#detailModal');
-                modal.modal('show')
-                modal.find(".modal-title").html(task.name);
-                modal.find(".content").html(task.description)
-            });
+                (task) => {
+            const modal = $('#detailModal');
+            modal.modal('show')
+            modal.find(".modal-title").html(task.name);
+            modal.find(".content").html(task.description)
+        });
     }
 });

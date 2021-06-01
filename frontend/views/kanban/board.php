@@ -13,7 +13,7 @@ use yii\widgets\Pjax;
 $this->registerAssetBundle(DragulaAsset::class);
 $this->registerAssetBundle(PahoMqttAsset::class);
 
-$boardCode = "board/create";
+$boardCode = \yii\helpers\Url::to(['kanban/board', 'uuid' => $boardUuid]);
 $boardColumnIdPrefix = "column-id_";
 //$columns = ArrayHelper::getColumn($board['columns'], 'name');
 $this->registerJsVar('channelName', $boardCode, View::POS_END);
@@ -58,7 +58,7 @@ $this->registerJsFile(
                 }
                 echo BoardColumn::widget(['id' => $column->uuid, 'idPrefix' => $boardColumnIdPrefix, 'name' => $column->title, 'boardUuid' => $boardUuid, 'cards' => $cards]);
             }
-            $this->registerJsVar('columns', $columnsId, View::POS_END);
+            $this->registerJsVar('columns', $columnsId ?? [], View::POS_END);
             Pjax::end();
             ?>
         </div>

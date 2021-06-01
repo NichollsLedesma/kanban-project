@@ -1,5 +1,6 @@
 <?php
 
+use common\widgets\listBoard\CardWidget;
 use common\widgets\listBoard\ListBoardWidget;
 
 $this->registerCssFile(
@@ -10,6 +11,8 @@ $this->registerCssFile(
 <?= ListBoardWidget::widget(
     [
         'boards' => $boards,
-        "title" => ""
+        "title" => "",
+        "isEnableToCreate" => true,
     ]
 ) ?>
+

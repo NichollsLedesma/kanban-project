@@ -12,6 +12,7 @@ class ListBoardWidget extends Widget
 
     public $boards = [];
     public $title = '';
+    public $isEnableToCreate = false;
 
     public function init()
     {
@@ -20,9 +21,9 @@ class ListBoardWidget extends Widget
 
     public function run()
     {
-        if (count($this->boards) === 0) {
-            return "<h1>Nothing to show</h1>";
-        }
+        // if (count($this->boards) === 0) {
+        //     return "<h1>Nothing to show</h1>";
+        // }
 
         ListBoardWidgetAsset::register($this->getView());
 
@@ -31,6 +32,7 @@ class ListBoardWidget extends Widget
             [
                 'boards' => $this->boards,
                 'title' => $this->title,
+                'isEnableToCreate' => $this->isEnableToCreate,
             ]
         );
     }
