@@ -95,5 +95,10 @@ return [
             // for the mailer to send real emails.
             'useFileTransport' => false,
         ],
+        'mqtt' => [
+            'class' => common\components\MqttComponent::class,
+            'host' => 'rabbitmq',
+            'port' => 1883
+        ]
     ],
 ];

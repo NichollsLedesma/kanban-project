@@ -15,25 +15,18 @@ class CreateCardForm extends Card
 {
 
     public function __construct($config = []) {
-        $this->color = "fff";
         parent::__construct($config);
     }
 
-    public function createCard() {
+    public function createCard(string $mqttTopic, string $columnUuid) {
         $this->order = 1;
         $this->owner_id = Yii::$app->getUser()->getId();
-        $card = $this->save();
+        if (!$this->save()) {
+            return false;
+        }
+        $obj = ['type' => 'card', 'action' => 'new', 'params' => ['columnId' => $columnUuid, 'order' => 'last', 'html' => \common\widgets\BoardCard\BoardCard::widget(['id' => $this->uuid, 'title' => $this->title, 'content' => $this->title])]];
+        Yii::$app->mqtt->sendMessage($mqttTopic, $obj);
         return true;
-    }
-
-    public function cardCreated() {
-        $server = 'rabbitmq';
-        $clientId = 'server';
-
-        $mqtt = new MqttClient($server, 1883, $clientId);
-        $mqtt->connect(null, true);
-        $mqtt->publish('board/create', 'new card123');
-        $mqtt->disconnect();
     }
 
 }

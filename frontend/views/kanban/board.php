@@ -13,7 +13,7 @@ use yii\widgets\Pjax;
 $this->registerAssetBundle(DragulaAsset::class);
 $this->registerAssetBundle(PahoMqttAsset::class);
 
-$boardCode = "board/create";
+$boardCode = \yii\helpers\Url::to(['kanban/board', 'uuid' => $boardUuid]);
 $boardColumnIdPrefix = "column-id_";
 $this->registerCssFile(
     Yii::$app->request->getBaseUrl() . '/css/column.css'

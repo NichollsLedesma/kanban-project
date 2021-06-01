@@ -19,11 +19,10 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
-
 class KanbanController extends Controller
 {
-    public function behaviors()
-    {
+
+    public function behaviors() {
         return [
             'access' => [
                 "class" => AccessControl::class,
@@ -38,8 +37,7 @@ class KanbanController extends Controller
         ];
     }
 
-    public function actionIndex()
-    {
+    public function actionIndex() {
         $boards = $this->getBoardsDump();
 
         return $this->render('index', [
@@ -64,7 +62,7 @@ class KanbanController extends Controller
             }
 
             $newCardModel->column_id = $columnUuid->scalar();
-            if ($this->request->isPost && $newCardModel->load($this->request->post()) && $newCardModel->validate() && $newCardModel->createCard()) {
+            if ($this->request->isPost && $newCardModel->load($this->request->post()) && $newCardModel->validate() && $newCardModel->createCard(Url::to(['kanban/board', 'uuid' => $uuid]), $this->request->get('addCard'))) {
                 $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
                 unset($newCardModel);
             }
@@ -75,7 +73,7 @@ class KanbanController extends Controller
             $newColumnModel = new CreateColumnForm(['scenario' => Column::SCENARIO_AJAX_CREATE]);
             $newColumnModel->board_id = $userBoard->select(['id'])->limit(1)->one()->id;
             if ($this->request->isPost && $newColumnModel->load($this->request->post()) && $newColumnModel->validate() && $newColumnModel->createColumn()) {
-                $newColumnModel->columnCreated();
+                $newColumnModel->columnCreated(Url::to(['kanban/board', 'uuid' => $uuid]));
                 $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
                 unset($newColumnModel);
             }
@@ -95,10 +93,7 @@ class KanbanController extends Controller
         ]);
     }
 
-
-
-    public function actionGet()
-    {
+    public function actionGet() {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $search = Yii::$app->request->get('query');
         $select = ['username as value', 'username as  label', 'id as id'];

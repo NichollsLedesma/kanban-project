@@ -19,7 +19,7 @@ class CreateColumnForm extends Column
         return true;
     }
 
-    public function columnCreated() {
+    public function columnCreated(string $mqttTopic) {
         $server = 'rabbitmq';
         $clientId = 'server';
 
@@ -33,7 +33,7 @@ class CreateColumnForm extends Column
                 'id' => $this->uuid,
                 'boardUuid' => $this->board->uuid,
             ]));
-        $mqtt->publish('board/create', json_encode($arr));
+        $mqtt->publish($mqttTopic, json_encode($arr));
         $mqtt->disconnect();
     }
 
