@@ -58,7 +58,7 @@ $this->registerJsFile(
     <section class="content pb-3">
             <?php
             Pjax::begin(['id' => 'board-container']);
-            echo '<div class="container-fluid h-100">';
+            echo '<div class="container-fluid h-100" id="board-body">';
             foreach ($boardColumns->all() as $column) {
                 $cards = [];
                 $columnsId[] = $boardColumnIdPrefix . $column->uuid;

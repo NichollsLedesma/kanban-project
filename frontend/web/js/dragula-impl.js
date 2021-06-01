@@ -50,15 +50,15 @@ $(document).ready(function () {
     const dragulaComp = dragula(
             columns.map(column => document.getElementById(column))
             );
+    dragulaComp.containers.push(document.getElementById('board-body'));
 
     dragulaComp.on('drop', (component) => {
-        const taskId = Number($(component).attr("id").split('_')[1]);
-        const targetColumnId = $(component.parentElement).attr('data-column-id')
-
-        sendMessage({taskId, targetColumnId})
+        if ($(component).hasClass('task')) {
+            const taskId = Number($(component).attr("id").split('_')[1]);
+            const targetColumnId = $(component.parentElement).attr('data-column-id')
+            sendMessage({taskId, targetColumnId})
+        }
     })
-
-
 
     $('#search').autocomplete({
         type: "POST",
