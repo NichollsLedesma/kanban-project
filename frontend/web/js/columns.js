@@ -1,5 +1,5 @@
 function addNewColumn(columnHtml) {
-    $('#creation-column').before(columnHtml);
+    $('.transparent').before(columnHtml);
 }
 
 function handleColumnElement(data = '') {

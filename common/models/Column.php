@@ -115,20 +115,20 @@ class Column extends \yii\db\ActiveRecord
 
     public function afterSave($insert, $changedAttributes)
     {
-        if ($insert) {
-            return  $this->createElasticDocument();
-        }
+        // if ($insert) {
+        //     return  $this->createElasticDocument();
+        // }
 
-        $doc = ElasticHelper::search(ElasticColumn::class, ["uuid" => $this->uuid]);
+        // $doc = ElasticHelper::search(ElasticColumn::class, ["uuid" => $this->uuid]);
 
-        if (!$doc) {
-            return  $this->createElasticDocument();
-        }
+        // if (!$doc) {
+        //     return  $this->createElasticDocument();
+        // }
 
-        $doc->setAttributes([
-            'title' => $this->title,
-        ], false);
-        $doc->save();
+        // $doc->setAttributes([
+        //     'title' => $this->title,
+        // ], false);
+        // $doc->save();
 
         return true;
     }
