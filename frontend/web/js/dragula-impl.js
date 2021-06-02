@@ -47,18 +47,27 @@ $(document).ready(function () {
         set.append(card);
     }
 
-    const dragulaComp = dragula(
+    function dragulaLoad(){
+        d = dragula(
             columns.map(column => document.getElementById(column))
             );
-    dragulaComp.containers.push(document.getElementById('board-body'));
+        d.containers.push(document.getElementById('board-body'));
+        d.on('drop', (component) => {
+            if ($(component).hasClass('task')) {
+                const taskId = Number($(component).attr("id").split('_')[1]);
+                const targetColumnId = $(component.parentElement).attr('data-column-id')
+                sendMessage({taskId, targetColumnId})
+            }
+        });
 
-    dragulaComp.on('drop', (component) => {
-        if ($(component).hasClass('task')) {
-            const taskId = Number($(component).attr("id").split('_')[1]);
-            const targetColumnId = $(component.parentElement).attr('data-column-id')
-            sendMessage({taskId, targetColumnId})
-        }
-    })
+        return d;
+    }
+
+    const dragulaComp = dragulaLoad();
+
+    $(document).on('pjax:end', function() {
+        dragulaComp = dragulaLoad();
+    });
 
     $('#search').autocomplete({
         type: "POST",
