@@ -94,4 +94,35 @@ $(document).ready(function () {
                 modal.find(".content").html(task.description)
             });
     }
+
+    const boardNameComp = $("#boardname");
+    boardNameComp.val(boardName);
+    boardNameComp.addClass("disabled-style")
+    boardNameComp.on("click", (e) => {
+        boardNameComp.removeClass("disabled-style");
+        boardNameComp.select();
+    });
+    boardNameComp.on("blur", (e) => {
+        boardNameComp.addClass("disabled-style");
+        if (boardNameComp.val() !== boardName) {
+            const url = `${window.location.pathname.replace("kanban", "board/update")}`
+            boardName = boardNameComp.val();
+            $.ajax({
+                method: "PUT",
+                url,
+                data: { title: boardNameComp.val() },
+            });
+        }
+    });
+
+    $("#remove-board").on("click", (e) => {
+        if (confirm("Are you sure you want to delete this board?")) {
+            const url = `${window.location.pathname.replace("kanban", "board/delete")}`
+            $.ajax({
+                method: "DELETE",
+                url
+            });
+        }
+    });
+
 });

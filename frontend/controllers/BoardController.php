@@ -60,34 +60,35 @@ class BoardController extends Controller
         return $entities[0];
     }
 
-    public function actionUpdate()
+    public function actionUpdate($uuid)
     {
-        $boardUuid = Yii::$app->request->get('uuid');
-        $board = Board::find()->where(['uuid' => $boardUuid])->limit(1)->one();
+        $board = Board::find()->where(['uuid' => $uuid])->limit(1)->one();
 
         if (!$board) {
             return throw new NotFoundHttpException("board not found.");
         }
 
         try {
-            $board->name = Yii::$app->request->post('name');
+            $board->title = Yii::$app->request->post('title');
             $board->save();
 
-            return $this->redirect(["kanban/board", "uuid" => $board->uuid]);
+            return true;
+            // return $this->redirect(["kanban/board", "uuid" => $board->uuid]);
         } catch (Exception $e) {
             return throw new BadRequestHttpException("Error updating board: " . $e->getMessage());
         }
     }
 
-    public function actionDelete()
+    public function actionDelete($uuid)
     {
-        $boardUuid = Yii::$app->request->get('uuid');
-        $board = Board::find()->where(['uuid' => $boardUuid])->limit(1)->one();
+        $board = Board::find()->where(['uuid' => $uuid])->limit(1)->one();
 
         if (!$board) {
             return throw new NotFoundHttpException("board not found.");
         }
 
         $board->delete();
+
+        return $this->redirect(["kanban/index"]);
     }
 }

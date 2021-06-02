@@ -30,3 +30,10 @@ body {
 .card-secondary .save-card{
     height: auto;
 }
+
+.disabled-style {
+    background-color: #dadada !important;
+}
+/* .enabled-style {
+    background-color: #fff !important;
+} */
