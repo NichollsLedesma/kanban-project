@@ -10,6 +10,8 @@ use common\models\Card;
 use common\models\Column;
 use common\models\Entity;
 use common\models\CreateColumnForm;
+use common\models\elastic\Card as ElasticCard;
+use common\models\elastic\ElasticHelper;
 use common\models\User;
 use common\widgets\BoardCard\BoardCard;
 use frontend\models\CreateCardForm;
@@ -110,27 +112,66 @@ class KanbanController extends Controller
         ]);
     }
 
-    public function actionGet()
+    public function actionGet($uuid)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $search = Yii::$app->request->get('query');
-        $select = ['username as value', 'username as  label', 'id as id'];
 
-        return User::find()
-            ->select($select)
-            ->asArray()
-            ->all();
+        $search = Yii::$app->request->get('query');
+        // $search = Yii::$app->request->get('query');
+
+        // $data = ElasticHelper::search(ElasticCard::class, ["title" => $search]);
+        $board = Board::find()->where(["uuid" => $uuid])->one();
+
+        if (!$board) {
+            return [];
+        }
+
+        $data = ElasticCard::find()->query([
+            "bool" => [
+                "filter" => [
+                    'match' => ["title" => $search],
+                ],
+                "must" => [
+                    'match' => ["board_id" => $board->id],
+                ],
+            ]
+        ])->asArray()->all();
+
+        $ret = [];
+        foreach ($data as $item) {
+            $itemSource = $item['_source'];
+            $ret[] = [
+                "id" => $itemSource['uuid'],
+                "value" => $itemSource['title'],
+                "label" => $itemSource['title'],
+            ];
+        }
+
+        return $ret;
+        // ArrayHelper::getColumn(
+        //     $data,
+        //     function ($item) {
+        //         $itemSource = $item['_source'];
+        //         return [
+        //             "id" => $itemSource['id'],
+        //             "value" => $itemSource['title'],
+        //             "label" => $itemSource['title'],
+        //         ];
+        //     }
+        // );
+        // $select = ['username as value', 'username as  label', 'id as id'];
+
+        // return User::find()
+        //     ->select($select)
+        //     ->asArray()
+        //     ->all();
     }
 
     public function actionGetOne($id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        return [
-            "id" => $id,
-            "name" => "task " . $id,
-            "description" => "something",
-        ];
+        return ElasticHelper::search(ElasticCard::class, ["uuid" => $id]);
     }
 
     public function actionMove()

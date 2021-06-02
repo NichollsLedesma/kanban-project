@@ -69,7 +69,7 @@ $(document).ready(function () {
         minLength: 3,
         source: (request, response) => {
             $('.ui-autocomplete').css('z-index', 9999);
-            $.get("get/" + request.term, (options) => {
+            $.get(window.location.pathname + "/get/" + request.term, (options) => {
                 response(options);
             });
         },
@@ -80,16 +80,17 @@ $(document).ready(function () {
     });
 
     $(".task").on("click", (e) => {
-        const id = Number($(e.currentTarget).attr("id").split('_')[1]);
+        const id = $(e.currentTarget).attr("id").split('_')[1];
         getInfoAndOpenModal(id);
     });
 
     function getInfoAndOpenModal(id) {
         $.get("get-one/" + id,
             (task) => {
+                console.log(task)
                 const modal = $('#detailModal');
                 modal.modal('show')
-                modal.find(".modal-title").html(task.name);
+                modal.find(".modal-title").html(task.title);
                 modal.find(".content").html(task.description)
             });
     }

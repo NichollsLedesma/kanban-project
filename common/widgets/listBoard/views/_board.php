@@ -43,17 +43,22 @@ use yii\widgets\ActiveForm;
 ]); ?>
 
 <div class="form-group">
+    <?= Html::tag('span', "Board name", ["for" => "name"]); ?>
     <?= Html::textInput('name', "", [
         'class' => "form-control",
-        'required' => "on"
+        'required' => "on",
+        "id" => "name",
+        "placeholder" => "Board name",
     ]); ?>
 </div>
 
 <?php if (count($entities) > 0) { ?>
     <div class="form-group">
-        <?= Html::dropDownList('entity_id', 0, [null => 'Please select', 'options' => $entities], [
+    <?= Html::tag('span', "Entity", ["for" => "name"]); ?>
+        <?= Html::dropDownList('entity_id', 0, [null => 'Please select entity', 'options' => $entities], [
             'class' => "form-control",
             'required' => "on",
+            'id' => "entity_id",
         ]) ?>
     </div>
     <?= Html::submitButton('Create', [
