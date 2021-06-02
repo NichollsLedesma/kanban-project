@@ -94,7 +94,7 @@ class SiteController extends Controller
     public function actionTestGet()
     {
         // search
-        $boardES = ElasticHelper::getAll(ElasticBoard::class);
+        $boardES = ElasticHelper::getAll(ElasticCard::class);
         echo "<pre>";
         VarDumper::dump($boardES);
         echo "</pre>";

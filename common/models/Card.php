@@ -117,7 +117,7 @@ class Card extends \yii\db\ActiveRecord
 
     public function afterSave($insert, $changedAttributes)
     {
-        return;
+        
         if ($insert) {
             return $this->createElasticDocument();
         }
@@ -133,6 +133,7 @@ class Card extends \yii\db\ActiveRecord
             'order' => $this->order,
             'description' => $this->description,
             'column_id' => $this->column_id,
+            'board_id' => $this->column["board_id"],
             'color' => $this->color,
             'owner_id' => $this->owner_id,
         ], false);
@@ -147,6 +148,7 @@ class Card extends \yii\db\ActiveRecord
             "title" => $this->title,
             "uuid" => $this->uuid,
             "owner_id" => $this->owner_id,
+            'board_id' => $this->column["board_id"],
             "column_id" => $this->column_id,
             "description" => $this->description,
             "color" => $this->color,
