@@ -99,16 +99,16 @@ class KanbanController extends Controller
         ]);
     }
 
-    public function actionUpdateOrder()
+    public function actionUpdateColumnOrder($uuid)
     {
-        foreach (Yii::$app->request->post('order') as $key => $value) {
+        foreach (Yii::$app->request->post('columns') as $key => $value) {
             Column::updateAll(['order' => $key], ['uuid' => $value]);
         }
-        $arr = array(
+        $topic = Url::to(['kanban/board', 'uuid' => $uuid]);
+        $response = array(
             'type'=>'Column ReOrder',
         );
-
-        Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => 'randomuuid_1']), $arr);
+        Yii::$app->mqtt->sendMessage($topic, $response);
     }
 
     public function actionGet()

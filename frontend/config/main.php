@@ -46,7 +46,7 @@ return [
             'rules' => [
                 'kanban/get/<query>' => 'kanban/get',
                 'kanban/get-one/<id>' => 'kanban/get-one',
-                'kanban/update-order' => 'kanban/update-order',
+                'kanban/<uuid>/column/order' => 'kanban/update-column-order',
                 'kanban/<uuid>' => 'kanban/board',
                 'board/create' => 'board/create',
             ],

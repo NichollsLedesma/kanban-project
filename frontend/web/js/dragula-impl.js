@@ -65,8 +65,8 @@ $(document).ready(function () {
             if ($(component).hasClass('card-row')) {
                 let updatedColumnOrder = getCurrentColumnOrder();
                 $.post({
-                    url: 'http://y2aa-frontend.test:81/kanban/update-order',
-                    data: {order:updatedColumnOrder},
+                    url: updateColumnOrderUrl,
+                    data: {columns:updatedColumnOrder},
                     cache: false,
                 });
             }

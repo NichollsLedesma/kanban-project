@@ -14,6 +14,7 @@ $this->registerAssetBundle(DragulaAsset::class);
 $this->registerAssetBundle(PahoMqttAsset::class);
 
 $boardCode = \yii\helpers\Url::to(['kanban/board', 'uuid' => $boardUuid]);
+$updateColumnOrderUrl = \yii\helpers\Url::to(['kanban/update-column-order', 'uuid' => $boardUuid]);
 $boardColumnIdPrefix = "column-id_";
 $this->registerCssFile(
     Yii::$app->request->getBaseUrl() . '/css/column.css'
@@ -21,6 +22,7 @@ $this->registerCssFile(
 //$columns = ArrayHelper::getColumn($board['columns'], 'name');
 
 $this->registerJsVar('channelName', $boardCode, View::POS_END);
+$this->registerJsVar('updateColumnOrderUrl', $updateColumnOrderUrl, View::POS_END);
 // $this->registerJsVar('cards', $board['columns'], View::POS_END);
 
 $this->registerJsFile(
