@@ -108,6 +108,9 @@ class Column extends \yii\db\ActiveRecord
     {
         if ($insert) {
             $this->uuid = \thamtech\uuid\helpers\UuidHelper::uuid();
+            $this->order = self::find()
+                               ->where(['board_id'=>$this->board_id])
+                               ->max('"order"')+1;
         }
 
         return parent::beforeSave($insert);
