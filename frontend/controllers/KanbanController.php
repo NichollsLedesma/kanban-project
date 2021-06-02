@@ -171,11 +171,7 @@ class KanbanController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        return [
-            "id" => $id,
-            "name" => "task " . $id,
-            "description" => "something",
-        ];
+        return ElasticHelper::search(ElasticCard::class, ["uuid" => $id]);
     }
 
     public function actionMove()

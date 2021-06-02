@@ -4,6 +4,8 @@ use common\widgets\BoardCard\BoardCard;
 use common\widgets\BoardColumn\BoardColumn;
 use frontend\assets\dragula\DragulaAsset;
 use frontend\assets\pahoMqtt\PahoMqttAsset;
+use yii\bootstrap4\Modal;
+use yii\helpers\Html;
 use yii\helpers\VarDumper;
 use yii\web\View;
 use yii\widgets\ActiveForm;
@@ -54,7 +56,7 @@ $this->registerJsFile(
         echo '<div class="container-fluid h-100">';
         foreach ($boardColumns->all() as $column) {
             $cards = [];
-            $this->registerJS('addColumnDragula("'. $boardColumnIdPrefix . $column->uuid.'")', View::POS_END);
+            $this->registerJS('addColumnDragula("' . $boardColumnIdPrefix . $column->uuid . '")', View::POS_END);
             foreach ($column->getCards()->all() as $task) {
                 $cards[] = BoardCard::widget(['id' => $task->uuid, 'title' => $task->title, 'content' => $task->description]);
             }
@@ -74,3 +76,16 @@ $this->registerJsFile(
         ?>
     </section>
 </div>
+
+
+
+<? Modal::begin([
+    "id" => "detailModal",
+    "title" => "",
+    "size" => Modal::SIZE_DEFAULT,
+]); ?>
+<?= Html::tag("p", "", [
+    "class" => "content",
+]) ?>
+
+<? Modal::end(); ?>

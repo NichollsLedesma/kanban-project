@@ -87,9 +87,10 @@ $(document).ready(function () {
     function getInfoAndOpenModal(id) {
         $.get("get-one/" + id,
             (task) => {
+                console.log(task)
                 const modal = $('#detailModal');
                 modal.modal('show')
-                modal.find(".modal-title").html(task.name);
+                modal.find(".modal-title").html(task.title);
                 modal.find(".content").html(task.description)
             });
     }
