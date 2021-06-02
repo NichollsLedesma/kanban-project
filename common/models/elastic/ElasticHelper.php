@@ -9,7 +9,13 @@ class ElasticHelper
     public static function create($class, $data)
     {
         $instance = new $class;
-        $instance->saving($data);
+        $properties = array_keys($data);
+
+        foreach ($properties as $property) {
+            $instance->$property = $data[$property];
+        }
+
+        return $instance->insert();
     }
 
     public static function search($model, $match)

@@ -9,7 +9,7 @@ class Card extends \yii\elasticsearch\ActiveRecord
 {
     public function attributes()
     {
-        return ['title', "uuid", "owner_id", "column_id", "description", "order", "color"];
+        return ['title', "uuid", "owner_id", "board_id", "column_id", "description", "order", "color"];
     }
 
     public function saving($data)
