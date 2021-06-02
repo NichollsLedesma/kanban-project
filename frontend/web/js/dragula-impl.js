@@ -17,6 +17,9 @@ $(document).ready(function () {
         if (objData.type === 'New Column') {
             addNewColumn(objData.html);
         };
+        if (objData.type === 'Column ReOrder') {
+            $.pjax.reload({container: '#board-container'});
+        };
         moveCard(objData);
         if (objData.type === 'card' && objData.action === 'new') {
             if ($('div#column-id_' + objData.params.columnId).length > 0) {
@@ -25,6 +28,7 @@ $(document).ready(function () {
         }
     };
     connect();
+    let currentColumnOrder = getCurrentColumnOrder();
 
     ////////////
     function connect() {
@@ -58,15 +62,32 @@ $(document).ready(function () {
                 const targetColumnId = $(component.parentElement).attr('data-column-id')
                 sendMessage({taskId, targetColumnId})
             }
+            if ($(component).hasClass('card-row')) {
+                let updatedColumnOrder = getCurrentColumnOrder();
+                $.post({
+                    url: 'http://y2aa-frontend.test:81/kanban/update-order',
+                    data: {order:updatedColumnOrder},
+                    cache: false,
+                });
+            }
         });
 
         return d;
     }
 
-    const dragulaComp = dragulaLoad();
+    function getCurrentColumnOrder() {
+        let columns = [];
+        $( "div[id*='column-id']" ).each(function() {
+            columns.push($(this).attr('data-column-id'));
+        });
+        return Array.from(new Set(columns));
+    }
+
+    let dragulaComp = dragulaLoad();
 
     $(document).on('pjax:end', function() {
         dragulaComp = dragulaLoad();
+        currentColumnOrder = getCurrentColumnOrder();
     });
 
     $('#search').autocomplete({
