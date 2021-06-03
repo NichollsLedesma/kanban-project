@@ -4,8 +4,60 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e060e47b66b315f3abec788f79bc45c8",
+    "content-hash": "02715416250545cb2068830164033514",
     "packages": [
+        {
+            "name": "alexantr/yii2-colorpicker",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/alexantr/yii2-colorpicker.git",
+                "reference": "43e79cba701c965b70e761e7be5e14534c1574b6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/alexantr/yii2-colorpicker/zipball/43e79cba701c965b70e761e7be5e14534c1574b6",
+                "reference": "43e79cba701c965b70e761e7be5e14534c1574b6",
+                "shasum": ""
+            },
+            "require": {
+                "yiisoft/yii2": "~2.0.6"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "alexantr\\colorpicker\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alex Yashkin",
+                    "email": "alex@yashkin.by"
+                }
+            ],
+            "description": "Color picker input widget for Yii 2",
+            "keywords": [
+                "color-picker",
+                "colorpicker",
+                "jquery-minicolors",
+                "widget",
+                "yii2"
+            ],
+            "support": {
+                "issues": "https://github.com/alexantr/yii2-colorpicker/issues",
+                "source": "https://github.com/alexantr/yii2-colorpicker"
+            },
+            "time": "2018-02-09T14:08:39+00:00"
+        },
         {
             "name": "almasaeed2010/adminlte",
             "version": "v3.1.0",

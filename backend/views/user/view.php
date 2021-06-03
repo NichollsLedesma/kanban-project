@@ -1,5 +1,6 @@
 <?php
 
+use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -26,21 +27,97 @@ $this->params['breadcrumbs'][] = $this->title;
         ]) ?>
     </p>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'username',
-            'auth_key',
-            'password_hash',
-            'password_reset_token',
-            'email:email',
-            'status',
-            'created_at',
-            'updated_at',
-            'verification_token',
-            'is_admin:boolean',
-        ],
-    ]) ?>
+    <div class="container mt-5 box-main">
+        <div class="box">
+            <div class="row box-header">
+                <div class="col d-flex flex-row">
+                    <div class="box-title">Details</div>
+                </div>
+                <div class="col d-flex flex-row-reverse">
+                    <!-- <button class=" btn">
+                        <i class="fa fa-plus"></i>
+                    </button> -->
+                </div>
+            </div>
+
+            <div class="box-content">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <span class="key">username: </span>
+                        <span class="value"><?= $model->username ?></span>
+                    </li>
+                    <li class="list-group-item">
+                        <span class="key">email: </span>
+                        <span class="value"><?= $model->email ?></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="box">
+            <div class="row box-header">
+                <div class="col d-flex flex-row">
+                    <div class="box-title">Entities</div>
+                </div>
+                <div class="col d-flex flex-row-reverse">
+                    <button class=" btn">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="box-content">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>Name of the company</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>Name of the company 2</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">3</th>
+                            <td>Name of the company 3</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="box">
+            <div class="row box-header">
+                <div class="col d-flex flex-row">
+                    <div class="box-title">Boards</div>
+                </div>
+                <div class="col d-flex flex-row-reverse">
+                    <button class=" btn">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="box-content">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>Name of the board</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>Name of the board 2</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">3</th>
+                            <td>Name of the board 3</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
 
 </div>
