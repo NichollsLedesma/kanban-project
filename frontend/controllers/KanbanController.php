@@ -59,8 +59,8 @@ class KanbanController extends Controller
 
     public function actionBoard($uuid)
     {
-        $userBoard = BoardRepository::getUserBoardByUuid(Yii::$app->getUser()->getId(), $uuid);
-        $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['id' => 'ASC']);
+        $userBoard = BoardRepository::getUserBoardByUuid(Yii::$app->user->id, $uuid);
+        $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['order' => 'ASC']);
         if ($userBoard->count() == 0) {
             throw new NotFoundHttpException('board not found');
         }

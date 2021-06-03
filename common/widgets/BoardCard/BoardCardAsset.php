@@ -20,7 +20,7 @@ class BoardCardAsset extends \yii\web\AssetBundle
         'yii\web\JqueryAsset'
     ];
     public $publishOptions = [
-        'forceCopy' => true,
+        'forceCopy' => false,
     ];
 
 }
