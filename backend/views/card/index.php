@@ -18,13 +18,19 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Create Card', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php // echo $this->render('_search', ['model' => $searchModel]); 
+    ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+            // ['class' => 'yii\grid\SerialColumn'],
+
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'headerOptions' => ['style' => 'width:10%'],
+            ],
 
             'id',
             'uuid',
@@ -40,8 +46,6 @@ $this->params['breadcrumbs'][] = $this->title;
             //'updated_at',
             'is_deleted:boolean',
             //'deleted_at',
-
-            ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
 

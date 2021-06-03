@@ -18,15 +18,18 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Create User', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php // echo $this->render('_search', ['model' => $searchModel]); 
+    ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+            // ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
+            ['class' => 'yii\grid\ActionColumn'],
+
+            // 'id',
             'username',
             // 'auth_key',
             // 'password_hash',
@@ -37,8 +40,6 @@ $this->params['breadcrumbs'][] = $this->title;
             //'updated_at',
             //'verification_token',
             'is_admin:boolean',
-
-            ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
 

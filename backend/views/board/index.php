@@ -19,28 +19,18 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Create Board', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php // echo $this->render('_search', ['model' => $searchModel]); 
+    ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'uuid',
-            'entity_id',
-            'owner_id',
-            'title',
-            //'created_by',
-            //'updated_by',
-            //'created_at',
-            //'updated_at',
-            'is_deleted:boolean',
-            //'deleted_at',
+            // ['class' => 'yii\grid\SerialColumn'],
 
             [
                 'class' => 'yii\grid\ActionColumn',
+                'headerOptions' => ['style' => 'width:15%'],
                 'template' => '{column} {user} {view} {update} {delete}',
                 'buttons' => [
                     'user' => function ($url, $model) {
@@ -82,7 +72,20 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                     return Url::to([$action, 'id' => $model->id]);
                 },
-            ]
+            ],
+
+            // 'id',
+            'uuid',
+            'entity_id',
+            'owner_id',
+            'title',
+            //'created_by',
+            //'updated_by',
+            //'created_at',
+            //'updated_at',
+            'is_deleted:boolean',
+            //'deleted_at',
+
         ],
     ]); ?>
 
