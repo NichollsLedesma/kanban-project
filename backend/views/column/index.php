@@ -26,23 +26,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'uuid',
-            'board_id',
-            'owner_id',
-            'title',
-            //'order',
-            //'created_by',
-            //'updated_by',
-            //'created_at',
-            //'updated_at',
-            'is_deleted:boolean',
-            //'deleted_at',
-
+            // ['class' => 'yii\grid\SerialColumn'],
             [
                 'class' => 'yii\grid\ActionColumn',
+                'headerOptions' => ['style' => 'width:10%'],
                 'template' => '{card} {view} {update} {delete}',
                 'buttons' => [
                     'card' => function ($url, $model) {
@@ -76,7 +63,21 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                     return Url::to([$action, 'id' => $model->id]);
                 },
-            ]
+            ],
+
+            // 'id',
+            'uuid',
+            'board_id',
+            'owner_id',
+            'title',
+            //'order',
+            //'created_by',
+            //'updated_by',
+            //'created_at',
+            //'updated_at',
+            'is_deleted:boolean',
+            //'deleted_at',
+
         ],
     ]); ?>
 
