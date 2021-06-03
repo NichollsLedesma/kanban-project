@@ -48,6 +48,7 @@ class KanbanController extends Controller
     {
         $boards = Board::find()
             ->where(["owner_id" => Yii::$app->getUser()->getId()])
+            ->andWhere(['is_deleted' => 0])
             ->all();
         $entities =  ArrayHelper::map(
             Yii::$app->getUser()->getIdentity()->entities,
@@ -99,12 +100,10 @@ class KanbanController extends Controller
         }
 
         $this->layout = "kanban";
-        // $search = Yii::$app->request->post('search');
-        // $board = ($search) ?
-        //     $this->getDataDump($search) :
-        //     $this->getDump();
+        $board = Board::find()->where(["uuid" => $uuid])->limit(1)->one();
 
         return $this->render('board', [
+            'boardName' => $board->title,
             'boardUuid' => $uuid,
             'boardColumns' => $boardColumns,
             'newCardModel' => $newCardModel ?? null,

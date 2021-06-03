@@ -44,10 +44,13 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'kanban/index' => 'kanban/index',
                 'kanban/<uuid>/get/<query>' => 'kanban/get',
                 'kanban/get-one/<id>' => 'kanban/get-one',
                 'kanban/<uuid>' => 'kanban/board',
                 'board/create' => 'board/create',
+                'board/update/<uuid>' => 'board/update',
+                'board/delete/<uuid>' => 'board/delete',
             ],
         ],
 

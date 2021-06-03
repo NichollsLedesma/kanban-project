@@ -117,7 +117,6 @@ class Card extends \yii\db\ActiveRecord
 
     public function afterSave($insert, $changedAttributes)
     {
-        
         if ($insert) {
             return $this->createElasticDocument();
         }

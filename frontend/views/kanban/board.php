@@ -23,6 +23,7 @@ $this->registerCssFile(
 );
 
 $this->registerJsVar('channelName', $boardCode, View::POS_END);
+$this->registerJsVar('boardName', $boardName, View::POS_END);
 
 $this->registerJsFile(
     Yii::$app->request->BaseUrl . '/js/dragula-impl.js',
