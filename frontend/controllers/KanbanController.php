@@ -64,6 +64,10 @@ class KanbanController extends Controller
         if ($userBoard->count() == 0) {
             throw new NotFoundHttpException('board not found');
         }
+        if ($this->request->isPost && $this->request->isAjax && $this->request->get('changeOrder')) {
+            $obj = ['type' => 'card', 'action' => 'move', 'params' => ['columnId' => $this->request->post('column'), 'cardId' => $this->request->post('card'), 'order' => $this->request->post('order')]];
+            Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => $uuid]), $obj);
+        }
 
         if ($this->request->isPjax && $this->request->get('addCard')) {
 

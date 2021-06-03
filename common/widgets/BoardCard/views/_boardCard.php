@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 ?>
-<div class="card card-info card-outline task" id="card_<?= $id ?>" style="border-top-color: #<?= $color ?>">
+<div class="card card-info card-outline task" id="card_<?= $id == '' ? 'new' : $id ?>" style="border-top-color: #<?= $color ?>">
 
     <div class="card-header">
         <h5 class="card-title"><?= $title ?></h5>

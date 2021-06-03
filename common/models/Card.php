@@ -113,7 +113,7 @@ class Card extends \yii\db\ActiveRecord
     public function beforeSave($insert)
     {
         /* data modifier, remove # from begin of color selector */
-        if ($this->color[0] == '#') {
+        if (isset($this->color)&&$this->color[0] == '#') {
             $this->color = substr($this->color, 1);
         }
 
