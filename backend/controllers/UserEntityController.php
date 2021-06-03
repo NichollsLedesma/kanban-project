@@ -10,6 +10,7 @@ use common\models\UserEntitySearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\VarDumper;
 
 /**
  * UserEntityController implements the CRUD actions for UserEntity model.
@@ -70,8 +71,11 @@ class UserEntityController extends Controller
         $model = new UserEntity();
         $users = \yii\helpers\ArrayHelper::map(User::find()->all(), 'id', 'username');
         $entities = \yii\helpers\ArrayHelper::map(Entity::find()->all(), 'id', 'name');
-
+        
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            if(Yii::$app->request->post("is_redirect_admin")=== "1"){
+                return $this->redirect(["user/view", "id" => $model->user_id]);
+            }
             return $this->redirect(['view', 'user_id' => $model->user_id, 'entity_id' => $model->entity_id]);
         }
 

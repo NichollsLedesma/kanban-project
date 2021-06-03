@@ -10,6 +10,7 @@ use common\models\UserBoardSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\VarDumper;
 
 /**
  * UserBoardController implements the CRUD actions for UserBoard model.
@@ -72,6 +73,10 @@ class UserBoardController extends Controller
         $boards = \yii\helpers\ArrayHelper::map(Board::find()->all(), 'id', 'title');
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            if(Yii::$app->request->post("is_redirect_admin")=== "1"){
+                return $this->redirect(["user/view", "id" => $model->user_id]);
+            }
+            
             return $this->redirect(['view', 'user_id' => $model->user_id, 'board_id' => $model->board_id]);
         }
 

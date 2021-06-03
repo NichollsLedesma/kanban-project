@@ -229,4 +229,10 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasMany(Entity::class, ["id" => "entity_id"])
             ->viaTable("user_entity", ["user_id" => "id"]);
     }
+
+    public function getBoards()
+    {
+        return $this->hasMany(Board::class, ["id" => "board_id"])
+            ->viaTable("user_board", ["user_id" => "id"]);
+    }
 }

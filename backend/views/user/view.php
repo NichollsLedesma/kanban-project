@@ -1,7 +1,11 @@
 <?php
 
+use common\models\UserBoard;
+use common\models\UserEntity;
+use common\widgets\details\BoxDetailWidget;
 use yii\grid\GridView;
 use yii\helpers\Html;
+use yii\helpers\VarDumper;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
@@ -11,6 +15,20 @@ $this->title = $model->username;
 $this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
+
+function getItems($data, $descr = "title", $key = "id")
+{
+    $items = [];
+    foreach ($data as $item) {
+        $items[] = [
+            "id" => $item[$key],
+            "description" => $item[$descr],
+        ];
+    }
+
+    return $items;
+}
+
 ?>
 <div class="user-view">
 
@@ -54,70 +72,22 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
 
-        <div class="box">
-            <div class="row box-header">
-                <div class="col d-flex flex-row">
-                    <div class="box-title">Entities</div>
-                </div>
-                <div class="col d-flex flex-row-reverse">
-                    <button class=" btn">
-                        <i class="fa fa-plus"></i>
-                    </button>
-                </div>
-            </div>
+        <?= BoxDetailWidget::widget([
+            'items' => getItems($model->entities, "name"),
+            'title' => "Entities",
+            "class_relation" => "UserEntity",
+            'key_class' => "entity",
+            "user_id" => $model->id,
+            "to_load" => $entities
+        ]) ?>
 
-            <div class="box-content">
-                <table class="table table-striped">
-                    <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Name of the company</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Name of the company 2</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">3</th>
-                            <td>Name of the company 3</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="box">
-            <div class="row box-header">
-                <div class="col d-flex flex-row">
-                    <div class="box-title">Boards</div>
-                </div>
-                <div class="col d-flex flex-row-reverse">
-                    <button class=" btn">
-                        <i class="fa fa-plus"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="box-content">
-                <table class="table table-striped">
-                    <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Name of the board</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Name of the board 2</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">3</th>
-                            <td>Name of the board 3</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
+        <?= BoxDetailWidget::widget([
+            'items' => getItems($model->boards),
+            'title' => "Boards",
+            "class_relation" => "UserBoard",
+            'key_class' => "board",
+            "user_id" => $model->id,
+            "to_load" => $boards
+        ]) ?>
     </div>
-
 </div>

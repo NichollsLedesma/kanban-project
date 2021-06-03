@@ -2,12 +2,18 @@
 
 namespace backend\controllers;
 
+use common\models\Board;
+use common\models\Entity;
 use Yii;
 use common\models\User;
+use common\models\UserBoard;
+use common\models\UserEntity;
 use common\models\UserSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
+use yii\helpers\VarDumper;
 
 /**
  * UserController implements the CRUD actions for User model.
@@ -52,8 +58,38 @@ class UserController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+
+        $entities =  ArrayHelper::map(
+            Entity::find()
+                ->where([
+                    "not in", "id", UserEntity::find()->select(["entity_id"])
+                        ->where(["user_id" => $model->id]),
+                ])
+                ->all(),
+            'id',
+            'name'
+        );
+        $boards =  ArrayHelper::map(
+            Board::find()
+                ->where([
+                    "not in", "id", UserBoard::find()->select(["board_id"])
+                        ->where(["user_id" => $model->id]),
+                ])
+                ->all(),
+            'id',
+            'title'
+        );
+
+        // echo "<pre>";
+        // VarDumper::dump($model->boards);
+        // echo "</pre>";
+        // die;
+       
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            "entities" => $entities,
+            "boards" => $boards,
         ]);
     }
 
