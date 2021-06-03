@@ -79,10 +79,10 @@ $(document).ready(function () {
         }
     });
 
-    $(".task").on("click", (e) => {
-        const id = $(e.currentTarget).attr("id").split('_')[1];
-        getInfoAndOpenModal(id);
-    });
+//    $(".task").on("click", (e) => {
+//        const id = $(e.currentTarget).attr("id").split('_')[1];
+//        getInfoAndOpenModal(id);
+//    });
 
     function getInfoAndOpenModal(id) {
         $.get("get-one/" + id,

@@ -28,8 +28,10 @@ use yii\helpers\VarDumper;
  */
 class Card extends \yii\db\ActiveRecord
 {
+
     const SCENARIO_AJAX_CREATE = 'ajax_create';
-    
+    const SCENARIO_AJAX_UPDATE = 'ajax_update';
+
     /**
      * {@inheritdoc}
      */
@@ -37,10 +39,12 @@ class Card extends \yii\db\ActiveRecord
     {
         return 'card';
     }
-    
-     public function scenarios() {
+
+    public function scenarios()
+    {
         $scenarios = parent::scenarios();
         $scenarios[self::SCENARIO_AJAX_CREATE] = ['title', 'description'];
+        $scenarios[self::SCENARIO_AJAX_UPDATE] = ['title', 'description', 'color'];
         return $scenarios;
     }
 
@@ -72,8 +76,8 @@ class Card extends \yii\db\ActiveRecord
             [['column_id', 'owner_id', 'order', 'created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
             [['title'], 'string', 'max' => 100],
             ['title', 'match', 'pattern' => '/^[A-Za-z !.]{1,100}$/'],
-            [['color'], 'string', 'length' => 6],
-            ['color', 'match', 'pattern' => '/^(([a-f0-9]{3}){1,2})$/i'],
+            [['color'], 'string', 'length' => 7],
+            ['color', 'match', 'pattern' => '/^#(([a-f0-9]{3}){1,2})$/i'],
             [['description'], 'string'],
             ['column_id', 'exist', 'targetClass' => Column::class, 'targetAttribute' => ['column_id' => 'id']],
             ['owner_id', 'exist', 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
@@ -108,6 +112,11 @@ class Card extends \yii\db\ActiveRecord
 
     public function beforeSave($insert)
     {
+        /* data modifier, remove # from begin of color selector */
+        if ($this->color[0] == '#') {
+            $this->color = substr($this->color, 1);
+        }
+
         if ($insert) {
             $this->uuid = \thamtech\uuid\helpers\UuidHelper::uuid();
         }
@@ -117,7 +126,7 @@ class Card extends \yii\db\ActiveRecord
 
     public function afterSave($insert, $changedAttributes)
     {
-        
+return;
         if ($insert) {
             return $this->createElasticDocument();
         }
@@ -136,7 +145,7 @@ class Card extends \yii\db\ActiveRecord
             'board_id' => $this->column["board_id"],
             'color' => $this->color,
             'owner_id' => $this->owner_id,
-        ], false);
+                ], false);
         $doc->save();
 
         return true;
@@ -170,4 +179,5 @@ class Card extends \yii\db\ActiveRecord
     {
         return $this->deleted_at > (time() - 3600); // allow restoration only for the records, being deleted during last hour
     }
+
 }

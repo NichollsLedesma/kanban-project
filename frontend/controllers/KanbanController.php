@@ -2,25 +2,21 @@
 
 namespace frontend\controllers;
 
-use Yii;
 use common\jobs\JobTest;
 use common\models\Board;
 use common\models\BoardRepository;
 use common\models\Card;
+use common\models\CardRepository;
 use common\models\Column;
-use common\models\Entity;
 use common\models\CreateColumnForm;
 use common\models\elastic\Card as ElasticCard;
 use common\models\elastic\ElasticHelper;
-use common\models\User;
 use common\widgets\BoardCard\BoardCard;
 use frontend\models\CreateCardForm;
-use yii\elasticsearch\QueryBuilder;
+use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
 use yii\helpers\Url;
-use yii\helpers\VarDumper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -47,23 +43,23 @@ class KanbanController extends Controller
     public function actionIndex()
     {
         $boards = Board::find()
-            ->where(["owner_id" => Yii::$app->getUser()->getId()])
-            ->all();
-        $entities =  ArrayHelper::map(
-            Yii::$app->getUser()->getIdentity()->entities,
-            'id',
-            'name'
+                ->where(["owner_id" => Yii::$app->getUser()->getId()])
+                ->all();
+        $entities = ArrayHelper::map(
+                        Yii::$app->getUser()->getIdentity()->entities,
+                        'id',
+                        'name'
         );
 
         return $this->render('index', [
-            "boards" => $boards,
-            "entities" => $entities
+                    "boards" => $boards,
+                    "entities" => $entities
         ]);
     }
 
     public function actionBoard($uuid)
     {
-        $userBoard = BoardRepository::getUserBoard(Yii::$app->getUser()->getId(), $uuid);
+        $userBoard = BoardRepository::getUserBoardByUuid(Yii::$app->getUser()->getId(), $uuid);
         $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['id' => 'ASC']);
         if ($userBoard->count() == 0) {
             throw new NotFoundHttpException('board not found');
@@ -105,11 +101,26 @@ class KanbanController extends Controller
         //     $this->getDump();
 
         return $this->render('board', [
-            'boardUuid' => $uuid,
-            'boardColumns' => $boardColumns,
-            'newCardModel' => $newCardModel ?? null,
-            'newColumnModel' => $newColumnModel ?? null,
+                    'boardUuid' => $uuid,
+                    'boardColumns' => $boardColumns,
+                    'newCardModel' => $newCardModel ?? null,
+                    'newColumnModel' => $newColumnModel ?? null,
         ]);
+    }
+
+    public function actionCardUpdate($uuid)
+    {
+        if (!$this->request->isAjax) {
+            throw new NotFoundHttpException('not found');
+        }
+        $userCardModel = CardRepository::getUserBoardCardByUuid(Yii::$app->user->id, $uuid);
+        if ($userCardModel === null) {
+            throw new NotFoundHttpException('card not found');
+        }
+        if ($this->request->isPost && $userCardModel->load($this->request->post()) && $userCardModel->validate() && $userCardModel->save()) {
+            Yii::$app->session->setFlash('updated', true);
+        }
+        return $this->renderAjax('_cardUpdate', ['model' => $userCardModel]);
     }
 
     public function actionGet($uuid)
@@ -118,7 +129,6 @@ class KanbanController extends Controller
 
         $search = Yii::$app->request->get('query');
         // $search = Yii::$app->request->get('query');
-
         // $data = ElasticHelper::search(ElasticCard::class, ["title" => $search]);
         $board = Board::find()->where(["uuid" => $uuid])->one();
 
@@ -127,15 +137,15 @@ class KanbanController extends Controller
         }
 
         $data = ElasticCard::find()->query([
-            "bool" => [
-                "filter" => [
-                    'match' => ["title" => $search],
-                ],
-                "must" => [
-                    'match' => ["board_id" => $board->id],
-                ],
-            ]
-        ])->asArray()->all();
+                    "bool" => [
+                        "filter" => [
+                            'match' => ["title" => $search],
+                        ],
+                        "must" => [
+                            'match' => ["board_id" => $board->id],
+                        ],
+                    ]
+                ])->asArray()->all();
 
         $ret = [];
         foreach ($data as $item) {
@@ -160,7 +170,6 @@ class KanbanController extends Controller
         //     }
         // );
         // $select = ['username as value', 'username as  label', 'id as id'];
-
         // return User::find()
         //     ->select($select)
         //     ->asArray()
@@ -177,11 +186,12 @@ class KanbanController extends Controller
     public function actionMove()
     {
         $id = Yii::$app->queue->push(
-            new JobTest(
-                [
+                new JobTest(
+                        [
                     "message" => "Hi job"
-                ]
-            )
+                        ]
+                )
         );
     }
+
 }

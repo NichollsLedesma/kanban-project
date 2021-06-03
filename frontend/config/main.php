@@ -48,6 +48,7 @@ return [
                 'kanban/get-one/<id>' => 'kanban/get-one',
                 'kanban/<uuid>' => 'kanban/board',
                 'board/create' => 'board/create',
+                'kanban/card-update/<uuid>' => 'kanban/card-update'
             ],
         ],
 
