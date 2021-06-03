@@ -18,9 +18,12 @@ class BoardCard extends Widget
     public $isForm = false;
     public $columnId = null;
     public $boardUuid = null;
+    public $color = '17a2b8';
 
-    public function run(): string {
-        return $this->render('_boardCard', ['id' => $this->id ?? null, 'title' => $this->title, 'content' => $this->content ?? null, 'isForm' => $this->isForm, 'boardUuid' => $this->boardUuid, 'columnId' => $this->columnId]);
+    public function run(): string
+    {
+        BoardCardAsset::register($this->getView());
+        return $this->render('_boardCard', ['id' => $this->id ?? null, 'title' => $this->title, 'content' => $this->content ?? null, 'isForm' => $this->isForm, 'boardUuid' => $this->boardUuid, 'columnId' => $this->columnId, 'color' => $this->color]);
     }
 
 }

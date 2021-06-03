@@ -19,34 +19,35 @@ $this->registerAssetBundle(PahoMqttAsset::class);
 $boardCode = \yii\helpers\Url::to(['kanban/board', 'uuid' => $boardUuid]);
 $boardColumnIdPrefix = "column-id_";
 $this->registerCssFile(
-    Yii::$app->request->getBaseUrl() . '/css/column.css'
+        Yii::$app->request->getBaseUrl() . '/css/column.css'
 );
 
 $this->registerJsVar('channelName', $boardCode, View::POS_END);
 $this->registerJsVar('boardName', $boardName, View::POS_END);
+$this->registerJsVar('board_id', $boardUuid, View::POS_END);
 
 $this->registerJsFile(
-    Yii::$app->request->BaseUrl . '/js/dragula-impl.js',
-    [
-        'depends' => "yii\web\JqueryAsset",
-        'position' => View::POS_END
-    ]
+        Yii::$app->request->BaseUrl . '/js/dragula-impl.js',
+        [
+            'depends' => "yii\web\JqueryAsset",
+            'position' => View::POS_END
+        ]
 );
 
 $this->registerJsFile(
-    Yii::$app->request->BaseUrl . '/js/columns.js',
-    [
-        'depends' => "/js/dragula-impl.js",
-        'position' => View::POS_END
-    ]
+        Yii::$app->request->BaseUrl . '/js/columns.js',
+        [
+            'depends' => "/js/dragula-impl.js",
+            'position' => View::POS_END
+        ]
 );
 
 $this->registerJsFile(
-    Yii::$app->request->BaseUrl . '/js/board-pjax.js',
-    [
-        'depends' => "/js/dragula-impl.js",
-        'position' => View::POS_END
-    ]
+        Yii::$app->request->BaseUrl . '/js/board-pjax.js',
+        [
+            'depends' => "/js/dragula-impl.js",
+            'position' => View::POS_END
+        ]
 );
 ?>
 
@@ -59,7 +60,7 @@ $this->registerJsFile(
             $cards = [];
             $this->registerJS('addColumnDragula("' . $boardColumnIdPrefix . $column->uuid . '")', View::POS_END);
             foreach ($column->getCards()->all() as $task) {
-                $cards[] = BoardCard::widget(['id' => $task->uuid, 'title' => $task->title, 'content' => $task->description]);
+                $cards[] = BoardCard::widget(['id' => $task->uuid, 'title' => $task->title, 'content' => $task->description, 'color' => $task->color]);
             }
             if ($newCardModel && $newCardModel->column_id == $column->id) {
                 $cards[] = $this->render('_newCard', ['model' => $newCardModel, 'columnId' => $column->uuid, 'boardUuid' => $boardUuid]);
@@ -80,13 +81,25 @@ $this->registerJsFile(
 
 
 
-<? Modal::begin([
+<?php
+Modal::begin([
     "id" => "detailModal",
     "title" => "",
     "size" => Modal::SIZE_DEFAULT,
-]); ?>
-<?= Html::tag("p", "", [
+]);
+?>
+<?=
+Html::tag("p", "", [
     "class" => "content",
-]) ?>
+])
+?>
 
-<? Modal::end(); ?>
+<?php Modal::end(); ?>
+<?php
+Modal::begin([
+    "id" => "cardModal",
+    "title" => "",
+    "size" => Modal::SIZE_DEFAULT
+]);
+Modal::end();
+?>

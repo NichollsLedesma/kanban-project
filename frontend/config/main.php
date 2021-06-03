@@ -51,6 +51,7 @@ return [
                 'board/create' => 'board/create',
                 'board/update/<uuid>' => 'board/update',
                 'board/delete/<uuid>' => 'board/delete',
+                'kanban/card-update/<uuid>' => 'kanban/card-update'
             ],
         ],
 
