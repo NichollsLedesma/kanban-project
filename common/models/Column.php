@@ -2,12 +2,13 @@
 
 namespace common\models;
 
+use Yii;
 use common\models\elastic\Column as ElasticColumn;
 use common\models\elastic\ElasticHelper;
-use Yii;
+use yii2tech\ar\softdelete\SoftDeleteBehavior;
+use yii2tech\ar\softdelete\SoftDeleteQueryBehavior;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
-use yii2tech\ar\softdelete\SoftDeleteBehavior;
 
 /**
  * This is the model class for table "column".
@@ -161,7 +162,7 @@ class Column extends \yii\db\ActiveRecord
 
     public function beforeSoftDelete()
     {
-        ElasticHelper::remove(ElasticColumn::class, ["uuid" => $this->uuid]);
+        // ElasticHelper::remove(ElasticColumn::class, ["uuid" => $this->uuid]);
 
         $this->deleted_at = time(); // log the deletion date
         return true;
@@ -171,5 +172,14 @@ class Column extends \yii\db\ActiveRecord
     public function beforeRestore()
     {
         return $this->deleted_at > (time() - 3600); // allow restoration only for the records, being deleted during last hour
+    }
+
+    public static function find()
+    {
+        $query = parent::find();
+
+        $query->attachBehavior('softDelete', SoftDeleteQueryBehavior::className());
+
+        return $query->notDeleted();
     }
 }

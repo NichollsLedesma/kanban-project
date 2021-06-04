@@ -29,7 +29,7 @@ use yii\helpers\VarDumper;
 class Card extends \yii\db\ActiveRecord
 {
     const SCENARIO_AJAX_CREATE = 'ajax_create';
-    
+
     /**
      * {@inheritdoc}
      */
@@ -37,7 +37,7 @@ class Card extends \yii\db\ActiveRecord
     {
         return 'card';
     }
-    
+
      public function scenarios() {
         $scenarios = parent::scenarios();
         $scenarios[self::SCENARIO_AJAX_CREATE] = ['title', 'description'];
@@ -158,7 +158,7 @@ class Card extends \yii\db\ActiveRecord
 
     public function beforeSoftDelete()
     {
-        ElasticHelper::remove(ElasticCard::class, ["uuid" => $this->uuid]);
+        // ElasticHelper::remove(ElasticCard::class, ["uuid" => $this->uuid]);
 
         $this->deleted_at = time(); // log the deletion date
         return true;
