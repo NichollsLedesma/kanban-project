@@ -23,32 +23,41 @@ class BoardController extends Controller
 
     public function actionCreate()
     {
-        $entity_id = Yii::$app->request->post('entity_id');
-        $entity = Entity::find()
-            ->where(["id" => $entity_id])
-            ->where([
-                "in", "id", UserEntity::find()->select(["entity_id"])
-                    ->where([
-                        "user_id" => Yii::$app->getUser()->getId(),
-                        "entity_id" => $entity_id,
-                    ]),
-            ])
-            ->limit(1)->one();
+        // $entity_id = Yii::$app->request->post('entity_id');
+        // $entity = Entity::find()
+        //     ->where(["id" => $entity_id])
+        //     ->where([
+        //         "in", "id", UserEntity::find()->select(["entity_id"])
+        //             ->where([
+        //                 "user_id" => Yii::$app->getUser()->getId(),
+        //                 "entity_id" => $entity_id,
+        //             ]),
+        //     ])
+        //     ->limit(1)->one();
+        $entity = Entity::findOne(Yii::$app->request->post('entity_id'));
 
         if (!$entity) {
             return throw new UnprocessableEntityHttpException("entity not belong to the user.");
         }
 
-        $newBoard = new Board();
-        $newBoard->title = Yii::$app->request->post('name');
-        $newBoard->owner_id = Yii::$app->getUser()->getId();
-        $newBoard->entity_id = $entity->id;
-        $newBoard->save();
-
-        $userBoard = new UserBoard();
-        $userBoard->user_id = Yii::$app->getUser()->getId();
-        $userBoard->board_id = $newBoard->id;
-        $userBoard->save();
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $newBoard = new Board();
+            $newBoard->title = Yii::$app->request->post('name');
+            $newBoard->owner_id = Yii::$app->getUser()->getId();
+            $newBoard->entity_id = $entity->id;
+            $newBoard->save();
+    
+            $userBoard = new UserBoard();
+            $userBoard->user_id = Yii::$app->getUser()->getId();
+            $userBoard->board_id = $newBoard->id;
+            $userBoard->save();
+            Yii::$app->session->setFlash('success', "Collection created.");
+            $transaction->commit();
+        } catch (\Throwable $th) {
+            Yii::$app->session->setFlash('error', "Error creating new collection.");
+            $transaction->rollBack();
+        }
 
         return $this->redirect(["kanban/board", "uuid" => $newBoard->uuid]);
     }
@@ -73,7 +82,6 @@ class BoardController extends Controller
             $board->save();
 
             return true;
-            // return $this->redirect(["kanban/board", "uuid" => $board->uuid]);
         } catch (Exception $e) {
             return throw new BadRequestHttpException("Error updating board: " . $e->getMessage());
         }

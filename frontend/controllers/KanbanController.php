@@ -9,8 +9,10 @@ use common\models\Card;
 use common\models\CardRepository;
 use common\models\Column;
 use common\models\CreateColumnForm;
+use common\models\elastic\Board as ElasticBoard;
 use common\models\elastic\Card as ElasticCard;
 use common\models\elastic\ElasticHelper;
+use common\models\UserBoard;
 use common\widgets\BoardCard\BoardCard;
 use frontend\models\CreateCardForm;
 use Yii;
@@ -43,9 +45,14 @@ class KanbanController extends Controller
     public function actionIndex()
     {
         $boards = Board::find()
-            ->where(["owner_id" => Yii::$app->getUser()->getId()])
-            ->andWhere(['is_deleted' => 0])
+            ->where([
+                "in", "id", UserBoard::find()->select(["board_id"])
+                    ->where([
+                        "user_id" => Yii::$app->getUser()->getId(),
+                    ]),
+            ])
             ->all();
+
         $entities =  ArrayHelper::map(
             Yii::$app->getUser()->getIdentity()->entities,
             'id',
@@ -53,8 +60,8 @@ class KanbanController extends Controller
         );
 
         return $this->render('index', [
-                    "boards" => $boards,
-                    "entities" => $entities
+            "boards" => $boards,
+            "entities" => $entities
         ]);
     }
 
@@ -129,54 +136,14 @@ class KanbanController extends Controller
     public function actionGet($uuid)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-
         $search = Yii::$app->request->get('query');
-        // $search = Yii::$app->request->get('query');
-        // $data = ElasticHelper::search(ElasticCard::class, ["title" => $search]);
         $board = Board::find()->where(["uuid" => $uuid])->one();
 
         if (!$board) {
             return [];
         }
 
-        $data = ElasticCard::find()->query([
-                    "bool" => [
-                        "filter" => [
-                            'match' => ["title" => $search],
-                        ],
-                        "must" => [
-                            'match' => ["board_id" => $board->id],
-                        ],
-                    ]
-                ])->asArray()->all();
-
-        $ret = [];
-        foreach ($data as $item) {
-            $itemSource = $item['_source'];
-            $ret[] = [
-                "id" => $itemSource['uuid'],
-                "value" => $itemSource['title'],
-                "label" => $itemSource['title'],
-            ];
-        }
-
-        return $ret;
-        // ArrayHelper::getColumn(
-        //     $data,
-        //     function ($item) {
-        //         $itemSource = $item['_source'];
-        //         return [
-        //             "id" => $itemSource['id'],
-        //             "value" => $itemSource['title'],
-        //             "label" => $itemSource['title'],
-        //         ];
-        //     }
-        // );
-        // $select = ['username as value', 'username as  label', 'id as id'];
-        // return User::find()
-        //     ->select($select)
-        //     ->asArray()
-        //     ->all();
+        return ElasticBoard::getFiltredCards($board->id, $search);
     }
 
     public function actionGetOne($id)
@@ -189,12 +156,11 @@ class KanbanController extends Controller
     public function actionMove()
     {
         $id = Yii::$app->queue->push(
-                new JobTest(
-                        [
+            new JobTest(
+                [
                     "message" => "Hi job"
-                        ]
-                )
+                ]
+            )
         );
     }
-
 }
