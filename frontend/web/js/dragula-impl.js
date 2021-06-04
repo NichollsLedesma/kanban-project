@@ -8,7 +8,6 @@ const addColumnDragula = (column) => {
 }
 
 dragulaComp.on('drop', (component) => {
-//    console.log(component)
     let card = $(component).attr("id").split('card_')[1];
     if (card === 'new') {
         return;
@@ -16,12 +15,12 @@ dragulaComp.on('drop', (component) => {
     let order = $(component, $(component).parent('div .card-body')).index();
     let column = $(component).parent('div .card-body').attr('data-column-id');
     let board = board_id;
-    $.post(channelName + '?changeOrder=true', {'column': column, 'card': card, 'order': order, 'board': board});
+    $.post(channelName + '?changeOrder=true', { 'column': column, 'card': card, 'order': order, 'board': board });
 
-//        const taskId = Number($(component).attr("id").split('_')[1]);
-//        const targetColumnId = $(component.parentElement).attr('data-column-id')
-//
-//        sendMessage({taskId, targetColumnId})
+    //        const taskId = Number($(component).attr("id").split('_')[1]);
+    //        const targetColumnId = $(component.parentElement).attr('data-column-id')
+    //
+    //        sendMessage({taskId, targetColumnId})
 })
 
 $(document).ready(function () {
@@ -29,17 +28,17 @@ $(document).ready(function () {
         const taskId = $(component).attr("id").split('_')[1];
         const targetColumnId = $(component.parentElement).attr('data-column-id')
 
-        sendMessage({taskId, targetColumnId})
+        sendMessage({ taskId, targetColumnId })
     })
     ////////////////////////////////////////////
     const wsbroker = "localhost";  // mqtt websocket enabled broker
     const wsport = 15675; // port for above
     const client = new Paho.MQTT.Client(
-            wsbroker,
-            wsport,
-            "/ws",
-            "myclientid_" + parseInt(Math.random() * 100, 10)
-            );
+        wsbroker,
+        wsport,
+        "/ws",
+        "myclientid_" + parseInt(Math.random() * 100, 10)
+    );
 
     client.onConnectionLost = function (responseObject) {
         connect();
@@ -76,9 +75,9 @@ $(document).ready(function () {
     }
 
     function sendMessage(objData) {
-//        message = new Paho.MQTT.Message(JSON.stringify(objData));
-//        message.destinationName = channelName;
-//        client.send(message);
+        //        message = new Paho.MQTT.Message(JSON.stringify(objData));
+        //        message.destinationName = channelName;
+        //        client.send(message);
     }
 
     function moveCard(data) {
@@ -98,25 +97,24 @@ $(document).ready(function () {
             });
         },
         select: (event, ui) => {
-            const {id} = ui.item;
+            const { id } = ui.item;
             getInfoAndOpenModal(id);
         }
     });
 
-//    $(".task").on("click", (e) => {
-//        const id = $(e.currentTarget).attr("id").split('_')[1];
-//        getInfoAndOpenModal(id);
-//    });
+    //    $(".task").on("click", (e) => {
+    //        const id = $(e.currentTarget).attr("id").split('_')[1];
+    //        getInfoAndOpenModal(id);
+    //    });
 
     function getInfoAndOpenModal(id) {
         $.get("get-one/" + id,
-                (task) => {
-            console.log(task)
-            const modal = $('#detailModal');
-            modal.modal('show')
-            modal.find(".modal-title").html(task.title);
-            modal.find(".content").html(task.description)
-        });
+            (task) => {
+                const modal = $('#detailModal');
+                modal.modal('show')
+                modal.find(".modal-title").html(task.title);
+                modal.find(".content").html(task.description)
+            });
     }
 
     const boardNameComp = $("#boardname");

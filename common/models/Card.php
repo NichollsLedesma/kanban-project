@@ -8,6 +8,7 @@ use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii2tech\ar\softdelete\SoftDeleteBehavior;
+use yii2tech\ar\softdelete\SoftDeleteQueryBehavior;
 use yii\helpers\VarDumper;
 
 /**

@@ -11,6 +11,7 @@ use common\models\Column;
 use common\models\CreateColumnForm;
 use common\models\elastic\Card as ElasticCard;
 use common\models\elastic\ElasticHelper;
+use common\models\UserBoard;
 use common\widgets\BoardCard\BoardCard;
 use frontend\models\CreateCardForm;
 use Yii;
@@ -42,9 +43,18 @@ class KanbanController extends Controller
 
     public function actionIndex()
     {
+        // $boards = Board::find()
+        //     ->where(["owner_id" => Yii::$app->getUser()->getId()])
+        //     ->all();
         $boards = Board::find()
-            ->where(["owner_id" => Yii::$app->getUser()->getId()])
+            ->where([
+                "in", "id", UserBoard::find()->select(["board_id"])
+                    ->where([
+                        "user_id" => Yii::$app->getUser()->getId(),
+                    ]),
+            ])
             ->all();
+
         $entities =  ArrayHelper::map(
             Yii::$app->getUser()->getIdentity()->entities,
             'id',

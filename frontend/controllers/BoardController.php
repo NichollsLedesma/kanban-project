@@ -35,8 +35,6 @@ class BoardController extends Controller
         //     ])
         //     ->limit(1)->one();
         $entity = Entity::findOne(Yii::$app->request->post('entity_id'));
-        // VarDumper::dump( $entity);
-        // die;
 
         if (!$entity) {
             return throw new UnprocessableEntityHttpException("entity not belong to the user.");
