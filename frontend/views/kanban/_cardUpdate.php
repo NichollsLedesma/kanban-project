@@ -28,11 +28,16 @@ $isDeleted = $model->is_deleted;
         <?= Html::submitButton('save', ['class' => 'btn btn-primary', 'name' => 'save-card-button', 'disabled' => $isDeleted]) ?>
         <?php ActiveForm::end(); ?>
     </div>
-    <div class="col-md-4" style="padding-top: 15px; text-align: right"><p><?php
+    <div class="col-md-4" style="padding-top: 15px; text-align: right">
+        <p>
+            <?php
             $formDelete = ActiveForm::begin(['id' => 'delete-card-form-' . $model->uuid, 'options' => ['data-pjax' => true]]);
+            echo $formDelete->field($deleteModel, 'cardId')->hiddenInput(['value' => $model->uuid, 'readOnly' => true])->label(false);
             echo Html::submitButton('delete', ['class' => 'btn btn-danger', 'disabled' => $isDeleted, 'data' => [
                     'confirm' => 'Are you sure you want to delete this card?']]);
             ActiveForm::end();
-            ?> </p></div>
+            ?> 
+        </p>
+    </div>
 </div>
 <?php Pjax::end(); ?>
