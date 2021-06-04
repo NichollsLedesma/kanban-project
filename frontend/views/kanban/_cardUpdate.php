@@ -21,6 +21,15 @@ $isDeleted = $model->is_deleted;
                 <h4><i class="icon fa fa-check"></i>Card updated!</h4>
             </div>
         <?php endif ?>
+        <?php
+        if (Yii::$app->session->hasFlash('deleted')):
+            $this->registerJs("$.pjax.reload({container: '#board-container', async: false});");
+            ?>
+            <div class="alert alert-danger alert-dismissable">
+                <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                <h4><i class="icon fa fa-check"></i>Card was deleted!</h4>
+            </div>
+        <?php endif ?>
         <?php $form = ActiveForm::begin(['id' => 'update-card-form-' . $model->uuid, 'enableAjaxValidation' => false, 'enableClientValidation' => true, 'options' => ['data-pjax' => true]]) ?>
         <?= $form->field($model, 'title')->textInput(['disabled' => $isDeleted]) ?>
         <?= $form->field($model, 'description')->textarea(['disabled' => $isDeleted]) ?>

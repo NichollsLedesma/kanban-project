@@ -45,23 +45,23 @@ class KanbanController extends Controller
     public function actionIndex()
     {
         $boards = Board::find()
-            ->where([
-                "in", "id", UserBoard::find()->select(["board_id"])
+                ->where([
+                    "in", "id", UserBoard::find()->select(["board_id"])
                     ->where([
                         "user_id" => Yii::$app->getUser()->getId(),
                     ]),
-            ])
-            ->all();
+                ])
+                ->all();
 
-        $entities =  ArrayHelper::map(
-            Yii::$app->getUser()->getIdentity()->entities,
-            'id',
-            'name'
+        $entities = ArrayHelper::map(
+                        Yii::$app->getUser()->getIdentity()->entities,
+                        'id',
+                        'name'
         );
 
         return $this->render('index', [
-            "boards" => $boards,
-            "entities" => $entities
+                    "boards" => $boards,
+                    "entities" => $entities
         ]);
     }
 
@@ -128,8 +128,9 @@ class KanbanController extends Controller
             throw new NotFoundHttpException('card not found');
         }
         $deleteCardModel = new \frontend\models\DeleteCardForm();
-        if ($this->request->isPost && $this->request->post('DeleteCardForm') && $deleteCardModel->load($this->request->post()) && $deleteCardModel->validate() && $userCardModel->delete()) {
-            Yii::$app->session->setFlash('updated', true);
+        if ($this->request->isPost && $this->request->post('DeleteCardForm') && $deleteCardModel->load($this->request->post()) && $deleteCardModel->validate()) {
+            $userCardModel->delete();
+            Yii::$app->session->setFlash('deleted', true);
         }
         if ($this->request->isPost && !$this->request->post('DeleteCardForm') && $userCardModel->load($this->request->post()) && $userCardModel->validate() && $userCardModel->save()) {
             Yii::$app->session->setFlash('updated', true);
@@ -160,11 +161,12 @@ class KanbanController extends Controller
     public function actionMove()
     {
         $id = Yii::$app->queue->push(
-            new JobTest(
-                [
+                new JobTest(
+                        [
                     "message" => "Hi job"
-                ]
-            )
+                        ]
+                )
         );
     }
+
 }
