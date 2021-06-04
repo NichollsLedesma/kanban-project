@@ -41,14 +41,6 @@ $this->registerJsFile(
             'position' => View::POS_END
         ]
 );
-
-$this->registerJsFile(
-        Yii::$app->request->BaseUrl . '/js/board-pjax.js',
-        [
-            'depends' => "/js/dragula-impl.js",
-            'position' => View::POS_END
-        ]
-);
 ?>
 
 <div class="content-wrapper kanban">
@@ -59,14 +51,15 @@ $this->registerJsFile(
         ]]);
         foreach ($boardColumns->all() as $column) {
             $cards = [];
+            $formCard = null;
             $this->registerJS('addColumnDragula("' . $boardColumnIdPrefix . $column->uuid . '")', View::POS_END);
             foreach ($column->getCards()->all() as $task) {
                 $cards[] = BoardCard::widget(['id' => $task->uuid, 'title' => $task->title, 'content' => $task->description, 'color' => $task->color]);
             }
             if ($newCardModel && $newCardModel->column_id == $column->id) {
-                $cards[] = $this->render('_newCard', ['model' => $newCardModel, 'columnId' => $column->uuid, 'boardUuid' => $boardUuid]);
+                $formCard = $this->render('_newCard', ['model' => $newCardModel, 'columnId' => $column->uuid, 'boardUuid' => $boardUuid]);
             }
-            echo BoardColumn::widget(['id' => $column->uuid, 'idPrefix' => $boardColumnIdPrefix, 'name' => $column->title, 'boardUuid' => $boardUuid, 'cards' => $cards]);
+            echo BoardColumn::widget(['id' => $column->uuid, 'idPrefix' => $boardColumnIdPrefix, 'name' => $column->title, 'boardUuid' => $boardUuid, 'cards' => $cards, 'formCard' => $formCard]);
         }
 
         $cardCreationForm = [];

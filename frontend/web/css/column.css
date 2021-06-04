@@ -2,3 +2,10 @@
     background: transparent!important;
     box-shadow: none!important;
 }
+.content {
+    overflow: auto !important;
+}
+
+.column {
+    max-height: 700px;
+}

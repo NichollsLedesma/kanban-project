@@ -23,17 +23,6 @@ class BoardController extends Controller
 
     public function actionCreate()
     {
-        // $entity_id = Yii::$app->request->post('entity_id');
-        // $entity = Entity::find()
-        //     ->where(["id" => $entity_id])
-        //     ->where([
-        //         "in", "id", UserEntity::find()->select(["entity_id"])
-        //             ->where([
-        //                 "user_id" => Yii::$app->getUser()->getId(),
-        //                 "entity_id" => $entity_id,
-        //             ]),
-        //     ])
-        //     ->limit(1)->one();
         $entity = Entity::findOne(Yii::$app->request->post('entity_id'));
 
         if (!$entity) {

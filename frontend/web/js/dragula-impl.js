@@ -24,12 +24,7 @@ dragulaComp.on('drop', (component) => {
 })
 
 $(document).ready(function () {
-    dragulaComp.on('drop', (component) => {
-        const taskId = $(component).attr("id").split('_')[1];
-        const targetColumnId = $(component.parentElement).attr('data-column-id')
 
-        sendMessage({ taskId, targetColumnId })
-    })
     ////////////////////////////////////////////
     const wsbroker = "localhost";  // mqtt websocket enabled broker
     const wsport = 15675; // port for above
@@ -132,7 +127,7 @@ $(document).ready(function () {
             $.ajax({
                 method: "PUT",
                 url,
-                data: { title: boardNameComp.val() },
+                data: {title: boardNameComp.val()},
             });
         }
     });

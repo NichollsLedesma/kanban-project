@@ -100,13 +100,13 @@ class Board extends \yii\db\ActiveRecord
         return $this->hasMany(UserBoard::className(), ['board_id' => 'id']);
     }
 
-        public static function find()
-        {
-            $query = parent::find();
-            $query->attachBehavior('softDelete', SoftDeleteQueryBehavior::class);
+    public static function find()
+    {
+        $query = parent::find();
+        $query->attachBehavior('softDelete', SoftDeleteQueryBehavior::class);
 
-            return $query->notDeleted();
-        }
+        return $query->notDeleted();
+    }
 
     /**
      * Gets query for [[Users]].
