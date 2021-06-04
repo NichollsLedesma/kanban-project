@@ -128,8 +128,8 @@ class KanbanController extends Controller
             throw new NotFoundHttpException('card not found');
         }
         $deleteCardModel = new \frontend\models\DeleteCardForm();
-        if ($this->request->isPost && $this->request->post('DeleteCardForm') && $deleteCardModel->load($this->request->post()) && $deleteCardModel->validate()) {
-            $userCardModel->delete();
+        if ($this->request->isPost && $this->request->post('DeleteCardForm') && $deleteCardModel->load($this->request->post()) && $deleteCardModel->validate() && $userCardModel->delete()) {
+            Yii::$app->session->setFlash('updated', true);
         }
         if ($this->request->isPost && !$this->request->post('DeleteCardForm') && $userCardModel->load($this->request->post()) && $userCardModel->validate() && $userCardModel->save()) {
             Yii::$app->session->setFlash('updated', true);
