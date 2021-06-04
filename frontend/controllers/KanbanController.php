@@ -43,13 +43,13 @@ class KanbanController extends Controller
     public function actionIndex()
     {
         $boards = Board::find()
-            ->where(["owner_id" => Yii::$app->getUser()->getId()])
-            ->andWhere(['is_deleted' => 0])
-            ->all();
-        $entities =  ArrayHelper::map(
-            Yii::$app->getUser()->getIdentity()->entities,
-            'id',
-            'name'
+                ->where(["owner_id" => Yii::$app->getUser()->getId()])
+                ->andWhere(['is_deleted' => 0])
+                ->all();
+        $entities = ArrayHelper::map(
+                        Yii::$app->getUser()->getIdentity()->entities,
+                        'id',
+                        'name'
         );
 
         return $this->render('index', [
@@ -103,11 +103,11 @@ class KanbanController extends Controller
         $board = Board::find()->where(["uuid" => $uuid])->limit(1)->one();
 
         return $this->render('board', [
-            'boardName' => $board->title,
-            'boardUuid' => $uuid,
-            'boardColumns' => $boardColumns,
-            'newCardModel' => $newCardModel ?? null,
-            'newColumnModel' => $newColumnModel ?? null,
+                    'boardName' => $board->title,
+                    'boardUuid' => $uuid,
+                    'boardColumns' => $boardColumns,
+                    'newCardModel' => $newCardModel ?? null,
+                    'newColumnModel' => $newColumnModel ?? null,
         ]);
     }
 
@@ -121,6 +121,8 @@ class KanbanController extends Controller
             throw new NotFoundHttpException('card not found');
         }
         if ($this->request->isPost && $userCardModel->load($this->request->post()) && $userCardModel->validate() && $userCardModel->save()) {
+//            \yii\helpers\VarDumper::dump($this->request->post(),10,true);
+//            die;
             Yii::$app->session->setFlash('updated', true);
         }
         return $this->renderAjax('_cardUpdate', ['model' => $userCardModel]);
