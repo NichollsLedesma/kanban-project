@@ -54,8 +54,9 @@ $this->registerJsFile(
 <div class="content-wrapper kanban">
     <section class="content pb-3">
         <?php
-        Pjax::begin(['id' => 'board-container']);
-        echo '<div class="container-fluid h-100">';
+        Pjax::begin(['id' => 'board-container', "options" => [
+            "class"=>"container-fluid h-100 m-0"
+        ]]);
         foreach ($boardColumns->all() as $column) {
             $cards = [];
             $this->registerJS('addColumnDragula("' . $boardColumnIdPrefix . $column->uuid . '")', View::POS_END);
@@ -73,7 +74,6 @@ $this->registerJsFile(
             $cardCreationForm[] = $this->render('_newColumn', ['model' => $newColumnModel, 'boardUuid' => $boardUuid]);
         }
         echo BoardColumn::widget(['enableColumnCreation' => true, 'withHeader' => false, 'boardUuid' => $boardUuid, 'cards' => $cardCreationForm]);
-        echo '</div>';
         Pjax::end();
         ?>
     </section>

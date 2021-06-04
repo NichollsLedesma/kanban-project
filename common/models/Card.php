@@ -105,6 +105,14 @@ class Card extends \yii\db\ActiveRecord
         ];
     }
 
+    public static function find()
+        {
+            $query = parent::find();
+            $query->attachBehavior('softDelete', SoftDeleteQueryBehavior::class);
+
+            return $query->notDeleted();
+        }
+        
     public function getColumn()
     {
         return $this->hasOne(Column::class, ['id' => 'column_id']);

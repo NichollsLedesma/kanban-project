@@ -44,7 +44,6 @@ class KanbanController extends Controller
     {
         $boards = Board::find()
             ->where(["owner_id" => Yii::$app->getUser()->getId()])
-            ->andWhere(['is_deleted' => 0])
             ->all();
         $entities =  ArrayHelper::map(
             Yii::$app->getUser()->getIdentity()->entities,
@@ -53,8 +52,8 @@ class KanbanController extends Controller
         );
 
         return $this->render('index', [
-                    "boards" => $boards,
-                    "entities" => $entities
+            "boards" => $boards,
+            "entities" => $entities
         ]);
     }
 
@@ -140,15 +139,15 @@ class KanbanController extends Controller
         }
 
         $data = ElasticCard::find()->query([
-                    "bool" => [
-                        "filter" => [
-                            'match' => ["title" => $search],
-                        ],
-                        "must" => [
-                            'match' => ["board_id" => $board->id],
-                        ],
-                    ]
-                ])->asArray()->all();
+            "bool" => [
+                "filter" => [
+                    'match' => ["title" => $search],
+                ],
+                "must" => [
+                    'match' => ["board_id" => $board->id],
+                ],
+            ]
+        ])->asArray()->all();
 
         $ret = [];
         foreach ($data as $item) {
@@ -189,12 +188,11 @@ class KanbanController extends Controller
     public function actionMove()
     {
         $id = Yii::$app->queue->push(
-                new JobTest(
-                        [
+            new JobTest(
+                [
                     "message" => "Hi job"
-                        ]
-                )
+                ]
+            )
         );
     }
-
 }
