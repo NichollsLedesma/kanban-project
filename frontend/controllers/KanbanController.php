@@ -127,12 +127,14 @@ class KanbanController extends Controller
         if ($userCardModel === null) {
             throw new NotFoundHttpException('card not found');
         }
-        if ($this->request->isPost && $userCardModel->load($this->request->post()) && $userCardModel->validate() && $userCardModel->save()) {
-//            \yii\helpers\VarDumper::dump($this->request->post(),10,true);
-//            die;
+        $deleteCardModel = new \frontend\models\DeleteCardForm();
+        if ($this->request->isPost && $this->request->post('DeleteCardForm') && $deleteCardModel->load($this->request->post()) && $deleteCardModel->validate()) {
+            $userCardModel->delete();
+        }
+        if ($this->request->isPost && !$this->request->post('DeleteCardForm') && $userCardModel->load($this->request->post()) && $userCardModel->validate() && $userCardModel->save()) {
             Yii::$app->session->setFlash('updated', true);
         }
-        return $this->renderAjax('_cardUpdate', ['model' => $userCardModel]);
+        return $this->renderAjax('_cardUpdate', ['model' => $userCardModel, 'deleteModel' => $deleteCardModel]);
     }
 
     public function actionGet($uuid)
