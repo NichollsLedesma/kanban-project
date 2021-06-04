@@ -1,9 +1,10 @@
 $( document ).ready(function() {
-    $('.dropbtn').click(function() {
+
+    $(document).on("click", ".dropbtn", function(){
         $(this).next('.dropdown-content').addClass('show');
     });
 
-    $('.archive-btn').click(function() {
+    $(document).on("click", ".archive-btn", function(event){
         let archiveColumnUrl = $(this).attr('data-column-archive-url');
         $.ajax({
             url: `${archiveColumnUrl}`,
