@@ -111,6 +111,24 @@ class KanbanController extends Controller
         Yii::$app->mqtt->sendMessage($topic, $response);
     }
 
+    public function actionArchiveColumn($uuid)
+    {
+        $column = Column::find()->where(['uuid' => $uuid])->limit(1)->one();
+
+        if (!$column) {
+            return false;
+        }
+
+        $topic = Url::to(['kanban/board', 'uuid' => $column->board->uuid]);
+        $response = array(
+            'type'=>'Column Removed',
+        );
+        Yii::$app->mqtt->sendMessage($topic, $response);
+
+        return $column->delete();
+
+    }
+
     public function actionGet()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;

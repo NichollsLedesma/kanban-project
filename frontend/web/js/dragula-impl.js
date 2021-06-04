@@ -20,6 +20,9 @@ $(document).ready(function () {
         if (objData.type === 'Column ReOrder') {
             $.pjax.reload({container: '#board-container'});
         };
+        if (objData.type === 'Column Removed') {
+            $.pjax.reload({container: '#board-container'});
+        };
         moveCard(objData);
         if (objData.type === 'card' && objData.action === 'new') {
             if ($('div#column-id_' + objData.params.columnId).length > 0) {

@@ -49,6 +49,7 @@ return [
                 'kanban/<uuid>/column/order' => 'kanban/update-column-order',
                 'kanban/<uuid>' => 'kanban/board',
                 'board/create' => 'board/create',
+                'DELETE kanban/column/<uuid>' => 'kanban/archive-column',
             ],
         ],
 

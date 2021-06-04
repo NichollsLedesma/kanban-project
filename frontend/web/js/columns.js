@@ -1,66 +1,20 @@
-function addNewColumn(columnHtml) {
-    $('.transparent').before(columnHtml);
-}
-
-function handleColumnElement(data = '') {
-    $.post({
-        url: location.hostname + '?boardId=' + boardId + '&type=column',
-        data: data,
-        cache: false,
-        success: function (data) {
-            if (data === true) {
-                cancelColumnElement();
-                return;
-            }
-            addColumnElement(data);
-        }
+$( document ).ready(function() {
+    $('.dropbtn').click(function() {
+        $(this).next('.dropdown-content').addClass('show');
     });
-}
 
-function addColumnElement(data) {
-    removeColumnElement();
-    $(data).insertBefore($('#add-list'));
-    bindColumnElement();
-}
-
-function removeColumnElement(reset = false) {
-    if ($('#creation-column form').length) {
-        $('#creation-column form').remove();
-        bindColumnElement(false);
-    }
-
-    if (reset === true) {
-        $('#add-list').show();
-    }
-}
-
-function bindColumnElement(bind = true) {
-    if (bind === false) {
-        $('#creation-column form').unbind('beforeSubmit');
-        return;
-    }
-    $('#add-list').hide();
-    $('#creation-column form').on('beforeSubmit', function (e) {
-        e.preventDefault();
-        handleColumnElement($(e.currentTarget).serialize());
-        return false;
+    $('.archive-btn').click(function() {
+        let archiveColumnUrl = $(this).attr('data-column-archive-url');
+        $.ajax({
+            url: `${archiveColumnUrl}`,
+            cache: false,
+            type: 'DELETE',
+        });
     });
-}
 
-function cancelColumnElement() {
-    removeColumnElement(true);
-}
-
-function isAddingColumn()
-{
-    return $('#creation-column form').length;
-}
-
-$(document).ready(function () {
-    $('#add-list').click(function (e) {
-        if (isAddingColumn()) {
-            return;
+    $(window).click(function(e) {
+        if (!e.target.matches('.dropbtn')) {
+            $('.dropdown-content').removeClass('show');
         }
-        handleColumnElement();
     });
 });
