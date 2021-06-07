@@ -47,17 +47,6 @@ class KanbanController extends Controller
 
     public function actionIndex()
     {
-        // $boards = Board::find()
-        //     ->select(["id", "title", "entity_id", "uuid"])
-        //     ->where([
-        //         "in", "id", UserBoard::find()->select(["board_id"])
-        //             ->where([
-        //                 "user_id" => Yii::$app->getUser()->getId(),
-        //             ]),
-        //     ])
-        // ->all();
-        // $entities = ArrayHelper::index($boards, null, "entity_id");
-
         $entities = Entity::find()
             ->select(["id", "name", "uuid"])
             ->where([
@@ -74,18 +63,12 @@ class KanbanController extends Controller
                                 "user_id" => Yii::$app->getUser()->getId(),
                             ])
                     ]);
-                    
                 }
             ])
             ->all();
 
-        // VarDumper::dump($entities, $depth = 10, $highlight = true);
-        // die;
-        // $isBelongToAnEntity = count(Yii::$app->getUser()->getIdentity()->entities) > 0;
-
         return $this->render('index', [
             "entities" => $entities,
-            // "isBelongToAnEntity" => $isBelongToAnEntity
         ]);
     }
 

@@ -9,7 +9,6 @@ class ListBoardWidgetAsset extends AssetBundle
     public $sourcePath = '@common/widgets/listBoard/assets';
 
     public $js = [
-        'js/main.js',
     ];
 
     public $css = [
