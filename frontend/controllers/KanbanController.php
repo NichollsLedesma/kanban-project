@@ -14,13 +14,16 @@ use common\models\User;
 use common\models\elastic\Board as ElasticBoard;
 use common\models\elastic\Card as ElasticCard;
 use common\models\elastic\ElasticHelper;
+use common\models\Entity;
 use common\models\UserBoard;
+use common\models\UserEntity;
 use common\widgets\BoardCard\BoardCard;
 use frontend\models\CreateCardForm;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
+use yii\helpers\VarDumper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -46,24 +49,28 @@ class KanbanController extends Controller
 
     public function actionIndex()
     {
-        $boards = Board::find()
-                ->where([
-                    "in", "id", UserBoard::find()->select(["board_id"])
+        $entities = Entity::find()
+            ->select(["id", "name", "uuid"])
+            ->where([
+                "in", "id", UserEntity::find()->select(["entity_id"])
                     ->where([
                         "user_id" => Yii::$app->getUser()->getId(),
                     ]),
-                ])
-                ->all();
-
-        $entities = ArrayHelper::map(
-                        Yii::$app->getUser()->getIdentity()->entities,
-                        'id',
-                        'name'
-        );
+            ])
+            ->with([
+                "boards" => function ($query) {
+                    $query->where([
+                        "in", "id", UserBoard::find()->select(["board_id"])
+                            ->where([
+                                "user_id" => Yii::$app->getUser()->getId(),
+                            ])
+                    ]);
+                }
+            ])
+            ->all();
 
         return $this->render('index', [
-                    "boards" => $boards,
-                    "entities" => $entities
+            "entities" => $entities,
         ]);
     }
 
@@ -222,12 +229,11 @@ class KanbanController extends Controller
     public function actionMove()
     {
         $id = Yii::$app->queue->push(
-                new JobTest(
-                        [
+            new JobTest(
+                [
                     "message" => "Hi job"
-                        ]
-                )
+                ]
+            )
         );
     }
-
 }
