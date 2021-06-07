@@ -1,15 +1,11 @@
 <?php
 
-use common\models\Board;
 use common\widgets\listBoard\CardWidget;
 use yii\bootstrap4\Modal;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
 
 ?>
 
-<h1><?= $title ?? '' ?></h1>
 <div class="wrapper ">
     <?php foreach ($boards as $board) { ?>
         <?= Html::a(
@@ -24,7 +20,9 @@ use yii\widgets\ActiveForm;
     if ($isEnableToCreate) {
         echo Html::tag('button', "create new board", [
             'class' => 'btn btn-default card-size-board',
-            "id" => "btn-create-board"
+            "id" => "btn-create-board",
+            "data-toggle" => "modal",
+            "data-target" => "#newBoardModal$entity_id",
         ]);
     }
     ?>
@@ -32,41 +30,28 @@ use yii\widgets\ActiveForm;
 </div>
 
 <? Modal::begin([
-    "id" => "newBoardModal",
+    "id" => "newBoardModal$entity_id",
     "title" => "Create new board",
     "size" => Modal::SIZE_DEFAULT,
 ]); ?>
 
 <?= Html::beginForm('/board/create', 'POST', [
     'class' => '',
-    "id" => "board-form"
+    "id" => "board-form-$entity_id"
 ]); ?>
 
-<div class="form-group">
-    <?= Html::tag('span', "Board name", ["for" => "name"]); ?>
-    <?= Html::textInput('name', "", [
-        'class' => "form-control",
-        'required' => "on",
-        "id" => "name",
-        "placeholder" => "Board name",
-    ]); ?>
-</div>
+<?= Html::tag('span', "Board name", ["for" => "name"]); ?>
+<?= Html::textInput('name', "", [
+    'class' => "form-control",
+    'required' => "on",
+    "id" => "name",
+    "placeholder" => "Board name",
+]); ?>
+<?= Html::hiddenInput('entity_id', $entity_id); ?>
 
-<?php if (count($entities) > 0) { ?>
-    <div class="form-group">
-    <?= Html::tag('span', "Entity", ["for" => "name"]); ?>
-        <?= Html::dropDownList('entity_id', 0, [null => 'Please select entity', 'options' => $entities], [
-            'class' => "form-control",
-            'required' => "on",
-            'id' => "entity_id",
-        ]) ?>
-    </div>
-    <?= Html::submitButton('Create', [
-        'class' => 'btn btn-primary'
-    ]) ?>
-<?php } else { ?>
-    <p>You don't belong to any entity, please, contact to the admin to create board.</p>
-<?php } ?>
+<?= Html::submitButton('Create', [
+    'class' => 'btn btn-primary'
+]) ?>
 
 <?= Html::endForm(); ?>
 

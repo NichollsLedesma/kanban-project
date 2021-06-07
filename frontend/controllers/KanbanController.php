@@ -19,6 +19,7 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
+use yii\helpers\VarDumper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -45,23 +46,17 @@ class KanbanController extends Controller
     public function actionIndex()
     {
         $boards = Board::find()
-                ->where([
-                    "in", "id", UserBoard::find()->select(["board_id"])
+            ->select(["id", "title", "entity_id", "uuid"])
+            ->where([
+                "in", "id", UserBoard::find()->select(["board_id"])
                     ->where([
                         "user_id" => Yii::$app->getUser()->getId(),
                     ]),
-                ])
-                ->all();
-
-        $entities = ArrayHelper::map(
-                        Yii::$app->getUser()->getIdentity()->entities,
-                        'id',
-                        'name'
-        );
+            ])
+            ->all();
 
         return $this->render('index', [
-                    "boards" => $boards,
-                    "entities" => $entities
+            "boardsByEntity" => ArrayHelper::index($boards, null, "entity_id"),
         ]);
     }
 
@@ -117,11 +112,11 @@ class KanbanController extends Controller
         $board = Board::find()->where(["uuid" => $uuid])->limit(1)->one();
 
         return $this->render('board', [
-                    'boardName' => $board->title,
-                    'boardUuid' => $uuid,
-                    'boardColumns' => $boardColumns,
-                    'newCardModel' => $newCardModel ?? null,
-                    'newColumnModel' => $newColumnModel ?? null,
+            'boardName' => $board->title,
+            'boardUuid' => $uuid,
+            'boardColumns' => $boardColumns,
+            'newCardModel' => $newCardModel ?? null,
+            'newColumnModel' => $newColumnModel ?? null,
         ]);
     }
 
@@ -175,12 +170,11 @@ class KanbanController extends Controller
     public function actionMove()
     {
         $id = Yii::$app->queue->push(
-                new JobTest(
-                        [
+            new JobTest(
+                [
                     "message" => "Hi job"
-                        ]
-                )
+                ]
+            )
         );
     }
-
 }
