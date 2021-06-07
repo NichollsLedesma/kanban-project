@@ -15,7 +15,7 @@ dragulaComp.on('drop', (component) => {
     let order = $(component, $(component).parent('div .card-body')).index();
     let column = $(component).parent('div .card-body').attr('data-column-id');
     let board = board_id;
-    $.post(channelName + '?changeOrder=true', { 'column': column, 'card': card, 'order': order, 'board': board });
+    $.post(channelName + '?changeOrder=true', {'column': column, 'card': card, 'order': order, 'board': board});
 
     //        const taskId = Number($(component).attr("id").split('_')[1]);
     //        const targetColumnId = $(component.parentElement).attr('data-column-id')
@@ -29,11 +29,11 @@ $(document).ready(function () {
     const wsbroker = "localhost";  // mqtt websocket enabled broker
     const wsport = 15675; // port for above
     const client = new Paho.MQTT.Client(
-        wsbroker,
-        wsport,
-        "/ws",
-        "myclientid_" + parseInt(Math.random() * 100, 10)
-    );
+            wsbroker,
+            wsport,
+            "/ws",
+            "myclientid_" + parseInt(Math.random() * 100, 10)
+            );
 
     client.onConnectionLost = function (responseObject) {
         connect();
@@ -45,7 +45,7 @@ $(document).ready(function () {
             addNewColumn(objData.html);
         }
         ;
-        moveCard(objData);
+//        moveCard(objData);
         if (objData.type === 'card' && objData.action === 'new') {
             if ($('div#column-id_' + objData.params.columnId).length > 0) {
                 $('div#column-id_' + objData.params.columnId).append(objData.params.html);
@@ -53,8 +53,22 @@ $(document).ready(function () {
         }
         if (objData.type === 'card' && objData.action === 'move') {
             let elm = $('#card_' + objData.params.cardId);
-            $('#column-id_' + objData.params.columnId).append(elm);
-
+            let refElm = $('#column-id_' + objData.params.columnId).children('div[id^="card_"]').not(elm).get(objData.params.order);
+            if (refElm === undefined) {
+                if (objData.params.order == 0) {
+                    $('#column-id_' + objData.params.columnId).prepend(elm);
+                } else {
+                    $('#column-id_' + objData.params.columnId).append(elm);
+                }
+            } else {
+                $(refElm).before(elm);
+            }
+        }
+        if (objData.type === 'card' && objData.action === 'update') {
+            let elm = $('#card_' + objData.params.cardId);
+            $(elm).css({'border-top-color': '#' + objData.params.color});
+            $('h5.card-title', elm).html(objData.params.title);
+            $('.card-body p', elm).html(objData.params.description);
         }
 
     };
@@ -92,7 +106,7 @@ $(document).ready(function () {
             });
         },
         select: (event, ui) => {
-            const { id } = ui.item;
+            const {id} = ui.item;
             getInfoAndOpenModal(id);
         }
     });
@@ -104,12 +118,12 @@ $(document).ready(function () {
 
     function getInfoAndOpenModal(id) {
         $.get("get-one/" + id,
-            (task) => {
-                const modal = $('#detailModal');
-                modal.modal('show')
-                modal.find(".modal-title").html(task.title);
-                modal.find(".content").html(task.description)
-            });
+                (task) => {
+            const modal = $('#detailModal');
+            modal.modal('show')
+            modal.find(".modal-title").html(task.title);
+            modal.find(".content").html(task.description)
+        });
     }
 
     const boardNameComp = $("#boardname");

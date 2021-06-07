@@ -47,14 +47,14 @@ $this->registerJsFile(
     <section class="content pb-3">
         <?php
         Pjax::begin(['id' => 'board-container', "options" => [
-            "class"=>"container-fluid h-100 m-0"
+                "class" => "container-fluid h-100 m-0"
         ]]);
         foreach ($boardColumns->all() as $column) {
             $cards = [];
             $formCard = null;
             $this->registerJS('addColumnDragula("' . $boardColumnIdPrefix . $column->uuid . '")', View::POS_END);
-            foreach ($column->getCards()->all() as $task) {
-                $cards[] = BoardCard::widget(['id' => $task->uuid, 'title' => $task->title, 'content' => $task->description, 'color' => $task->color]);
+            foreach ($column->getCards()->orderBy('order ASC')->all() as $task) {
+                $cards[] = BoardCard::widget(['id' => $task->uuid, 'title' => $task->title, 'content' => $task->description, 'color' => $task->color, 'boardUuid' => $boardUuid]);
             }
             if ($newCardModel && $newCardModel->column_id == $column->id) {
                 $formCard = $this->render('_newCard', ['model' => $newCardModel, 'columnId' => $column->uuid, 'boardUuid' => $boardUuid]);

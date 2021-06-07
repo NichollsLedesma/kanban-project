@@ -73,6 +73,13 @@ class KanbanController extends Controller
             throw new NotFoundHttpException('board not found');
         }
         if ($this->request->isPost && $this->request->isAjax && $this->request->get('changeOrder')) {
+            $userCard = CardRepository::getUserBoardCardByUuid(Yii::$app->user->id, $this->request->post('card'));
+
+            $column = Column::find()->select(['id'])->where(['uuid' => $this->request->post('column')])->limit(1)->one();
+            if ($userBoard === null || $column === null) {
+                throw new NotFoundHttpException('card  or column not found');
+            }
+            CardRepository::reArrageByCardId($userCard->id, $this->request->post('order'), $column->id);
             $obj = ['type' => 'card', 'action' => 'move', 'params' => ['columnId' => $this->request->post('column'), 'cardId' => $this->request->post('card'), 'order' => $this->request->post('order')]];
             Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => $uuid]), $obj);
         }
@@ -118,7 +125,7 @@ class KanbanController extends Controller
         ]);
     }
 
-    public function actionCardUpdate($uuid)
+    public function actionCardUpdate($uuid, $boardUuid)
     {
         if (!$this->request->isAjax) {
             throw new NotFoundHttpException('not found');
@@ -133,6 +140,9 @@ class KanbanController extends Controller
             Yii::$app->session->setFlash('deleted', true);
         }
         if ($this->request->isPost && !$this->request->post('DeleteCardForm') && $userCardModel->load($this->request->post()) && $userCardModel->validate() && $userCardModel->save()) {
+            $obj = ['type' => 'card', 'action' => 'update', 'params' => ['cardId' => $userCardModel->uuid, 'title' => $userCardModel->title, 'description' => $userCardModel->description, 'color' => $userCardModel->color]];
+            
+            Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => $boardUuid]), $obj);
             Yii::$app->session->setFlash('updated', true);
         }
         return $this->renderAjax('_cardUpdate', ['model' => $userCardModel, 'deleteModel' => $deleteCardModel]);

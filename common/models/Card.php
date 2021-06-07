@@ -107,13 +107,13 @@ class Card extends \yii\db\ActiveRecord
     }
 
     public static function find()
-        {
-            $query = parent::find();
-            $query->attachBehavior('softDelete', SoftDeleteQueryBehavior::class);
+    {
+        $query = parent::find();
+        $query->attachBehavior('softDelete', SoftDeleteQueryBehavior::class);
 
-            return $query->notDeleted();
-        }
-        
+        return $query->notDeleted();
+    }
+
     public function getColumn()
     {
         return $this->hasOne(Column::class, ['id' => 'column_id']);
@@ -122,7 +122,7 @@ class Card extends \yii\db\ActiveRecord
     public function beforeSave($insert)
     {
         /* data modifier, remove # from begin of color selector */
-        if (isset($this->color)&&$this->color[0] == '#') {
+        if (isset($this->color) && $this->color[0] == '#') {
             $this->color = substr($this->color, 1);
         }
 

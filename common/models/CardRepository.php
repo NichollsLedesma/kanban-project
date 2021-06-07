@@ -31,4 +31,50 @@ class CardRepository extends Card
         return $card->select([])->one();
     }
 
+    /**
+     * re-arrage cards by columns
+     * return true always
+     * @param int $cardId
+     * @param int $position new position(order) 
+     * @param int $columnId target column id
+     * @return bool
+     */
+    static public function reArrageByCardId(int $cardId, int $position, int $columnId): bool
+    {
+        $columnCardOrdered = parent::find()->where(['column_id' => $columnId])->orderBy('order ASC')->all();
+        $updateCard = true;
+        $addition = 0;
+        if (empty($columnCardOrdered)) {
+            foreach ($columnCardOrdered as $k => $v) {
+                if ($v->id == $cardId) {
+                    $updateCard = false;
+                    $v->order = $position;
+                    $addition = -1;
+                } else {
+                    if ($k < $position) {
+                        $v->order = ($k + ($addition));
+                    }
+                    if ($k == $position) {
+                        $addition = ($addition == 0 ? 1 : $addition);
+                        $v->order = ($k + ($addition));
+                        if (!$updateCard) {
+                            $addition = 0;
+                        }
+                    }
+                    if ($k > $position) {
+                        $v->order = ($k + ($addition));
+                    }
+                }
+                $v->save(false);
+            }
+        }
+        if ($updateCard === true) {
+            $card = parent::findOne(['id' => $cardId]);
+            $card->order = $position;
+            $card->column_id = $columnId;
+            $card->save(false);
+        }
+        return true;
+    }
+
 }
