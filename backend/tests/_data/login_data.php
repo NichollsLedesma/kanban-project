@@ -9,5 +9,6 @@ return [
         'created_at' => '1392559490',
         'updated_at' => '1392559490',
         'email' => 'sfriesen@jenkins.info',
+        'is_admin' => true
     ],
 ];

@@ -5,6 +5,7 @@ namespace backend\controllers;
 use common\models\Board;
 use common\models\Entity;
 use Yii;
+use yii\filters\AccessControl;
 use common\models\User;
 use common\models\UserBoard;
 use common\models\UserEntity;
@@ -28,9 +29,19 @@ class UserController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                "class" => AccessControl::class,
+                "only" => ['index', 'view', 'update', 'delete'],
+                "rules" => [
+                    [
+                        'allow' => true,
+                        'roles' => ["@"],
+                    ]
                 ],
             ],
         ];
@@ -85,6 +96,11 @@ class UserController extends Controller
             'title'
         );
 
+        // echo "<pre>";
+        // VarDumper::dump($model->boards);
+        // echo "</pre>";
+        // die;
+
         return $this->render('view', [
             'model' => $model,
             "entities" => $entities,
@@ -99,7 +115,7 @@ class UserController extends Controller
      */
     public function actionCreate()
     {
-        throw new ForbiddenHttpException('You are not allowed to perform this action.'); 
+        throw new ForbiddenHttpException('You are not allowed to perform this action.');
 
         // $model = new User();
 
