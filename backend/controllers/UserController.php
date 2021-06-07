@@ -14,6 +14,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\VarDumper;
+use yii\web\ForbiddenHttpException;
 
 /**
  * UserController implements the CRUD actions for User model.
@@ -98,15 +99,17 @@ class UserController extends Controller
      */
     public function actionCreate()
     {
-        $model = new User();
+        throw new ForbiddenHttpException('You are not allowed to perform this action.'); 
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
+        // $model = new User();
 
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+        // if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        //     return $this->redirect(['view', 'id' => $model->id]);
+        // }
+
+        // return $this->render('create', [
+        //     'model' => $model,
+        // ]);
     }
 
     /**
