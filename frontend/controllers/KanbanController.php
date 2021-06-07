@@ -12,7 +12,9 @@ use common\models\CreateColumnForm;
 use common\models\elastic\Board as ElasticBoard;
 use common\models\elastic\Card as ElasticCard;
 use common\models\elastic\ElasticHelper;
+use common\models\Entity;
 use common\models\UserBoard;
+use common\models\UserEntity;
 use common\widgets\BoardCard\BoardCard;
 use frontend\models\CreateCardForm;
 use Yii;
@@ -45,18 +47,45 @@ class KanbanController extends Controller
 
     public function actionIndex()
     {
-        $boards = Board::find()
-            ->select(["id", "title", "entity_id", "uuid"])
+        // $boards = Board::find()
+        //     ->select(["id", "title", "entity_id", "uuid"])
+        //     ->where([
+        //         "in", "id", UserBoard::find()->select(["board_id"])
+        //             ->where([
+        //                 "user_id" => Yii::$app->getUser()->getId(),
+        //             ]),
+        //     ])
+        // ->all();
+        // $entities = ArrayHelper::index($boards, null, "entity_id");
+
+        $entities = Entity::find()
+            ->select(["id", "name", "uuid"])
             ->where([
-                "in", "id", UserBoard::find()->select(["board_id"])
+                "in", "id", UserEntity::find()->select(["entity_id"])
                     ->where([
                         "user_id" => Yii::$app->getUser()->getId(),
                     ]),
             ])
+            ->with([
+                "boards" => function ($query) {
+                    $query->where([
+                        "in", "id", UserBoard::find()->select(["board_id"])
+                            ->where([
+                                "user_id" => Yii::$app->getUser()->getId(),
+                            ])
+                    ]);
+                    
+                }
+            ])
             ->all();
 
+        // VarDumper::dump($entities, $depth = 10, $highlight = true);
+        // die;
+        // $isBelongToAnEntity = count(Yii::$app->getUser()->getIdentity()->entities) > 0;
+
         return $this->render('index', [
-            "boardsByEntity" => ArrayHelper::index($boards, null, "entity_id"),
+            "entities" => $entities,
+            // "isBelongToAnEntity" => $isBelongToAnEntity
         ]);
     }
 
