@@ -70,7 +70,11 @@ $this->registerJsFile(
                 if ($newCardModel && $newCardModel->column_id == $column->id) {
                     $cards[] = $this->render('_newCard', ['model' => $newCardModel, 'columnId' => $column->uuid, 'boardUuid' => $boardUuid]);
                 }
-                echo BoardColumn::widget(['id' => $column->uuid, 'idPrefix' => $boardColumnIdPrefix, 'name' => $column->title, 'boardUuid' => $boardUuid, 'cards' => $cards]);
+                $updateForm = null;
+                if ($updateColumnModel && $updateColumnModel->id == $column->id) {
+                    $updateForm = $this->render('_editColumn', ['model' => $updateColumnModel]);
+                }
+                echo BoardColumn::widget(['id' => $column->uuid, 'idPrefix' => $boardColumnIdPrefix, 'name' => $column->title, 'boardUuid' => $boardUuid, 'cards' => $cards, 'updateForm' => $updateForm]);
             }
 
             $cardCreationForm = [];

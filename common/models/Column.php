@@ -31,6 +31,7 @@ class Column extends \yii\db\ActiveRecord
      */
 
     const SCENARIO_AJAX_CREATE = 'ajax_create';
+    const SCENARIO_AJAX_UPDATE = 'ajax_update';
 
     public static function tableName()
     {
@@ -40,6 +41,7 @@ class Column extends \yii\db\ActiveRecord
     public function scenarios() {
         $scenarios = parent::scenarios();
         $scenarios[self::SCENARIO_AJAX_CREATE] = ['title'];
+        $scenarios[self::SCENARIO_AJAX_UPDATE] = ['title'];
         return $scenarios;
     }
 

@@ -3,7 +3,13 @@
     <?php if($withHeader) : ?>
     <div class="card-header" data-column-id="<?= $id ?>">
             <h3 class="card-title">
-                <?= $name ?>
+                <?php if ($updateForm): ?>
+                    <?
+                     echo $updateForm;
+                    ?>
+                <?php else: ?>
+                <?= yii\helpers\Html::a($name, \yii\helpers\Url::to(["/kanban/board", 'uuid' => $boardUuid, 'updateColumn' => $id])); ?>
+                <?php endif ?>
             </h3>
             <div class="dropdown" style="float: right;">
                 <button class="dropbtn">...</button>

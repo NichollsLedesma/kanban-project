@@ -9,6 +9,7 @@ use common\models\BoardRepository;
 use common\models\Card;
 use common\models\Column;
 use common\models\CreateColumnForm;
+use common\models\UpdateColumnForm;
 use common\models\User;
 use frontend\models\CreateCardForm;
 use yii\elasticsearch\QueryBuilder;
@@ -85,6 +86,18 @@ class KanbanController extends Controller
             }
         }
 
+        if ($this->request->isPjax && $this->request->get('updateColumn')) {
+            $uuidColumn = $this->request->get('updateColumn');
+            $updateColumnModel = new UpdateColumnForm(['scenario' => Column::SCENARIO_AJAX_UPDATE]);
+            $updateColumnModel = $updateColumnModel->find()->where(['uuid' => $uuidColumn])->one();
+            if ($this->request->isPost && $updateColumnModel->load($this->request->post()) &&$updateColumnModel->validate()) {
+                $updateColumnModel->save();
+                $updateColumnModel->columnUpdated(Url::to(['kanban/board', 'uuid' => $uuid]));
+                $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
+                unset($updateColumnModel);
+            }
+        }
+
         $this->layout = "kanban";
         // $search = Yii::$app->request->post('search');
         // $board = ($search) ?
@@ -96,6 +109,7 @@ class KanbanController extends Controller
             'boardColumns' => $boardColumns,
             'newCardModel' => $newCardModel ?? null,
             'newColumnModel' => $newColumnModel ?? null,
+            'updateColumnModel' => $updateColumnModel ?? null,
         ]);
     }
 

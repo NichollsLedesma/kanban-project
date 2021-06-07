@@ -20,6 +20,12 @@ $(document).ready(function () {
         if (objData.type === 'Column ReOrder') {
             $.pjax.reload({container: '#board-container'});
         };
+        if (objData.type === 'Column Updated') {
+            if (location.href.includes('?')) {
+                history.pushState({}, null, location.href.split('?')[0]);
+            }
+            $.pjax.reload({container: '#board-container'});
+        };
         if (objData.type === 'Column Removed') {
             $.pjax.reload({container: '#board-container'});
         };

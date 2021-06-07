@@ -20,6 +20,7 @@ class BoardColumn extends Widget
     public $enableCardCreation = true;
     public $enableColumnCreation = false;
     public $withHeader = true;
+    public $updateForm = null;
 
     public function run(): string {
         return $this->render(
@@ -33,6 +34,7 @@ class BoardColumn extends Widget
         		'enableCardCreation' => $this->enableCardCreation,
         		'enableColumnCreation' => $this->enableColumnCreation,
         		'cards' => $this->cards,
+                'updateForm' => $this->updateForm,
         	]
         );
     }
