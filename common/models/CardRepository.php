@@ -44,7 +44,7 @@ class CardRepository extends Card
         $columnCardOrdered = parent::find()->where(['column_id' => $columnId])->orderBy('order ASC')->all();
         $updateCard = true;
         $addition = 0;
-        if (empty($columnCardOrdered)) {
+        if (!empty($columnCardOrdered)) {
             foreach ($columnCardOrdered as $k => $v) {
                 if ($v->id == $cardId) {
                     $updateCard = false;
