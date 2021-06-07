@@ -6,22 +6,42 @@ const addColumnDragula = (column) => {
         dragulaComp.containers.push(document.getElementById(column));
     }
 }
+dragulaComp.containers.push(document.getElementById('board-container'));
 
 dragulaComp.on('drop', (component) => {
-    let card = $(component).attr("id").split('card_')[1];
-    if (card === 'new') {
-        return;
+    if ($(component).hasClass('task')) {
+        let card = $(component).attr("id").split('card_')[1];
+        if (card === 'new') {
+            return;
+        }
+        let order = $(component, $(component).parent('div .card-body')).index();
+        let column = $(component).parent('div .card-body').attr('data-column-id');
+        let board = board_id;
+        $.post(channelName + '?changeOrder=true', {'column': column, 'card': card, 'order': order, 'board': board});
     }
-    let order = $(component, $(component).parent('div .card-body')).index();
-    let column = $(component).parent('div .card-body').attr('data-column-id');
-    let board = board_id;
-    $.post(channelName + '?changeOrder=true', {'column': column, 'card': card, 'order': order, 'board': board});
+
+    if ($(component).hasClass('card-row')) {
+        let updatedColumnOrder = getCurrentColumnOrder();
+        $.post({
+            url: updateColumnOrderUrl,
+            data: {columns:updatedColumnOrder},
+            cache: false,
+        });
+    }
 
     //        const taskId = Number($(component).attr("id").split('_')[1]);
     //        const targetColumnId = $(component.parentElement).attr('data-column-id')
     //
     //        sendMessage({taskId, targetColumnId})
 })
+
+function getCurrentColumnOrder() {
+    let columns = [];
+    $( "div[id*='column-id']" ).each(function() {
+        columns.push($(this).attr('data-column-id'));
+    });
+    return Array.from(new Set(columns));
+}
 
 $(document).ready(function () {
 
@@ -112,16 +132,7 @@ $(document).ready(function () {
         set.append(card);
     }
 
-    function getCurrentColumnOrder() {
-        let columns = [];
-        $( "div[id*='column-id']" ).each(function() {
-            columns.push($(this).attr('data-column-id'));
-        });
-        return Array.from(new Set(columns));
-    }
-
-     $(document).on('pjax:end', function() {
-        // dragulaComp = dragulaLoad();
+    $(document).on('pjax:end', function() {
         currentColumnOrder = getCurrentColumnOrder();
     });
 
