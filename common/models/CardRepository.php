@@ -49,7 +49,7 @@ class CardRepository extends Card
                 if ($v->id == $cardId) {
                     $updateCard = false;
                     $v->order = $position;
-                    $addition = -1;
+                    $addition = ($k == 0 ? 0 : -1);
                 } else {
                     if ($k < $position) {
                         $v->order = ($k + ($addition));
@@ -70,7 +70,7 @@ class CardRepository extends Card
         }
         if ($updateCard === true) {
             $card = parent::findOne(['id' => $cardId]);
-            $card->order = $position;
+            $card->order = (empty($columnCardOrdered) ? ($position + (-1)) : $position);
             $card->column_id = $columnId;
             $card->save(false);
         }
