@@ -70,6 +70,10 @@ $(document).ready(function () {
             $('h5.card-title', elm).html(objData.params.title);
             $('.card-body p', elm).html(objData.params.description);
         }
+        if (objData.type === 'card' && objData.action === 'remove') {
+            let elm = $('#card_' + objData.params.cardId);
+            $(elm).remove();
+        }
 
     };
     connect();

@@ -137,11 +137,15 @@ class KanbanController extends Controller
         $deleteCardModel = new \frontend\models\DeleteCardForm();
         if ($this->request->isPost && $this->request->post('DeleteCardForm') && $deleteCardModel->load($this->request->post()) && $deleteCardModel->validate()) {
             $userCardModel->delete();
+            $obj = ['type' => 'card', 'action' => 'remove', 'params' => ['cardId' => $userCardModel->uuid]];
+
+            Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => $boardUuid]), $obj);
+
             Yii::$app->session->setFlash('deleted', true);
         }
         if ($this->request->isPost && !$this->request->post('DeleteCardForm') && $userCardModel->load($this->request->post()) && $userCardModel->validate() && $userCardModel->save()) {
             $obj = ['type' => 'card', 'action' => 'update', 'params' => ['cardId' => $userCardModel->uuid, 'title' => $userCardModel->title, 'description' => $userCardModel->description, 'color' => $userCardModel->color]];
-            
+
             Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => $boardUuid]), $obj);
             Yii::$app->session->setFlash('updated', true);
         }
