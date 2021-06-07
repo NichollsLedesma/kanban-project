@@ -3,6 +3,7 @@
 namespace common\models\elastic;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\helpers\VarDumper;
 
 class Board extends \yii\elasticsearch\ActiveRecord
@@ -22,6 +23,31 @@ class Board extends \yii\elasticsearch\ActiveRecord
 
 
         $this->insert();
+    }
+
+
+    public static function getFiltredCards($board_id, $search)
+    {
+        $cards = Card::find()->query([
+            "bool" => [
+                "filter" => [
+                    'match' => ["title" => $search],
+                ],
+                "must" => [
+                    'match' => ["board_id" => $board_id],
+                ],
+            ]
+        ])->asArray()->all();
+
+        return ArrayHelper::getColumn($cards, function ($card) {
+            $source = $card["_source"];
+
+            return [
+                "id" => $source['uuid'],
+                "value" => $source['title'],
+                "label" => $source['title'],
+            ];
+        });
     }
 
     public function deleteDocument()

@@ -1,9 +1,9 @@
+<div class="card card-row card-secondary column <?php if ($enableColumnCreation) echo 'transparent' ?>">
 
-<div class="card card-row card-secondary <?php if($enableColumnCreation) echo 'transparent' ?>" >
-    <?php if($withHeader) : ?>
-    <div class="card-header" data-column-id="<?= $id ?>">
+    <?php if ($withHeader) : ?>
+        <div class="card-header">
             <h3 class="card-title">
-                <?php if ($updateForm): ?>
+                 <?php if ($updateForm): ?>
                     <?
                      echo $updateForm;
                     ?>
@@ -22,9 +22,9 @@
                         </span>
                 </div>
             </div>
-    </div>
+        </div>
     <?php endif; ?>
-    <div class="card-body" id="<?= $idPrefix . $id ?>" data-column-id="<?= $id ?>">
+    <div class="card-body " id="<?= $idPrefix . $id ?>" data-column-id="<?= $id ?>">
         <?php
         if (!empty($cards)) {
             foreach ($cards as $card) {
@@ -37,11 +37,18 @@
             if ($enableColumnCreation) {
                 echo yii\helpers\Html::a('+ add column', \yii\helpers\Url::to(["/kanban/board", 'uuid' => $boardUuid, 'addColumn' => 'addColumn']));
             }
-            else{
-                echo yii\helpers\Html::a('+ add card', \yii\helpers\Url::to(["/kanban/board", 'uuid' => $boardUuid, 'addCard' => $id]));
-            }
             ?>
         </p>
-            <!--<p class="add-card">+ add card</p>-->
+
+
     </div>
+    <?php
+    if (!$enableColumnCreation && $formCard === null) {
+        echo yii\helpers\Html::a('+ add card', \yii\helpers\Url::to(["/kanban/board", 'uuid' => $boardUuid, 'addCard' => $id]), ['style' => 'display:block;margin: 15px auto;']);
+    } elseif (!$enableColumnCreation && $formCard !== null) {
+        echo $formCard;
+    }
+    ?>
+
+
 </div>

@@ -3,14 +3,13 @@
 namespace common\widgets\listBoard;
 
 use yii\base\Widget;
-use yii\helpers\Html;
-use yii\helpers\VarDumper;
 use common\widgets\listBoard\ListBoardWidgetAsset;
 
 class ListBoardWidget extends Widget
 {
 
     public $boards = [];
+    public $entities = [];
     public $title = '';
     public $isEnableToCreate = false;
 
@@ -31,6 +30,7 @@ class ListBoardWidget extends Widget
             '_board',
             [
                 'boards' => $this->boards,
+                'entities' => $this->entities,
                 'title' => $this->title,
                 'isEnableToCreate' => $this->isEnableToCreate,
             ]

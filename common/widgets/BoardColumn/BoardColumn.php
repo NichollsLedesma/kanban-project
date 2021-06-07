@@ -17,6 +17,7 @@ class BoardColumn extends Widget
     public $idPrefix = '';
     public $boardUuid = '';
     public $cards = [];
+    public $formCard = null;
     public $enableCardCreation = true;
     public $enableColumnCreation = false;
     public $withHeader = true;
@@ -35,6 +36,7 @@ class BoardColumn extends Widget
         		'enableColumnCreation' => $this->enableColumnCreation,
         		'cards' => $this->cards,
                 'updateForm' => $this->updateForm,
+                'formCard'=>$this->formCard,
         	]
         );
     }

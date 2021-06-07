@@ -44,3 +44,11 @@
 }
 
 .show {display:block;}
+
+.content {
+    overflow: auto !important;
+}
+
+.column {
+    max-height: 700px;
+}

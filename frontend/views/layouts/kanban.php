@@ -32,7 +32,12 @@ AppAsset::register($this);
     // $this->registerAssetBundle(PluginAsset::class);
     $this->head()
     ?>
-
+    <style>
+        .alert-style {
+            width: fit-content;
+            float: right;
+        }
+    </style>
 </head>
 
 <body>
@@ -43,7 +48,9 @@ AppAsset::register($this);
         <?= $this->render('navbar', ['assetDir' => $assetDir]) ?>
 
         <div class="">
-            <?= Alert::widget() ?>
+            <?= Alert::widget([
+                'options' => ['class' => 'ml-auto alert-style'],
+            ]) ?>
         </div>
         <?= $content ?>
     </div>

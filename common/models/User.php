@@ -215,9 +215,24 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
     }
 
+    public static function isUserAdmin($username)
+    {
+        if (static::findOne(['username' => $username, 'is_admin' => 1])) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function getEntities()
     {
         return $this->hasMany(Entity::class, ["id" => "entity_id"])
             ->viaTable("user_entity", ["user_id" => "id"]);
+    }
+
+    public function getBoards()
+    {
+        return $this->hasMany(Board::class, ["id" => "board_id"])
+            ->viaTable("user_board", ["user_id" => "id"]);
     }
 }

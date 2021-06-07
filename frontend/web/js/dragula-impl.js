@@ -1,4 +1,31 @@
+
+let dragulaComp = dragula();
+
+const addColumnDragula = (column) => {
+    if (!dragulaComp.containers.includes(column)) {
+        dragulaComp.containers.push(document.getElementById(column));
+    }
+}
+
+dragulaComp.on('drop', (component) => {
+    let card = $(component).attr("id").split('card_')[1];
+    if (card === 'new') {
+        return;
+    }
+    let order = $(component, $(component).parent('div .card-body')).index();
+    let column = $(component).parent('div .card-body').attr('data-column-id');
+    let board = board_id;
+    $.post(channelName + '?changeOrder=true', {'column': column, 'card': card, 'order': order, 'board': board});
+
+    //        const taskId = Number($(component).attr("id").split('_')[1]);
+    //        const targetColumnId = $(component.parentElement).attr('data-column-id')
+    //
+    //        sendMessage({taskId, targetColumnId})
+})
+
 $(document).ready(function () {
+
+    ////////////////////////////////////////////
     const wsbroker = "localhost";  // mqtt websocket enabled broker
     const wsport = 15675; // port for above
     const client = new Paho.MQTT.Client(
@@ -16,7 +43,7 @@ $(document).ready(function () {
         const objData = JSON.parse(message.payloadString);
         if (objData.type === 'New Column') {
             addNewColumn(objData.html);
-        };
+        }
         if (objData.type === 'Column ReOrder') {
             $.pjax.reload({container: '#board-container'});
         };
@@ -29,12 +56,37 @@ $(document).ready(function () {
         if (objData.type === 'Column Removed') {
             $.pjax.reload({container: '#board-container'});
         };
-        moveCard(objData);
+
+//        moveCard(objData);
         if (objData.type === 'card' && objData.action === 'new') {
             if ($('div#column-id_' + objData.params.columnId).length > 0) {
                 $('div#column-id_' + objData.params.columnId).append(objData.params.html);
             }
         }
+        if (objData.type === 'card' && objData.action === 'move') {
+            let elm = $('#card_' + objData.params.cardId);
+            let refElm = $('#column-id_' + objData.params.columnId).children('div[id^="card_"]').not(elm).get(objData.params.order);
+            if (refElm === undefined) {
+                if (objData.params.order == 0) {
+                    $('#column-id_' + objData.params.columnId).prepend(elm);
+                } else {
+                    $('#column-id_' + objData.params.columnId).append(elm);
+                }
+            } else {
+                $(refElm).before(elm);
+            }
+        }
+        if (objData.type === 'card' && objData.action === 'update') {
+            let elm = $('#card_' + objData.params.cardId);
+            $(elm).css({'border-top-color': '#' + objData.params.color});
+            $('h5.card-title', elm).html(objData.params.title);
+            $('.card-body p', elm).html(objData.params.description);
+        }
+        if (objData.type === 'card' && objData.action === 'remove') {
+            let elm = $('#card_' + objData.params.cardId);
+            $(elm).remove();
+        }
+
     };
     connect();
     let currentColumnOrder = getCurrentColumnOrder();
@@ -49,39 +101,15 @@ $(document).ready(function () {
     }
 
     function sendMessage(objData) {
-        message = new Paho.MQTT.Message(JSON.stringify(objData));
-        message.destinationName = channelName;
-        client.send(message);
+        //        message = new Paho.MQTT.Message(JSON.stringify(objData));
+        //        message.destinationName = channelName;
+        //        client.send(message);
     }
 
     function moveCard(data) {
         card = $(`#${data.taskId}`)
         set = $(`div[data-column-id=${data.targetColumnId}]`)
         set.append(card);
-    }
-
-    function dragulaLoad(){
-        d = dragula(
-            columns.map(column => document.getElementById(column))
-            );
-        d.containers.push(document.getElementById('board-body'));
-        d.on('drop', (component) => {
-            if ($(component).hasClass('task')) {
-                const taskId = Number($(component).attr("id").split('_')[1]);
-                const targetColumnId = $(component.parentElement).attr('data-column-id')
-                sendMessage({taskId, targetColumnId})
-            }
-            if ($(component).hasClass('card-row')) {
-                let updatedColumnOrder = getCurrentColumnOrder();
-                $.post({
-                    url: updateColumnOrderUrl,
-                    data: {columns:updatedColumnOrder},
-                    cache: false,
-                });
-            }
-        });
-
-        return d;
     }
 
     function getCurrentColumnOrder() {
@@ -92,19 +120,18 @@ $(document).ready(function () {
         return Array.from(new Set(columns));
     }
 
-    let dragulaComp = dragulaLoad();
-
-    $(document).on('pjax:end', function() {
-        dragulaComp = dragulaLoad();
+     $(document).on('pjax:end', function() {
+        // dragulaComp = dragulaLoad();
         currentColumnOrder = getCurrentColumnOrder();
     });
 
+    //////////////////////////////////////////
     $('#search').autocomplete({
         type: "POST",
         minLength: 3,
         source: (request, response) => {
             $('.ui-autocomplete').css('z-index', 9999);
-            $.get("get/" + request.term, (options) => {
+            $.get(window.location.pathname + "/get/" + request.term, (options) => {
                 response(options);
             });
         },
@@ -114,18 +141,49 @@ $(document).ready(function () {
         }
     });
 
-    $(".task").on("click", (e) => {
-        const id = Number($(e.currentTarget).attr("id").split('_')[1]);
-        getInfoAndOpenModal(id);
-    });
+    //    $(".task").on("click", (e) => {
+    //        const id = $(e.currentTarget).attr("id").split('_')[1];
+    //        getInfoAndOpenModal(id);
+    //    });
 
     function getInfoAndOpenModal(id) {
         $.get("get-one/" + id,
                 (task) => {
             const modal = $('#detailModal');
             modal.modal('show')
-            modal.find(".modal-title").html(task.name);
+            modal.find(".modal-title").html(task.title);
             modal.find(".content").html(task.description)
         });
     }
+
+    const boardNameComp = $("#boardname");
+    boardNameComp.val(boardName);
+    boardNameComp.addClass("disabled-style")
+    boardNameComp.on("click", (e) => {
+        boardNameComp.removeClass("disabled-style");
+        boardNameComp.select();
+    });
+    boardNameComp.on("blur", (e) => {
+        boardNameComp.addClass("disabled-style");
+        if (boardNameComp.val() !== boardName) {
+            const url = `${window.location.pathname.replace("kanban", "board/update")}`
+            boardName = boardNameComp.val();
+            $.ajax({
+                method: "PUT",
+                url,
+                data: {title: boardNameComp.val()},
+            });
+        }
+    });
+
+    $("#remove-board").on("click", (e) => {
+        if (confirm("Are you sure you want to delete this board?")) {
+            const url = `${window.location.pathname.replace("kanban", "board/delete")}`
+            $.ajax({
+                method: "DELETE",
+                url
+            });
+        }
+    });
+
 });

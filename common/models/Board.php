@@ -8,6 +8,7 @@ use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii2tech\ar\softdelete\SoftDeleteBehavior;
+use yii2tech\ar\softdelete\SoftDeleteQueryBehavior;
 use yii\helpers\VarDumper;
 
 /**
@@ -97,6 +98,14 @@ class Board extends \yii\db\ActiveRecord
     public function getUserBoards()
     {
         return $this->hasMany(UserBoard::className(), ['board_id' => 'id']);
+    }
+
+    public static function find()
+    {
+        $query = parent::find();
+        $query->attachBehavior('softDelete', SoftDeleteQueryBehavior::class);
+
+        return $query->notDeleted();
     }
 
     /**

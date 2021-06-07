@@ -38,3 +38,8 @@ a.link-board:hover {
 .card-title {
   font-size: xx-large;
 }
+
+/* .float-options {
+  float: right;
+  z-index: 9999999;
+} */

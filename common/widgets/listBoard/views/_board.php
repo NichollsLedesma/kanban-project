@@ -3,6 +3,7 @@
 use common\models\Board;
 use common\widgets\listBoard\CardWidget;
 use yii\bootstrap4\Modal;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -37,17 +38,35 @@ use yii\widgets\ActiveForm;
 ]); ?>
 
 <?= Html::beginForm('/board/create', 'POST', [
-    'class' => 'form-inline',
+    'class' => '',
     "id" => "board-form"
 ]); ?>
 
-<?= Html::textInput('name', "", [
-    'class' => "form-control",
-    'required' => "on"
-]); ?>
-<?= Html::submitButton('Create', [
-    'class' => 'btn btn-primary'
-]) ?>
+<div class="form-group">
+    <?= Html::tag('span', "Board name", ["for" => "name"]); ?>
+    <?= Html::textInput('name', "", [
+        'class' => "form-control",
+        'required' => "on",
+        "id" => "name",
+        "placeholder" => "Board name",
+    ]); ?>
+</div>
+
+<?php if (count($entities) > 0) { ?>
+    <div class="form-group">
+    <?= Html::tag('span', "Entity", ["for" => "name"]); ?>
+        <?= Html::dropDownList('entity_id', 0, [null => 'Please select entity', 'options' => $entities], [
+            'class' => "form-control",
+            'required' => "on",
+            'id' => "entity_id",
+        ]) ?>
+    </div>
+    <?= Html::submitButton('Create', [
+        'class' => 'btn btn-primary'
+    ]) ?>
+<?php } else { ?>
+    <p>You don't belong to any entity, please, contact to the admin to create board.</p>
+<?php } ?>
 
 <?= Html::endForm(); ?>
 

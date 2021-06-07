@@ -2,21 +2,25 @@
 
 namespace frontend\controllers;
 
-use Yii;
 use common\jobs\JobTest;
 use common\models\Board;
 use common\models\BoardRepository;
 use common\models\Card;
+use common\models\CardRepository;
 use common\models\Column;
 use common\models\CreateColumnForm;
 use common\models\UpdateColumnForm;
 use common\models\User;
+use common\models\elastic\Board as ElasticBoard;
+use common\models\elastic\Card as ElasticCard;
+use common\models\elastic\ElasticHelper;
+use common\models\UserBoard;
+use common\widgets\BoardCard\BoardCard;
 use frontend\models\CreateCardForm;
-use yii\elasticsearch\QueryBuilder;
+use Yii;
 use yii\filters\AccessControl;
-use yii\helpers\Json;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
-use yii\helpers\VarDumper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -43,20 +47,45 @@ class KanbanController extends Controller
     public function actionIndex()
     {
         $boards = Board::find()
-            ->where(["owner_id" => Yii::$app->getUser()->getId()])
-            ->all();
+                ->where([
+                    "in", "id", UserBoard::find()->select(["board_id"])
+                    ->where([
+                        "user_id" => Yii::$app->getUser()->getId(),
+                    ]),
+                ])
+                ->all();
+
+        $entities = ArrayHelper::map(
+                        Yii::$app->getUser()->getIdentity()->entities,
+                        'id',
+                        'name'
+        );
 
         return $this->render('index', [
-            "boards" => $boards
+                    "boards" => $boards,
+                    "entities" => $entities
         ]);
     }
 
     public function actionBoard($uuid)
     {
-        $userBoard = BoardRepository::getUserBoard(Yii::$app->getUser()->getId(), $uuid);
+
+        $userBoard = BoardRepository::getUserBoardByUuid(Yii::$app->user->id, $uuid);
+
         $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['order' => 'ASC']);
         if ($userBoard->count() == 0) {
             throw new NotFoundHttpException('board not found');
+        }
+        if ($this->request->isPost && $this->request->isAjax && $this->request->get('changeOrder')) {
+            $userCard = CardRepository::getUserBoardCardByUuid(Yii::$app->user->id, $this->request->post('card'));
+
+            $column = Column::find()->select(['id'])->where(['uuid' => $this->request->post('column')])->limit(1)->one();
+            if ($userBoard === null || $column === null) {
+                throw new NotFoundHttpException('card  or column not found');
+            }
+            CardRepository::reArrageByCardId($userCard->id, $this->request->post('order'), $column->id);
+            $obj = ['type' => 'card', 'action' => 'move', 'params' => ['columnId' => $this->request->post('column'), 'cardId' => $this->request->post('card'), 'order' => $this->request->post('order')]];
+            Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => $uuid]), $obj);
         }
 
         if ($this->request->isPjax && $this->request->get('addCard')) {
@@ -69,7 +98,9 @@ class KanbanController extends Controller
             }
 
             $newCardModel->column_id = $columnUuid->scalar();
-            if ($this->request->isPost && $newCardModel->load($this->request->post()) && $newCardModel->validate() && $newCardModel->createCard(Url::to(['kanban/board', 'uuid' => $uuid]), $this->request->get('addCard'))) {
+            if ($this->request->isPost && $newCardModel->load($this->request->post()) && $newCardModel->validate() && $newCardModel->createCard()) {
+                $obj = ['type' => 'card', 'action' => 'new', 'params' => ['columnId' => $this->request->get('addCard'), 'order' => 'last', 'html' => BoardCard::widget(['id' => $newCardModel->uuid, 'title' => $newCardModel->title, 'content' => $newCardModel->description])]];
+                Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => $uuid]), $obj);
                 $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
                 unset($newCardModel);
             }
@@ -99,12 +130,10 @@ class KanbanController extends Controller
         }
 
         $this->layout = "kanban";
-        // $search = Yii::$app->request->post('search');
-        // $board = ($search) ?
-        //     $this->getDataDump($search) :
-        //     $this->getDump();
+        $board = Board::find()->where(["uuid" => $uuid])->limit(1)->one();
 
         return $this->render('board', [
+            'boardName' => $board->title,
             'boardUuid' => $uuid,
             'boardColumns' => $boardColumns,
             'newCardModel' => $newCardModel ?? null,
@@ -143,156 +172,62 @@ class KanbanController extends Controller
 
     }
 
-    public function actionGet()
+    public function actionCardUpdate($uuid, $boardUuid)
+    {
+        if (!$this->request->isAjax) {
+            throw new NotFoundHttpException('not found');
+        }
+        $userCardModel = CardRepository::getUserBoardCardByUuid(Yii::$app->user->id, $uuid);
+        if ($userCardModel === null) {
+            throw new NotFoundHttpException('card not found');
+        }
+        $deleteCardModel = new \frontend\models\DeleteCardForm();
+        if ($this->request->isPost && $this->request->post('DeleteCardForm') && $deleteCardModel->load($this->request->post()) && $deleteCardModel->validate()) {
+            $userCardModel->delete();
+            $obj = ['type' => 'card', 'action' => 'remove', 'params' => ['cardId' => $userCardModel->uuid]];
+
+            Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => $boardUuid]), $obj);
+
+            Yii::$app->session->setFlash('deleted', true);
+        }
+        if ($this->request->isPost && !$this->request->post('DeleteCardForm') && $userCardModel->load($this->request->post()) && $userCardModel->validate() && $userCardModel->save()) {
+            $obj = ['type' => 'card', 'action' => 'update', 'params' => ['cardId' => $userCardModel->uuid, 'title' => $userCardModel->title, 'description' => $userCardModel->description, 'color' => $userCardModel->color]];
+
+            Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => $boardUuid]), $obj);
+            Yii::$app->session->setFlash('updated', true);
+        }
+        return $this->renderAjax('_cardUpdate', ['model' => $userCardModel, 'deleteModel' => $deleteCardModel]);
+    }
+
+    public function actionGet($uuid)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $search = Yii::$app->request->get('query');
-        $select = ['username as value', 'username as  label', 'id as id'];
+        $board = Board::find()->where(["uuid" => $uuid])->one();
 
-        return User::find()
-            ->select($select)
-            ->asArray()
-            ->all();
+        if (!$board) {
+            return [];
+        }
+
+        return ElasticBoard::getFiltredCards($board->id, $search);
     }
 
     public function actionGetOne($id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        return [
-            "id" => $id,
-            "name" => "task " . $id,
-            "description" => "something",
-        ];
+        return ElasticHelper::search(ElasticCard::class, ["uuid" => $id]);
     }
 
     public function actionMove()
     {
         $id = Yii::$app->queue->push(
-            new JobTest(
-                [
+                new JobTest(
+                        [
                     "message" => "Hi job"
-                ]
-            )
+                        ]
+                )
         );
     }
 
-    private function getBoardsDump()
-    {
-        return [
-            $this->getDump(1),
-            $this->getDump(2),
-            $this->getDump(3),
-            $this->getDump(4),
-            $this->getDump(5),
-            $this->getDump(6),
-            $this->getDump(7),
-            $this->getDump(8),
-        ];
-    }
-
-    private function getDump($id = 1)
-    {
-        return [
-            "id" => $id,
-            "uuid" => "randomuuid_$id",
-            "name" => "board_name_$id",
-            "columns" => [
-                [
-                    "id" => 1,
-                    "name" => "backlog",
-                    "tasks" => [
-                        [
-                            "id" => 1,
-                            "name" => "task 1",
-                            "description" => "something",
-                        ],
-                        [
-                            "id" => 2,
-                            "name" => "task 2",
-                            "description" => "something",
-                        ],
-                        [
-                            "id" => 3,
-                            "name" => "task 3",
-                            "description" => "something",
-                        ],
-                        [
-                            "id" => 4,
-                            "name" => "task 4",
-                            "description" => "something",
-                        ],
-                        [
-                            "id" => 5,
-                            "name" => "task 5",
-                            "description" => "something",
-                        ]
-                    ]
-                ],
-                [
-                    "id" => 2,
-                    "name" => "todo",
-                    "tasks" => [
-                        [
-                            "id" => 6,
-                            "name" => "task 6",
-                            "description" => "something",
-                        ]
-                    ]
-                ],
-                [
-                    "id" => 3,
-                    "name" => "doing",
-                    "tasks" => []
-                ],
-                [
-                    "id" => 4,
-                    "name" => "done",
-                    "tasks" => []
-                ],
-            ]
-        ];
-    }
-
-    private function getDataDump($search)
-    {
-        return [
-            "id" => 1,
-            "name" => "board_name",
-            "columns" => [
-                [
-                    "id" => 1,
-                    "name" => "backlog",
-                    "tasks" => [
-                        [
-                            "id" => 1,
-                            "name" => "task 1",
-                            "description" => "something",
-                        ],
-                    ]
-                ],
-                [
-                    "id" => 2,
-                    "name" => "todo",
-                    "tasks" => [
-                        [
-                            "id" => 6,
-                            "name" => "task 6",
-                            "description" => "something",
-                        ]
-                    ]
-                ],
-                [
-                    "id" => 3,
-                    "name" => "doing",
-                    "tasks" => []
-                ],
-                [
-                    "id" => 4,
-                    "name" => "done",
-                    "tasks" => []
-                ],
-            ]
-        ];
-    }
 }

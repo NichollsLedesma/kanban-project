@@ -12,6 +12,7 @@ use yii\helpers\VarDumper;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\UnprocessableEntityHttpException;
 
 class BoardController extends Controller
 {
@@ -22,18 +23,30 @@ class BoardController extends Controller
 
     public function actionCreate()
     {
-        $entity = $this->getEntity();
+        $entity = Entity::findOne(Yii::$app->request->post('entity_id'));
 
-        $newBoard = new Board();
-        $newBoard->title = Yii::$app->request->post('name');
-        $newBoard->owner_id = Yii::$app->getUser()->getId();
-        $newBoard->entity_id = $entity->id;
-        $newBoard->save();
+        if (!$entity) {
+            return throw new UnprocessableEntityHttpException("entity not belong to the user.");
+        }
 
-        $userBoard = new UserBoard();
-        $userBoard->user_id = Yii::$app->getUser()->getId();
-        $userBoard->board_id = $newBoard->id;
-        $userBoard->save();
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $newBoard = new Board();
+            $newBoard->title = Yii::$app->request->post('name');
+            $newBoard->owner_id = Yii::$app->getUser()->getId();
+            $newBoard->entity_id = $entity->id;
+            $newBoard->save();
+    
+            $userBoard = new UserBoard();
+            $userBoard->user_id = Yii::$app->getUser()->getId();
+            $userBoard->board_id = $newBoard->id;
+            $userBoard->save();
+            Yii::$app->session->setFlash('success', "Collection created.");
+            $transaction->commit();
+        } catch (\Throwable $th) {
+            Yii::$app->session->setFlash('error', "Error creating new collection.");
+            $transaction->rollBack();
+        }
 
         return $this->redirect(["kanban/board", "uuid" => $newBoard->uuid]);
     }
@@ -45,34 +58,34 @@ class BoardController extends Controller
         return $entities[0];
     }
 
-    public function actionUpdate()
+    public function actionUpdate($uuid)
     {
-        $boardUuid = Yii::$app->request->get('uuid');
-        $board = Board::find()->where(['uuid' => $boardUuid])->limit(1)->one();
+        $board = Board::find()->where(['uuid' => $uuid])->limit(1)->one();
 
         if (!$board) {
             return throw new NotFoundHttpException("board not found.");
         }
 
         try {
-            $board->name = Yii::$app->request->post('name');
+            $board->title = Yii::$app->request->post('title');
             $board->save();
 
-            return $this->redirect(["kanban/board", "uuid" => $board->uuid]);
+            return true;
         } catch (Exception $e) {
             return throw new BadRequestHttpException("Error updating board: " . $e->getMessage());
         }
     }
 
-    public function actionDelete()
+    public function actionDelete($uuid)
     {
-        $boardUuid = Yii::$app->request->get('uuid');
-        $board = Board::find()->where(['uuid' => $boardUuid])->limit(1)->one();
+        $board = Board::find()->where(['uuid' => $uuid])->limit(1)->one();
 
         if (!$board) {
             return throw new NotFoundHttpException("board not found.");
         }
 
         $board->delete();
+
+        return $this->redirect(["kanban/index"]);
     }
 }
