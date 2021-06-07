@@ -70,22 +70,20 @@ class UserController extends Controller
             'id',
             'name'
         );
+        
         $boards =  ArrayHelper::map(
             Board::find()
                 ->where([
+                    "in", "entity_id", ArrayHelper::getColumn($model->entities, "id")
+                ])->andWhere([
                     "not in", "id", UserBoard::find()->select(["board_id"])
-                        ->where(["user_id" => $model->id]),
+                        ->where(["user_id" => $model->id])
                 ])
                 ->all(),
             'id',
             'title'
         );
 
-        // echo "<pre>";
-        // VarDumper::dump($model->boards);
-        // echo "</pre>";
-        // die;
-       
         return $this->render('view', [
             'model' => $model,
             "entities" => $entities,
