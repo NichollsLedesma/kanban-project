@@ -6,6 +6,7 @@ use frontend\assets\dragula\DragulaAsset;
 use frontend\assets\pahoMqtt\PahoMqttAsset;
 use yii\bootstrap4\Modal;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\helpers\VarDumper;
 use yii\web\View;
 use yii\widgets\ActiveForm;
@@ -20,7 +21,7 @@ $boardCode = \yii\helpers\Url::to(['kanban/board', 'uuid' => $boardUuid]);
 $updateColumnOrderUrl = \yii\helpers\Url::to(['kanban/update-column-order', 'uuid' => $boardUuid]);
 $boardColumnIdPrefix = "column-id_";
 $this->registerCssFile(
-        Yii::$app->request->getBaseUrl() . '/css/column.css'
+    Yii::$app->request->getBaseUrl() . '/css/column.css'
 );
 
 $this->registerJsVar('channelName', $boardCode, View::POS_END);
@@ -30,19 +31,19 @@ $this->registerJsVar('updateColumnOrderUrl', $updateColumnOrderUrl, View::POS_EN
 
 
 $this->registerJsFile(
-        Yii::$app->request->BaseUrl . '/js/dragula-impl.js',
-        [
-            'depends' => "yii\web\JqueryAsset",
-            'position' => View::POS_END
-        ]
+    Yii::$app->request->BaseUrl . '/js/dragula-impl.js',
+    [
+        'depends' => "yii\web\JqueryAsset",
+        'position' => View::POS_END
+    ]
 );
 
 $this->registerJsFile(
-        Yii::$app->request->BaseUrl . '/js/columns.js',
-        [
-            'depends' => "/js/dragula-impl.js",
-            'position' => View::POS_END
-        ]
+    Yii::$app->request->BaseUrl . '/js/columns.js',
+    [
+        'depends' => "/js/dragula-impl.js",
+        'position' => View::POS_END
+    ]
 );
 ?>
 
@@ -50,7 +51,7 @@ $this->registerJsFile(
     <section class="content pb-3">
         <?php
         Pjax::begin(['id' => 'board-container', "options" => [
-                "class" => "container-fluid h-100 m-0"
+            "class" => "container-fluid h-100 m-0"
         ]]);
         foreach ($boardColumns->all() as $column) {
             $cards = [];
@@ -79,7 +80,47 @@ $this->registerJsFile(
     </section>
 </div>
 
+<?php
+Modal::begin([
+    "id" => "boardMenu",
+    "title" => "Board menu",
+    "size" => Modal::SIZE_DEFAULT
+]); ?>
 
+<div class="info">
+    <h3 class="float-left"><?= $boardName ?></h3>
+    <div class="ml-auto">
+        <?= Html::button('<i class="fas fa-window-close"></i>', [
+            "id" => "remove-board",
+            "class" => "btn btn-danger btn-remove ",
+        ]); ?>
+    </div>
+</div>
+<hr>
+
+<div class="members">
+    <h4>Members</h4>
+    <ul class="list-group">
+        <?php foreach ($members as $member) { ?>
+            <li class="list-group-item">
+                <span class="float-left"><?= $member->username ?></span>
+                <span class="float-right">
+                    <? if (Yii::$app->getUser()->getId() === $member->id) {
+                        echo Html::a('<i class="fas fa-sign-out-alt"></i>', Url::to(['/board/leave/' . $boardUuid]), [
+                            'class' => 'btn btn-danger',
+                            'data' => [
+                                'confirm' => 'Are you sure you want to leave this board?',
+                                'method' => 'post',
+                            ],
+                        ]);
+                    } ?>
+                </span>
+            </li>
+        <?php } ?>
+    </ul>
+</div>
+
+<?php Modal::end(); ?>
 
 <?php
 Modal::begin([
@@ -88,8 +129,7 @@ Modal::begin([
     "size" => Modal::SIZE_DEFAULT,
 ]);
 ?>
-<?=
-Html::tag("p", "", [
+<?= Html::tag("p", "", [
     "class" => "content",
 ])
 ?>

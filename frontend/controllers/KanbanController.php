@@ -128,7 +128,7 @@ class KanbanController extends Controller
             $uuidColumn = $this->request->get('updateColumn');
             $updateColumnModel = new UpdateColumnForm(['scenario' => Column::SCENARIO_AJAX_UPDATE]);
             $updateColumnModel = $updateColumnModel->find()->where(['uuid' => $uuidColumn])->one();
-            if ($this->request->isPost && $updateColumnModel->load($this->request->post()) &&$updateColumnModel->validate()) {
+            if ($this->request->isPost && $updateColumnModel->load($this->request->post()) && $updateColumnModel->validate()) {
                 $updateColumnModel->save();
                 $updateColumnModel->columnUpdated(Url::to(['kanban/board', 'uuid' => $uuid]));
                 $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
@@ -141,6 +141,7 @@ class KanbanController extends Controller
 
         return $this->render('board', [
             'boardName' => $board->title,
+            'members' => $board->users,
             'boardUuid' => $uuid,
             'boardColumns' => $boardColumns,
             'newCardModel' => $newCardModel ?? null,
@@ -156,7 +157,7 @@ class KanbanController extends Controller
         }
         $topic = Url::to(['kanban/board', 'uuid' => $uuid]);
         $response = array(
-            'type'=>'Column ReOrder',
+            'type' => 'Column ReOrder',
         );
         Yii::$app->mqtt->sendMessage($topic, $response);
     }
@@ -171,12 +172,11 @@ class KanbanController extends Controller
 
         $topic = Url::to(['kanban/board', 'uuid' => $column->board->uuid]);
         $response = array(
-            'type'=>'Column Removed',
+            'type' => 'Column Removed',
         );
         Yii::$app->mqtt->sendMessage($topic, $response);
 
         return $column->delete();
-
     }
 
     public function actionCardUpdate($uuid, $boardUuid)

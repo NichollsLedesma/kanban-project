@@ -21,11 +21,13 @@ use yii\web\JsExpression;
             <a href="/kanban" class="nav-link">Boards</a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="#" class="nav-link" id="remove-board">Close board</a>
+            <a href="#" class="nav-link" data-toggle="modal" data-target="#boardMenu">Menu</a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
             <input type="text" name="boardname" id="boardname" value="" class="form-control" autocomplete="off">
         </li>
+
+
     </ul>
 
     <!-- SEARCH FORM -->

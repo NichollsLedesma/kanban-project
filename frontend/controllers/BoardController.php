@@ -36,7 +36,7 @@ class BoardController extends Controller
             $newBoard->owner_id = Yii::$app->getUser()->getId();
             $newBoard->entity_id = $entity->id;
             $newBoard->save();
-    
+
             $userBoard = new UserBoard();
             $userBoard->user_id = Yii::$app->getUser()->getId();
             $userBoard->board_id = $newBoard->id;
@@ -85,6 +85,30 @@ class BoardController extends Controller
         }
 
         $board->delete();
+
+        return $this->redirect(["kanban/index"]);
+    }
+
+    public function actionLeave($uuid)
+    {
+        $board = Board::find()
+            ->where(["uuid" => $uuid])
+            ->limit(1)->one();
+
+        if (!$board) {
+            return throw new NotFoundHttpException("Board not found");
+        }
+
+        $userBoard = UserBoard::find()->where([
+            "user_id" => Yii::$app->getUser()->getId(),
+            "board_id" => $board->id,
+        ])->limit(1)->one();
+
+        if (!$userBoard) {
+            return throw new NotFoundHttpException("Relationshio user-board not found");
+        }
+
+        $userBoard->delete();
 
         return $this->redirect(["kanban/index"]);
     }
