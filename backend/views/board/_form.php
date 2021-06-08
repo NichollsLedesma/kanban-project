@@ -10,7 +10,9 @@ use yii\widgets\ActiveForm;
 
 <div class="board-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+        'id' => 'board-form',
+    ]); ?>
 
     <!-- <?= $form->field($model, 'uuid')->textInput(['maxlength' => true]) ?> -->
 

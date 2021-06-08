@@ -7,6 +7,7 @@ use common\models\Board;
 use common\models\BoardSearch;
 use common\models\Entity;
 use common\models\User;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -26,6 +27,16 @@ class BoardController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                "class" => AccessControl::class,
+                "only" => ["*"],
+                "rules" => [
+                    [
+                        'allow' => true,
+                        'roles' => ["@"],
+                    ]
                 ],
             ],
         ];
