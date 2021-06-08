@@ -6,6 +6,7 @@ use Yii;
 use common\models\Entity;
 use common\models\EntitySearch;
 use common\models\User;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -25,6 +26,16 @@ class EntityController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                "class" => AccessControl::class,
+                "only" => ["*"],
+                "rules" => [
+                    [
+                        'allow' => true,
+                        'roles' => ["@"],
+                    ]
                 ],
             ],
         ];

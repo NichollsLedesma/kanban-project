@@ -122,7 +122,6 @@ class Column extends \yii\db\ActiveRecord
 
     public function afterSave($insert, $changedAttributes)
     {
-        return true;
         if ($insert) {
             return  $this->createElasticDocument();
         }
