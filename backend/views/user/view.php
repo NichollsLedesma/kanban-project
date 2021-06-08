@@ -3,6 +3,7 @@
 use common\models\UserBoard;
 use common\models\UserEntity;
 use common\widgets\details\BoxDetailWidget;
+use yii\bootstrap4\Modal;
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\VarDumper;
@@ -15,19 +16,6 @@ $this->title = $model->username;
 $this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
-
-function getItems($data, $descr = "title", $key = "id")
-{
-    $items = [];
-    foreach ($data as $item) {
-        $items[] = [
-            "id" => $item[$key],
-            "description" => $item[$descr],
-        ];
-    }
-
-    return $items;
-}
 
 ?>
 <div class="user-view">
@@ -72,22 +60,109 @@ function getItems($data, $descr = "title", $key = "id")
             </div>
         </div>
 
-        <?= BoxDetailWidget::widget([
-            'items' => getItems($model->entities, "name"),
-            'title' => "Entities",
-            "class_relation" => "UserEntity",
-            'key_class' => "entity",
-            "user_id" => $model->id,
-            "to_load" => $entities
-        ]) ?>
+        <div class="box">
+            <div class="row box-header">
+                <div class="col d-flex flex-row">
+                    <div class="box-title">Entities</div>
+                </div>
+                <div class="col d-flex flex-row-reverse">
+                    <button class=" btn" data-toggle="modal" data-target="#modalAddNewEntity">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                </div>
+            </div>
 
-        <?= BoxDetailWidget::widget([
-            'items' => getItems($model->boards),
-            'title' => "Boards",
-            "class_relation" => "UserBoard",
-            'key_class' => "board",
-            "user_id" => $model->id,
-            "to_load" => $boards
-        ]) ?>
+            <div class="box-content">
+                <table class="table table-striped">
+                    <tbody>
+                        <?php foreach ($model->entities as $entity) { ?>
+                            <tr>
+                                <th scope="row"><?= $entity->id ?></th>
+                                <td><?= $entity->name ?></td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="box">
+            <div class="row box-header">
+                <div class="col d-flex flex-row">
+                    <div class="box-title">Boards</div>
+                </div>
+                <div class="col d-flex flex-row-reverse">
+                    <button class=" btn" data-toggle="modal" data-target="#modalAddNewBoard">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="box-content">
+                <table class="table table-striped">
+                    <tbody>
+                        <?php foreach ($model->boards as $board) { ?>
+                            <tr>
+                                <th scope="row"><?= $board->id ?></th>
+                                <td><?= $board->title ?></td>
+                                <td><?= $board->getEntity()->one()->name ?></td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 </div>
+
+<? Modal::begin([
+    "id" => "modalAddNewEntity",
+    "title" => "Link with entity",
+    "size" => Modal::SIZE_DEFAULT,
+]); ?>
+<?= Html::beginForm("/user-entity/create", 'POST', [
+    'class' => '',
+    "id" => "entity-form"
+]); ?>
+<?= Html::hiddenInput("UserEntity[user_id]", $model->id); ?>
+<?= Html::hiddenInput('is_redirect_admin', true); ?>
+<div class="form-group">
+    <?= Html::tag('span', "entity name", ["for" => "name", 'class' => "text-capitalize"]); ?>
+    <?= Html::dropDownList("UserEntity[entity_id]", 0, [null => "Please select entity", 'options' => $entities], [
+        'class' => "form-control",
+        'required' => "on",
+        'id' => "entity_id",
+    ]) ?>
+</div>
+<?= Html::submitButton('Save', [
+    'class' => 'btn btn-primary'
+]) ?>
+<?= Html::endForm(); ?>
+<? Modal::end(); ?>
+
+
+<? Modal::begin([
+    "id" => "modalAddNewBoard",
+    "title" => "Create new board",
+    "size" => Modal::SIZE_DEFAULT,
+]); ?>
+<?= Html::beginForm("/user-board/create", 'POST', [
+    'class' => '',
+    "id" => "board-form"
+]); ?>
+<?= Html::hiddenInput("UserBoard[user_id]", $model->id); ?>
+<?= Html::hiddenInput('is_redirect_admin', true); ?>
+<div class="form-group">
+    <?= Html::tag('span', "board name", ["for" => "name", 'class' => "text-capitalize"]); ?>
+    <?= Html::dropDownList("UserBoard[board_id]", 0, [null => "Please select board", 'options' => $boards], [
+        'class' => "form-control",
+        'required' => "on",
+        'id' => "entity_id",
+    ]) ?>
+</div>
+<?= Html::submitButton('Save', [
+    'class' => 'btn btn-primary'
+]) ?>
+<?= Html::endForm(); ?>
+<? Modal::end(); ?>

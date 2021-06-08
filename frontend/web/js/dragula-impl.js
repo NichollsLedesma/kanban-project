@@ -176,7 +176,6 @@ $(document).ready(function () {
     });
     boardNameComp.on("blur", (e) => {
         boardNameComp.addClass("disabled-style");
-        console.log(boardNameComp.val());
         if (boardNameComp.val() !== boardName) {
             const url = `${window.location.pathname.replace("kanban", "board/update")}`
             $.ajax({
