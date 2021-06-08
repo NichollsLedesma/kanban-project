@@ -10,7 +10,9 @@ use yii\widgets\ActiveForm;
 
 <div class="entity-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+        'id' => 'entity-form',
+    ]); ?>
 
     <!-- <?= $form->field($model, 'uuid')->textInput(['maxlength' => true]) ?> -->
 
