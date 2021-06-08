@@ -7,9 +7,11 @@ use common\models\Board;
 use common\models\BoardSearch;
 use common\models\Entity;
 use common\models\User;
+use common\models\UserEntity;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\VarDumper;
 
 /**
  * BoardController implements the CRUD actions for Board model.
@@ -67,8 +69,8 @@ class BoardController extends Controller
     public function actionCreate()
     {
         $model = new Board();
-        $users = \yii\helpers\ArrayHelper::map(User::find()->all(), 'id', 'username');
         $entities = \yii\helpers\ArrayHelper::map(Entity::find()->all(), 'id', 'name');
+        $users = UserEntity::find()->with("user")->asArray()->all();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -91,8 +93,8 @@ class BoardController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $users = \yii\helpers\ArrayHelper::map(User::find()->all(), 'id', 'username');
         $entities = \yii\helpers\ArrayHelper::map(Entity::find()->all(), 'id', 'name');
+        $users = UserEntity::find()->with("user")->asArray()->all();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
