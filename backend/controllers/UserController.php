@@ -96,11 +96,6 @@ class UserController extends Controller
             'title'
         );
 
-        // echo "<pre>";
-        // VarDumper::dump($model->boards);
-        // echo "</pre>";
-        // die;
-
         return $this->render('view', [
             'model' => $model,
             "entities" => $entities,

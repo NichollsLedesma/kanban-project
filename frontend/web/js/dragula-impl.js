@@ -17,14 +17,14 @@ dragulaComp.on('drop', (component) => {
         let order = $(component, $(component).parent('div .card-body')).index();
         let column = $(component).parent('div .card-body').attr('data-column-id');
         let board = board_id;
-        $.post(channelName + '?changeOrder=true', {'column': column, 'card': card, 'order': order, 'board': board});
+        $.post(channelName + '?changeOrder=true', { 'column': column, 'card': card, 'order': order, 'board': board });
     }
 
     if ($(component).hasClass('card-row')) {
         let updatedColumnOrder = getCurrentColumnOrder();
         $.post({
             url: updateColumnOrderUrl,
-            data: {columns:updatedColumnOrder},
+            data: { columns: updatedColumnOrder },
             cache: false,
         });
     }
@@ -37,7 +37,7 @@ dragulaComp.on('drop', (component) => {
 
 function getCurrentColumnOrder() {
     let columns = [];
-    $( "div[id*='column-id']" ).each(function() {
+    $("div[id*='column-id']").each(function () {
         columns.push($(this).attr('data-column-id'));
     });
     return Array.from(new Set(columns));
@@ -49,11 +49,11 @@ $(document).ready(function () {
     const wsbroker = "localhost";  // mqtt websocket enabled broker
     const wsport = 15675; // port for above
     const client = new Paho.MQTT.Client(
-            wsbroker,
-            wsport,
-            "/ws",
-            "myclientid_" + parseInt(Math.random() * 100, 10)
-            );
+        wsbroker,
+        wsport,
+        "/ws",
+        "myclientid_" + parseInt(Math.random() * 100, 10)
+    );
 
     client.onConnectionLost = function (responseObject) {
         connect();
@@ -65,19 +65,19 @@ $(document).ready(function () {
             addNewColumn(objData.html);
         }
         if (objData.type === 'Column ReOrder') {
-            $.pjax.reload({container: '#board-container'});
+            $.pjax.reload({ container: '#board-container' });
         };
         if (objData.type === 'Column Updated') {
             if (location.href.includes('?')) {
                 history.pushState({}, null, location.href.split('?')[0]);
             }
-            $.pjax.reload({container: '#board-container'});
+            $.pjax.reload({ container: '#board-container' });
         };
         if (objData.type === 'Column Removed') {
-            $.pjax.reload({container: '#board-container'});
+            $.pjax.reload({ container: '#board-container' });
         };
 
-//        moveCard(objData);
+        //        moveCard(objData);
         if (objData.type === 'card' && objData.action === 'new') {
             if ($('div#column-id_' + objData.params.columnId).length > 0) {
                 $('div#column-id_' + objData.params.columnId).append(objData.params.html);
@@ -98,7 +98,7 @@ $(document).ready(function () {
         }
         if (objData.type === 'card' && objData.action === 'update') {
             let elm = $('#card_' + objData.params.cardId);
-            $(elm).css({'border-top-color': '#' + objData.params.color});
+            $(elm).css({ 'border-top-color': '#' + objData.params.color });
             $('h5.card-title', elm).html(objData.params.title);
             $('.card-body p', elm).html(objData.params.description);
         }
@@ -132,7 +132,7 @@ $(document).ready(function () {
         set.append(card);
     }
 
-    $(document).on('pjax:end', function() {
+    $(document).on('pjax:end', function () {
         currentColumnOrder = getCurrentColumnOrder();
     });
 
@@ -147,7 +147,7 @@ $(document).ready(function () {
             });
         },
         select: (event, ui) => {
-            const {id} = ui.item;
+            const { id } = ui.item;
             getInfoAndOpenModal(id);
         }
     });
@@ -159,12 +159,12 @@ $(document).ready(function () {
 
     function getInfoAndOpenModal(id) {
         $.get("get-one/" + id,
-                (task) => {
-            const modal = $('#detailModal');
-            modal.modal('show')
-            modal.find(".modal-title").html(task.title);
-            modal.find(".content").html(task.description)
-        });
+            (task) => {
+                const modal = $('#detailModal');
+                modal.modal('show')
+                modal.find(".modal-title").html(task.title);
+                modal.find(".content").html(task.description)
+            });
     }
 
     const boardNameComp = $("#boardname");
@@ -178,11 +178,14 @@ $(document).ready(function () {
         boardNameComp.addClass("disabled-style");
         if (boardNameComp.val() !== boardName) {
             const url = `${window.location.pathname.replace("kanban", "board/update")}`
-            boardName = boardNameComp.val();
             $.ajax({
                 method: "PUT",
                 url,
-                data: {title: boardNameComp.val()},
+                data: { title: boardNameComp.val() },
+            }).then(data => {
+                boardName = boardNameComp.val();
+            }).catch(err => {
+                boardNameComp.val(boardName);
             });
         }
     });
