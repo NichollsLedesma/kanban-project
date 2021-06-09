@@ -1,0 +1,33 @@
+<?php
+return [
+    [
+        'uuid' => '962758a7-d8d6-4a3b-ad10-93dfc344b983',
+        'column_id' => 1,
+        'owner_id' => 2,
+        'title' => 'default title',
+        'description' => 'default description',
+        'order' => 0,
+        'color' => 'FFFFFF',
+        'created_by' => 1,
+        'updated_by' => 1,
+        'created_at' => '1391885313',
+        'updated_at' => '1391885313',
+        'is_deleted' => false,
+        'deleted_at' => null,
+    ],
+    [
+        'uuid' => '340e9b52-2d81-4fa2-b648-7879db1b1d21',
+        'column_id' => 1,
+        'owner_id' => 2,
+        'title' => 'default title',
+        'description' => 'default description',
+        'order' => 1,
+        'color' => 'FFFFFF',
+        'created_by' => 1,
+        'updated_by' => 1,
+        'created_at' => '1391885313',
+        'updated_at' => '1391885313',
+        'is_deleted' => false,
+        'deleted_at' => null,
+    ],
+];
