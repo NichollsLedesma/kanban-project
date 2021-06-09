@@ -13,7 +13,7 @@ return [
     ],
     [
         'uuid' => '0cbf72c8-c87a-11eb-b8bc-0242ac130003',
-        'owner_id' => 1,
+        'owner_id' => 2,
         'name' => 'default name',
         'created_by' => 1,
         'updated_by' => 1,

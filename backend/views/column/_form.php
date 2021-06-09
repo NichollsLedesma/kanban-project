@@ -10,7 +10,9 @@ use yii\widgets\ActiveForm;
 
 <div class="column-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+        'id' => 'column-form',
+    ]); ?>
 
     <!-- <?= $form->field($model, 'uuid')->textInput(['maxlength' => true]) ?> -->
 
