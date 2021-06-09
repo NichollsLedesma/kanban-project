@@ -51,7 +51,7 @@ $this->registerJsFile(
     <section class="content pb-3">
         <?php
         Pjax::begin(['id' => 'board-container', "options" => [
-            "class" => "container-fluid h-100 m-0"
+            "class" => "container-fluid h-100 m-0 mt-3"
         ]]);
         foreach ($boardColumns->all() as $column) {
             $cards = [];

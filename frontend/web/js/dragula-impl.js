@@ -1,11 +1,17 @@
 
-let dragulaComp = dragula();
+let dragulaComp = dragula([], {
+    accepts: function (el, target, source, sibling) {
+        if ($(el).hasClass('column')) return true;
+        return $(target).hasClass('column-container-to-card') && $(el).hasClass('task');
+    }
+});
 
 const addColumnDragula = (column) => {
     if (!dragulaComp.containers.includes(column)) {
         dragulaComp.containers.push(document.getElementById(column));
     }
 }
+
 dragulaComp.containers.push(document.getElementById('board-container'));
 
 dragulaComp.on('drop', (component) => {

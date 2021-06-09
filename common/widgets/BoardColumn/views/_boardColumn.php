@@ -24,7 +24,7 @@
             </div>
         </div>
     <?php endif; ?>
-    <div class="card-body " id="<?= $idPrefix . $id ?>" data-column-id="<?= $id ?>">
+    <div class="card-body column-container-to-card" id="<?= $idPrefix . $id ?>" data-column-id="<?= $id ?>">
         <?php
         if (!empty($cards)) {
             foreach ($cards as $card) {
