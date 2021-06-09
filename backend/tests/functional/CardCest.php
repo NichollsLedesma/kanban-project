@@ -12,7 +12,6 @@ use common\fixtures\ColumnFixture;
 use common\fixtures\UserBoardFixture;
 use common\fixtures\UserEntityFixture;
 use common\models\Card;
-use common\models\Column;
 
 class CardCest
 {

@@ -139,6 +139,10 @@ class Board extends \yii\db\ActiveRecord
 
     public function afterSave($insert, $changedAttributes)
     {
+        if (YII_ENV_TEST) {
+            return true;
+        }
+
         if ($insert) {
             return  $this->createElasticDocument();
         }

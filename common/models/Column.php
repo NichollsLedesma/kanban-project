@@ -38,7 +38,8 @@ class Column extends \yii\db\ActiveRecord
         return 'column';
     }
 
-    public function scenarios() {
+    public function scenarios()
+    {
         $scenarios = parent::scenarios();
         $scenarios[self::SCENARIO_AJAX_CREATE] = ['title'];
         $scenarios[self::SCENARIO_AJAX_UPDATE] = ['title'];
@@ -113,8 +114,8 @@ class Column extends \yii\db\ActiveRecord
         if ($insert) {
             $this->uuid = \thamtech\uuid\helpers\UuidHelper::uuid();
             $this->order = self::find()
-                               ->where(['board_id'=>$this->board_id])
-                               ->max('"order"')+1;
+                ->where(['board_id' => $this->board_id])
+                ->max('"order"') + 1;
         }
 
         return parent::beforeSave($insert);
@@ -122,6 +123,10 @@ class Column extends \yii\db\ActiveRecord
 
     public function afterSave($insert, $changedAttributes)
     {
+        if (YII_ENV_TEST) {
+            return true;
+        }
+
         if ($insert) {
             return  $this->createElasticDocument();
         }
