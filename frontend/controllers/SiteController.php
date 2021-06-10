@@ -90,6 +90,7 @@ class SiteController extends Controller
     public function actionIndex()
     {
         if(Yii::$app->getUser()->getIsGuest()){
+            $this->layout = "blank";
             return $this->render('index');
         }
         
@@ -107,6 +108,7 @@ class SiteController extends Controller
             return $this->goHome();
         }
 
+        $this->layout = "blank";
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
@@ -171,6 +173,7 @@ class SiteController extends Controller
      */
     public function actionSignup()
     {
+        $this->layout = "blank";
         $model = new SignupForm();
         if ($model->load(Yii::$app->request->post()) && $model->signup()) {
             Yii::$app->session->setFlash('success', 'Thank you for registration. Please check your inbox for verification email.');

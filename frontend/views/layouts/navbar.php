@@ -11,21 +11,24 @@ $hasUuid = !Yii::$app->getUser()->getIsGuest() && UuidHelper::isValid(explode("k
 
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <ul class="navbar-nav">
-        <li class="nav-item">
-            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-        </li>
+        <?php if ($hasUuid) { ?>
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            </li>
+        <?php } ?>
+
         <li class="nav-item d-none d-sm-inline-block">
             <a href="<?= \yii\helpers\Url::home() ?>" class="nav-link">Home</a>
         </li>
 
-            <?php if ($hasUuid) { ?>
-                <!-- <li class="nav-item d-none d-sm-inline-block">
+        <?php if ($hasUuid) { ?>
+            <!-- <li class="nav-item d-none d-sm-inline-block">
                     <a href="#" class="nav-link" data-toggle="modal" data-target="#boardMenu">Menu</a>
                 </li> -->
-                <li class="nav-item d-none d-sm-inline-block">
-                    <input type="text" name="boardname" id="boardname" value="" class="form-control" autocomplete="off">
-                </li>
-            <?php } ?>
+            <li class="nav-item d-none d-sm-inline-block">
+                <input type="text" name="boardname" id="boardname" value="" class="form-control" autocomplete="off">
+            </li>
+        <?php } ?>
     </ul>
 
     <ul class="navbar-nav ml-auto">
