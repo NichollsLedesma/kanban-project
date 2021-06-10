@@ -5,6 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%board}}`.
  */
+// class m210520_200538_create_board_table extends Migration
 class m210520_200538_create_board_table extends Migration
 {
     /**
@@ -14,7 +15,7 @@ class m210520_200538_create_board_table extends Migration
     {
         $this->createTable('{{%board}}', [
             'id' => $this->primaryKey(),
-            'uuid' => $this->string(36)->unique(),
+            'uuid' => 'uuid DEFAULT uuid_generate_v4() UNIQUE NOT NULL',
             'entity_id' => $this->integer()->notNull(),
             'owner_id' => $this->integer()->notNull(),
             'title' => $this->string(100)->notNull(),
