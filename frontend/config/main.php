@@ -39,7 +39,13 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-
+        'view' => [
+            'theme' => [
+                'pathMap' => [
+                    '@app/views' => '@app/views'
+                ],
+            ],
+        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
