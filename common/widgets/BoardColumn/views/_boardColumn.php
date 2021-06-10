@@ -34,7 +34,7 @@
         ?>
         <p>
             <?php
-            if ($enableColumnCreation) {
+            if ($enableColumnCreation && empty($cards)) {
                 echo yii\helpers\Html::a('+ add column', \yii\helpers\Url::to(["/kanban/board", 'uuid' => $boardUuid, 'addColumn' => 'addColumn']));
             }
             ?>

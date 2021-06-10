@@ -14,7 +14,7 @@ class m210520_201609_create_column_table extends Migration
     {
         $this->createTable('{{%column}}', [
             'id' => $this->primaryKey(),
-            'uuid' => $this->string(36)->unique(),
+            'uuid' => 'uuid DEFAULT uuid_generate_v4() UNIQUE NOT NULL',
             'board_id' => $this->integer()->notNull(),
             'owner_id' => $this->integer()->notNull(),
             'title' => $this->string(100)->notNull(),
