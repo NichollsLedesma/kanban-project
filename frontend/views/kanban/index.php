@@ -8,7 +8,6 @@ $this->registerCssFile(
 
 
 ?>
-
 <?php if (count($entities) === 0) { ?>
     <p>You don't belong to any entity, please, contact to the admin to create board.</p>
 <?php } ?>

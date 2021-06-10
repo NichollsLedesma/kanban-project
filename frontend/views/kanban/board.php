@@ -47,7 +47,7 @@ $this->registerJsFile(
 );
 ?>
 
-<div class="content-wrapper kanban">
+<div class="content-wrapper kanban m-0">
     <section class="content pb-3">
         <?php
         Pjax::begin(['id' => 'board-container', "options" => [
