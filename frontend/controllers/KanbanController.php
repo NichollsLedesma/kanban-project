@@ -49,31 +49,6 @@ class KanbanController extends Controller
 
     public function actionIndex()
     {
-        // $entity_id = 1;
-        // $entity = Entity::find()
-        //     ->select(["id", "name", "uuid"])
-        //     ->where([
-        //         "in", "id", UserEntity::find()->select(["entity_id"])
-        //             ->where([
-        //                 "user_id" => Yii::$app->getUser()->getId(),
-        //             ])
-        //             ->AndWhere([
-        //                 "entity_id" => $entity_id,
-        //             ])
-        //     ])
-        //     ->with([
-        //         "boards" => function ($query) {
-        //             $query->where([
-        //                 "in", "id", UserBoard::find()->select(["board_id"])
-        //                     ->where([
-        //                         "user_id" => Yii::$app->getUser()->getId(),
-        //                     ])
-        //             ]);
-        //         }
-        //     ])
-        //     ->all();
-        // VarDumper::dump($entity, $depth = 10, $highlight = true);
-        // die;
         $boards = [];
         if ( $this->request->get('uuid')) {
             $entity = Entity::findOne(["uuid" => $this->request->get('uuid')]);
@@ -146,34 +121,11 @@ class KanbanController extends Controller
     public function actionMove()
     {
         $id = Yii::$app->queue->push(
-            new JobTest(
-                [
+                new JobTest(
+                        [
                     "message" => "Hi job"
-                ]
-            )
+                        ]
+                )
         );
-    }
-    public function actionGetEntities()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $entities = Entity::find()->select(["uuid", "name"])->with("boards")->all();
-
-        return [
-            "boardsInitial" => $entities[0]->boards,
-            "entities" => $entities,
-        ];
-    }
-
-    public function actionGetBoards($uuid)
-    {
-        $entity = Entity::findOne(["uuid" => $uuid]);
-
-        if (!$entity) {
-            return throw new NotFoundHttpException("entity not found.");
-        }
-
-        Yii::$app->response->format = Response::FORMAT_JSON;
-
-        return $entity->boards;
     }
 }
