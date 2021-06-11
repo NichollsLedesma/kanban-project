@@ -50,27 +50,27 @@ class KanbanController extends Controller
     public function actionIndex()
     {
         $entities = Entity::find()
-            ->select(["id", "name", "uuid"])
-            ->where([
-                "in", "id", UserEntity::find()->select(["entity_id"])
+                ->select(["id", "name", "uuid"])
+                ->where([
+                    "in", "id", UserEntity::find()->select(["entity_id"])
                     ->where([
                         "user_id" => Yii::$app->getUser()->getId(),
                     ]),
-            ])
-            ->with([
-                "boards" => function ($query) {
-                    $query->where([
-                        "in", "id", UserBoard::find()->select(["board_id"])
+                ])
+                ->with([
+                    "boards" => function ($query) {
+                        $query->where([
+                            "in", "id", UserBoard::find()->select(["board_id"])
                             ->where([
                                 "user_id" => Yii::$app->getUser()->getId(),
                             ])
-                    ]);
-                }
-            ])
-            ->all();
+                        ]);
+                    }
+                ])
+                ->all();
 
         return $this->render('index', [
-            "entities" => $entities,
+                    "entities" => $entities,
         ]);
     }
 
@@ -79,16 +79,20 @@ class KanbanController extends Controller
 
         $userBoard = BoardRepository::getUserBoardByUuid(Yii::$app->user->id, $uuid);
 
-        $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['order' => 'ASC']);
         if ($userBoard->count() == 0) {
             throw new NotFoundHttpException('board not found');
         }
+        $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['order' => 'ASC']);
         if ($this->request->isPost && $this->request->isAjax && $this->request->get('changeOrder')) {
             $userCard = CardRepository::getUserBoardCardByUuid(Yii::$app->user->id, $this->request->post('card'));
 
-            $column = Column::find()->select(['id'])->where(['uuid' => $this->request->post('column')])->limit(1)->one();
-            if ($userBoard === null || $column === null) {
-                throw new NotFoundHttpException('card  or column not found');
+            $column = Column::find()->select(['id', 'board_id'])->where(['uuid' => $this->request->post('column')])->limit(1)->one();
+            if ($userCard === null || $column === null) {
+                throw new NotFoundHttpException('card or column not found');
+            }
+            $cardColumnBelongBoard = Column::find()->select(['id'])->where(['board_id' => $column->board_id])->asArray()->all();
+            if (empty($cardColumnBelongBoard) || !in_array($userCard->column_id, array_column($cardColumnBelongBoard, 'id'))) {
+                throw new NotFoundHttpException('card or column not found');
             }
             CardRepository::reArrageByCardId($userCard->id, $this->request->post('order'), $column->id);
             $obj = ['type' => 'card', 'action' => 'move', 'params' => ['columnId' => $this->request->post('column'), 'cardId' => $this->request->post('card'), 'order' => $this->request->post('order')]];
@@ -140,13 +144,13 @@ class KanbanController extends Controller
         $board = Board::find()->where(["uuid" => $uuid])->limit(1)->one();
 
         return $this->render('board', [
-            'boardName' => $board->title,
-            'members' => $board->users,
-            'boardUuid' => $uuid,
-            'boardColumns' => $boardColumns,
-            'newCardModel' => $newCardModel ?? null,
-            'newColumnModel' => $newColumnModel ?? null,
-            'updateColumnModel' => $updateColumnModel ?? null,
+                    'boardName' => $board->title,
+                    'members' => $board->users,
+                    'boardUuid' => $uuid,
+                    'boardColumns' => $boardColumns,
+                    'newCardModel' => $newCardModel ?? null,
+                    'newColumnModel' => $newColumnModel ?? null,
+                    'updateColumnModel' => $updateColumnModel ?? null,
         ]);
     }
 
@@ -229,11 +233,12 @@ class KanbanController extends Controller
     public function actionMove()
     {
         $id = Yii::$app->queue->push(
-            new JobTest(
-                [
+                new JobTest(
+                        [
                     "message" => "Hi job"
-                ]
-            )
+                        ]
+                )
         );
     }
+
 }
