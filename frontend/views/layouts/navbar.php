@@ -3,10 +3,9 @@
 use thamtech\uuid\helpers\UuidHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\helpers\VarDumper;
 use yii\jui\AutoComplete;
 
-$hasUuid = !Yii::$app->getUser()->getIsGuest() && UuidHelper::isValid( explode("board/", Url::current())[1] ?? "");
+$hasUuid = !Yii::$app->getUser()->getIsGuest() && UuidHelper::isValid(explode("kanban/", Url::current())[1]);
 
 ?>
 

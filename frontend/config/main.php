@@ -50,11 +50,11 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                'kanban/<uuid>' => 'kanban/index',
+                'kanban/index' => 'kanban/index',
                 'kanban/<uuid>/get/<query>' => 'kanban/get',
                 'kanban/get-one/<id>' => 'kanban/get-one',
                 'kanban/<uuid>/column/order' => 'kanban/update-column-order',
-                'board/<uuid>' => 'board/index',
+                'kanban/<uuid>' => 'kanban/board',
                 'board/create' => 'board/create',
                 'DELETE kanban/column/<uuid>' => 'kanban/archive-column',
                 'board/leave/<uuid>' => 'board/leave',
