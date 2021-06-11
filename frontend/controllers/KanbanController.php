@@ -49,103 +49,65 @@ class KanbanController extends Controller
 
     public function actionIndex()
     {
-        $entities = Entity::find()
-            ->select(["id", "name", "uuid"])
-            ->where([
-                "in", "id", UserEntity::find()->select(["entity_id"])
-                    ->where([
-                        "user_id" => Yii::$app->getUser()->getId(),
-                    ]),
-            ])
-            ->with([
-                "boards" => function ($query) {
-                    $query->where([
-                        "in", "id", UserBoard::find()->select(["board_id"])
-                            ->where([
-                                "user_id" => Yii::$app->getUser()->getId(),
-                            ])
-                    ]);
-                }
-            ])
-            ->all();
+        // $entity_id = 1;
+        // $entity = Entity::find()
+        //     ->select(["id", "name", "uuid"])
+        //     ->where([
+        //         "in", "id", UserEntity::find()->select(["entity_id"])
+        //             ->where([
+        //                 "user_id" => Yii::$app->getUser()->getId(),
+        //             ])
+        //             ->AndWhere([
+        //                 "entity_id" => $entity_id,
+        //             ])
+        //     ])
+        //     ->with([
+        //         "boards" => function ($query) {
+        //             $query->where([
+        //                 "in", "id", UserBoard::find()->select(["board_id"])
+        //                     ->where([
+        //                         "user_id" => Yii::$app->getUser()->getId(),
+        //                     ])
+        //             ]);
+        //         }
+        //     ])
+        //     ->all();
+        // VarDumper::dump($entity, $depth = 10, $highlight = true);
+        // die;
+        $boards = [];
+        if ( $this->request->get('uuid')) {
+            $entity = Entity::findOne(["uuid" => $this->request->get('uuid')]);
+
+            if (!$entity) {
+                return throw new NotFoundHttpException("Entity not found");
+            }
+
+            $boards = Entity::find()
+                ->select(["id", "name", "uuid"])
+                ->where([
+                    "in", "id", UserEntity::find()->select(["entity_id"])
+                        ->where([
+                            "user_id" => Yii::$app->getUser()->getId(),
+                        ])
+                        ->AndWhere([
+                            "entity_id" => $entity->id,
+                        ])
+                ])
+                ->with([
+                    "boards" => function ($query) {
+                        $query->where([
+                            "in", "id", UserBoard::find()->select(["board_id"])
+                                ->where([
+                                    "user_id" => Yii::$app->getUser()->getId(),
+                                ])
+                        ]);
+                    }
+                ])
+                ->all();
+        }
 
         return $this->render('index', [
-            "entities" => $entities,
-        ]);
-    }
-
-    public function actionBoard($uuid)
-    {
-
-        $userBoard = BoardRepository::getUserBoardByUuid(Yii::$app->user->id, $uuid);
-
-        $boardColumns = Column::find()->where(['board_id' => $userBoard->select(['id'])->limit(1)])->orderBy(['order' => 'ASC']);
-        if ($userBoard->count() == 0) {
-            throw new NotFoundHttpException('board not found');
-        }
-        if ($this->request->isPost && $this->request->isAjax && $this->request->get('changeOrder')) {
-            $userCard = CardRepository::getUserBoardCardByUuid(Yii::$app->user->id, $this->request->post('card'));
-
-            $column = Column::find()->select(['id'])->where(['uuid' => $this->request->post('column')])->limit(1)->one();
-            if ($userBoard === null || $column === null) {
-                throw new NotFoundHttpException('card  or column not found');
-            }
-            CardRepository::reArrageByCardId($userCard->id, $this->request->post('order'), $column->id);
-            $obj = ['type' => 'card', 'action' => 'move', 'params' => ['columnId' => $this->request->post('column'), 'cardId' => $this->request->post('card'), 'order' => $this->request->post('order')]];
-            Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => $uuid]), $obj);
-        }
-
-        if ($this->request->isPjax && $this->request->get('addCard')) {
-
-            $newCardModel = new CreateCardForm(['scenario' => Card::SCENARIO_AJAX_CREATE]);
-            $columnUuid = clone $boardColumns;
-            $columnUuid->filterWhere(['uuid' => $this->request->get('addCard')])->select(['id'])->limit(1);
-            if ($columnUuid->count() == 0) {
-                throw new NotFoundHttpException(printf("Column %s doesn't exists", $this->request->get('addCard')));
-            }
-
-            $newCardModel->column_id = $columnUuid->scalar();
-            if ($this->request->isPost && $newCardModel->load($this->request->post()) && $newCardModel->validate() && $newCardModel->createCard()) {
-                $obj = ['type' => 'card', 'action' => 'new', 'params' => ['columnId' => $this->request->get('addCard'), 'order' => 'last', 'html' => BoardCard::widget(['id' => $newCardModel->uuid, 'title' => $newCardModel->title, 'content' => $newCardModel->description])]];
-                Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => $uuid]), $obj);
-                $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
-                unset($newCardModel);
-            }
-        }
-
-        if ($this->request->isPjax && $this->request->get('addColumn')) {
-
-            $newColumnModel = new CreateColumnForm(['scenario' => Column::SCENARIO_AJAX_CREATE]);
-            $newColumnModel->board_id = $userBoard->select(['id'])->limit(1)->one()->id;
-            if ($this->request->isPost && $newColumnModel->load($this->request->post()) && $newColumnModel->validate() && $newColumnModel->createColumn()) {
-                $newColumnModel->columnCreated(Url::to(['kanban/board', 'uuid' => $uuid]));
-                $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
-                unset($newColumnModel);
-            }
-        }
-
-        if ($this->request->isPjax && $this->request->get('updateColumn')) {
-            $uuidColumn = $this->request->get('updateColumn');
-            $updateColumnModel = new UpdateColumnForm(['scenario' => Column::SCENARIO_AJAX_UPDATE]);
-            $updateColumnModel = $updateColumnModel->find()->where(['uuid' => $uuidColumn])->one();
-            if ($this->request->isPost && $updateColumnModel->load($this->request->post()) && $updateColumnModel->validate()) {
-                $updateColumnModel->save();
-                $updateColumnModel->columnUpdated(Url::to(['kanban/board', 'uuid' => $uuid]));
-                $this->response->headers->set('X-PJAX-URL', Url::to(['/kanban/board', 'uuid' => $uuid]));
-                unset($updateColumnModel);
-            }
-        }
-
-        $board = Board::find()->where(["uuid" => $uuid])->limit(1)->one();
-
-        return $this->render('board', [
-            'boardName' => $board->title,
-            'members' => $board->users,
-            'boardUuid' => $uuid,
-            'boardColumns' => $boardColumns,
-            'newCardModel' => $newCardModel ?? null,
-            'newColumnModel' => $newColumnModel ?? null,
-            'updateColumnModel' => $updateColumnModel ?? null,
+            "entities" => $boards,
         ]);
     }
 
@@ -159,50 +121,6 @@ class KanbanController extends Controller
             'type' => 'Column ReOrder',
         );
         Yii::$app->mqtt->sendMessage($topic, $response);
-    }
-
-    public function actionArchiveColumn($uuid)
-    {
-        $column = Column::find()->where(['uuid' => $uuid])->limit(1)->one();
-
-        if (!$column) {
-            return false;
-        }
-
-        $topic = Url::to(['kanban/board', 'uuid' => $column->board->uuid]);
-        $response = array(
-            'type' => 'Column Removed',
-        );
-        Yii::$app->mqtt->sendMessage($topic, $response);
-
-        return $column->delete();
-    }
-
-    public function actionCardUpdate($uuid, $boardUuid)
-    {
-        if (!$this->request->isAjax) {
-            throw new NotFoundHttpException('not found');
-        }
-        $userCardModel = CardRepository::getUserBoardCardByUuid(Yii::$app->user->id, $uuid);
-        if ($userCardModel === null) {
-            throw new NotFoundHttpException('card not found');
-        }
-        $deleteCardModel = new \frontend\models\DeleteCardForm();
-        if ($this->request->isPost && $this->request->post('DeleteCardForm') && $deleteCardModel->load($this->request->post()) && $deleteCardModel->validate()) {
-            $userCardModel->delete();
-            $obj = ['type' => 'card', 'action' => 'remove', 'params' => ['cardId' => $userCardModel->uuid]];
-
-            Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => $boardUuid]), $obj);
-
-            Yii::$app->session->setFlash('deleted', true);
-        }
-        if ($this->request->isPost && !$this->request->post('DeleteCardForm') && $userCardModel->load($this->request->post()) && $userCardModel->validate() && $userCardModel->save()) {
-            $obj = ['type' => 'card', 'action' => 'update', 'params' => ['cardId' => $userCardModel->uuid, 'title' => $userCardModel->title, 'description' => $userCardModel->description, 'color' => $userCardModel->color]];
-
-            Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => $boardUuid]), $obj);
-            Yii::$app->session->setFlash('updated', true);
-        }
-        return $this->renderAjax('_cardUpdate', ['model' => $userCardModel, 'deleteModel' => $deleteCardModel]);
     }
 
     public function actionGet($uuid)
@@ -234,5 +152,28 @@ class KanbanController extends Controller
                 ]
             )
         );
+    }
+    public function actionGetEntities()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $entities = Entity::find()->select(["uuid", "name"])->with("boards")->all();
+
+        return [
+            "boardsInitial" => $entities[0]->boards,
+            "entities" => $entities,
+        ];
+    }
+
+    public function actionGetBoards($uuid)
+    {
+        $entity = Entity::findOne(["uuid" => $uuid]);
+
+        if (!$entity) {
+            return throw new NotFoundHttpException("entity not found.");
+        }
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        return $entity->boards;
     }
 }

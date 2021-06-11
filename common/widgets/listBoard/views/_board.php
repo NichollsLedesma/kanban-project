@@ -10,7 +10,7 @@ use yii\helpers\Html;
     <?php foreach ($boards as $board) { ?>
         <?= Html::a(
             CardWidget::widget(["board" => $board]),
-            ["kanban/board", 'uuid' => $board["uuid"]],
+            ["board/".$board["uuid"]],
             [
                 "class" => "link-board"
             ]

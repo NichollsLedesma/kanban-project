@@ -10,6 +10,7 @@ use hail812\adminlte3\assets\AdminLteAsset;
 use hail812\adminlte3\assets\BaseAsset;
 use hail812\adminlte3\assets\FontAwesomeAsset;
 use hail812\adminlte3\assets\PluginAsset;
+use yii\widgets\Pjax;
 
 AppAsset::register($this);
 ?>
@@ -46,9 +47,7 @@ AppAsset::register($this);
     <div class="wrap">
         <?= $this->render('sidebar', ['assetDir' => $assetDir]) ?>
 
-            <?= $this->render('navbar', ['assetDir' => $assetDir]) ?>
-       
-
+        <?= $this->render('navbar', ['assetDir' => $assetDir]) ?>
         <div class="">
             <?= Alert::widget([
                 'options' => ['class' => 'ml-auto alert-style'],
@@ -58,9 +57,8 @@ AppAsset::register($this);
             <?= $content ?>
         </div>
         <?= $this->render('control-sidebar') ?>
+
     </div>
-
-
     <?php $this->endBody() ?>
 </body>
 
