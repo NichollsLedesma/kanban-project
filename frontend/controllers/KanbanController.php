@@ -140,7 +140,6 @@ class KanbanController extends Controller
             }
         }
 
-        $this->layout = "kanban";
         $board = Board::find()->where(["uuid" => $uuid])->limit(1)->one();
 
         return $this->render('board', [

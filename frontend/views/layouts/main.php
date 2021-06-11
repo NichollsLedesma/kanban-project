@@ -4,11 +4,12 @@
 /* @var $content string */
 
 use yii\helpers\Html;
-use yii\bootstrap4\Nav;
-use yii\bootstrap4\NavBar;
-use yii\widgets\Breadcrumbs;
 use frontend\assets\AppAsset;
 use common\widgets\Alert;
+use hail812\adminlte3\assets\AdminLteAsset;
+use hail812\adminlte3\assets\BaseAsset;
+use hail812\adminlte3\assets\FontAwesomeAsset;
+use hail812\adminlte3\assets\PluginAsset;
 
 AppAsset::register($this);
 ?>
@@ -22,59 +23,43 @@ AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
-    <?php $this->head() ?>
+    <?php
+    $assetDir = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
+
+    $this->registerAssetBundle(AdminLteAsset::class);
+    $this->registerAssetBundle(FontAwesomeAsset::class);
+    // $this->registerAssetBundle(BaseAsset::class);
+    // $this->registerAssetBundle(PluginAsset::class);
+    $this->head()
+    ?>
+    <style>
+        .alert-style {
+            width: fit-content;
+            float: right;
+        }
+    </style>
 </head>
+
 <body>
     <?php $this->beginBody() ?>
 
     <div class="wrap">
-        <?php
-        NavBar::begin([
-            'brandLabel' => Yii::$app->name,
-            'brandUrl' => Yii::$app->homeUrl,
-            'options' => [
-                'class' => 'navbar navbar-expand-lg navbar-light bg-light',
-            ],
-        ]);
-        $menuItems = [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
-        ];
-        if (Yii::$app->user->isGuest) {
-            $menuItems[] = ['label' => 'Signup', 'url' => ['/site/signup']];
-            $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
-        } else {
-            $menuItems[] = ['label' => 'Kanban', 'url' => ['/kanban']];
-            $menuItems[] = '<li>'
-                . Html::beginForm(['/site/logout'], 'post')
-                . Html::submitButton(
-                    'Logout (' . Yii::$app->user->identity->username . ')',
-                    ['class' => 'btn btn-link logout']
-                )
-                . Html::endForm()
-                . '</li>';
-        }
-        echo Nav::widget([
-            'options' => ['class' => 'navbar-nav ml-auto'],
-            'items' => $menuItems,
-        ]);
-        NavBar::end();
-        ?>
+        <?= $this->render('sidebar', ['assetDir' => $assetDir]) ?>
 
-        <div class="container">
-            <?= Alert::widget() ?>
+            <?= $this->render('navbar', ['assetDir' => $assetDir]) ?>
+       
+
+        <div class="">
+            <?= Alert::widget([
+                'options' => ['class' => 'ml-auto alert-style'],
+            ]) ?>
+        </div>
+        <div class="content-wrapper">
             <?= $content ?>
         </div>
+        <?= $this->render('control-sidebar') ?>
     </div>
 
-    <footer class="footer">
-        <div class="container">
-            <p class="pull-left">&copy; <?= Html::encode(Yii::$app->name) ?> <?= date('Y') ?></p>
-
-            <p class="pull-right"><?= Yii::powered() ?></p>
-        </div>
-    </footer>
 
     <?php $this->endBody() ?>
 </body>

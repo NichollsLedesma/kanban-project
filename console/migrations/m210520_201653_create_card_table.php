@@ -14,7 +14,7 @@ class m210520_201653_create_card_table extends Migration
     {
         $this->createTable('{{%card}}', [
             'id' => $this->primaryKey(),
-            'uuid' => $this->string(36)->unique(),
+            'uuid' => 'uuid DEFAULT uuid_generate_v4() UNIQUE NOT NULL',
             'column_id' => $this->integer()->notNull(),
             'owner_id' => $this->integer()->notNull(),
             'title' => $this->string(100)->notNull(),

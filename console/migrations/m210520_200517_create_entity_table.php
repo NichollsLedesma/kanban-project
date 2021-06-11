@@ -14,7 +14,7 @@ class m210520_200517_create_entity_table extends Migration
     {
         $this->createTable('{{%entity}}', [
             'id' => $this->primaryKey(),
-            'uuid' => $this->string(36)->unique(),
+            'uuid' => 'uuid DEFAULT uuid_generate_v4() UNIQUE NOT NULL',
             'owner_id' => $this->integer()->notNull(),
             'name' => $this->string(100)->notNull(),
             'created_by' => $this->integer()->notNull(),
