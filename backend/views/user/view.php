@@ -20,99 +20,76 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
-
-    <div class="container mt-5 box-main">
-        <div class="box">
-            <div class="row box-header">
-                <div class="col d-flex flex-row">
-                    <div class="box-title">Details</div>
-                </div>
-                <div class="col d-flex flex-row-reverse">
-                    <!-- <button class=" btn">
-                        <i class="fa fa-plus"></i>
-                    </button> -->
-                </div>
-            </div>
-
-            <div class="box-content">
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        <span class="key">username: </span>
-                        <span class="value"><?= $model->username ?></span>
-                    </li>
-                    <li class="list-group-item">
-                        <span class="key">email: </span>
-                        <span class="value"><?= $model->email ?></span>
-                    </li>
-                </ul>
-            </div>
+    <div class="card">
+        <div class="card-header">
+            Personal info
         </div>
-
-        <div class="box">
-            <div class="row box-header">
-                <div class="col d-flex flex-row">
-                    <div class="box-title">Entities</div>
-                </div>
-                <div class="col d-flex flex-row-reverse">
-                    <button class=" btn" data-toggle="modal" data-target="#modalAddNewEntity">
+        <div class="card-body">
+            <h4 class="card-title"><?= $model->username ?></h4>
+            <p class="card-text p-2">
+                <span class="key">email: </span>
+                <span class="value"><?= $model->email ?></span>
+            </p>
+            <p>
+                <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+                <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+                    'class' => 'btn btn-danger',
+                    'data' => [
+                        'confirm' => 'Are you sure you want to delete this item?',
+                        'method' => 'post',
+                    ],
+                ]) ?>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <h5 class="card-header">
+                    <span>Entities</span>
+                    <button class="float-right btn" data-toggle="modal" data-target="#modalAddNewEntity">
                         <i class="fa fa-plus"></i>
                     </button>
+                </h5>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <tbody>
+                            <?php foreach ($model->entities as $entity) { ?>
+                                <tr>
+                                    <th scope="row"><?= $entity->id ?></th>
+                                    <td><?= $entity->name ?></td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-
-            <div class="box-content">
-                <table class="table table-striped">
-                    <tbody>
-                        <?php foreach ($model->entities as $entity) { ?>
-                            <tr>
-                                <th scope="row"><?= $entity->id ?></th>
-                                <td><?= $entity->name ?></td>
-                            </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
             </div>
         </div>
 
-        <div class="box">
-            <div class="row box-header">
-                <div class="col d-flex flex-row">
-                    <div class="box-title">Boards</div>
-                </div>
-                <div class="col d-flex flex-row-reverse">
-                    <button class=" btn" data-toggle="modal" data-target="#modalAddNewBoard">
+        <div class="col">
+            <div class="card">
+                <h5 class="card-header">
+                    <span>Boards</span>
+                    <button class="float-right btn" data-toggle="modal" data-target="#modalAddNewBoard">
                         <i class="fa fa-plus"></i>
                     </button>
+                </h5>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <tbody>
+                            <?php foreach ($model->boards as $board) { ?>
+                                <tr>
+                                    <th scope="row"><?= $board->id ?></th>
+                                    <td><?= $board->title ?></td>
+                                    <td><?= $board->getEntity()->one()->name ?></td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <div class="box-content">
-                <table class="table table-striped">
-                    <tbody>
-                        <?php foreach ($model->boards as $board) { ?>
-                            <tr>
-                                <th scope="row"><?= $board->id ?></th>
-                                <td><?= $board->title ?></td>
-                                <td><?= $board->getEntity()->one()->name ?></td>
-                            </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-            </div>
         </div>
-
     </div>
 </div>
 

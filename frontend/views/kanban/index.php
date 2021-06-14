@@ -12,7 +12,7 @@ $this->registerCssFile(
 <?php } ?>
 
 <?php if ($entity !== null) { ?>
-    <div class="accordion" id="accordionExample">
+    <div class="accordion" id="accordion<?= $entity->id ?>">
         <div class="card">
             <div class="card-header" id="heading<?= $entity->id ?>">
                 <h2 class="mb-0">
@@ -21,7 +21,7 @@ $this->registerCssFile(
                     </button>
                 </h2>
             </div>
-            <div id="collapse<?= $entity->id ?>" class="collapse show" aria-labelledby="heading<?= $entity->id ?>" data-parent="#accordionExample">
+            <div id="collapse<?= $entity->id ?>" class="collapse show" aria-labelledby="heading<?= $entity->id ?>" data-parent="#accordion<?= $entity->id ?>">
                 <div class="card-body">
                     <?= ListBoardWidget::widget(
                         [
