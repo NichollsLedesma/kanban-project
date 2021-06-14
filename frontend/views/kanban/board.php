@@ -23,6 +23,9 @@ $boardColumnIdPrefix = "column-id_";
 $this->registerCssFile(
     Yii::$app->request->getBaseUrl() . '/css/column.css'
 );
+$this->registerCssFile(
+    Yii::$app->request->getBaseUrl() . '/css/card.css'
+);
 
 $this->registerJsVar('channelName', $boardCode, View::POS_END);
 $this->registerJsVar('boardName', $boardName, View::POS_END);
@@ -47,11 +50,11 @@ $this->registerJsFile(
 );
 ?>
 
-<div class="content-wrapper kanban">
+<div class="content-wrapper kanban m-0">
     <section class="content pb-3">
         <?php
         Pjax::begin(['id' => 'board-container', "options" => [
-            "class" => "container-fluid h-100 m-0"
+            "class" => "container-fluid h-100 m-0 mt-3"
         ]]);
         foreach ($boardColumns->all() as $column) {
             $cards = [];

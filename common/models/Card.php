@@ -136,6 +136,10 @@ class Card extends \yii\db\ActiveRecord
 
     public function afterSave($insert, $changedAttributes)
     {
+        if (YII_ENV_TEST) {
+            return true;
+        }
+
         if ($insert) {
             return $this->createElasticDocument();
         }
@@ -154,7 +158,7 @@ class Card extends \yii\db\ActiveRecord
             'board_id' => $this->column["board_id"],
             'color' => $this->color,
             'owner_id' => $this->owner_id,
-                ], false);
+        ], false);
         $doc->save();
 
         return true;
@@ -188,5 +192,4 @@ class Card extends \yii\db\ActiveRecord
     {
         return $this->deleted_at > (time() - 3600); // allow restoration only for the records, being deleted during last hour
     }
-
 }

@@ -1,21 +1,26 @@
 <?php
 
-namespace common\tests;
+namespace common\tests\unit;
 
-use common\fixtures\UserFixture;
-use common\fixtures\EntityFixture;
+use Codeception\Test\Unit;
 use common\fixtures\BoardFixture;
-use common\fixtures\UserEntityFixture;
-use common\fixtures\UserBoardFixture;
-use common\fixtures\ColumnFixture;
 use common\fixtures\CardFixture;
+use common\fixtures\ColumnFixture;
+use common\fixtures\EntityFixture;
+use common\fixtures\UserBoardFixture;
+use common\fixtures\UserEntityFixture;
+use common\fixtures\UserFixture;
 use common\models\Card;
+use common\models\CardRepository;
 use common\models\LoginForm;
+use common\tests\UnitTester;
+use function codecept_data_dir;
 
-class CardTest extends \Codeception\Test\Unit
+class CardTest extends Unit
 {
+
     /**
-     * @var \common\tests\UnitTester
+     * @var UnitTester
      */
     protected $tester;
 
@@ -55,16 +60,17 @@ class CardTest extends \Codeception\Test\Unit
 
     protected function _after()
     {
+        
     }
 
     // tests
     public function testSaveCard()
     {
         $card = $this->getMockBuilder(Card::class)
-            ->getMock();
+                ->getMock();
 
         $card->method('save')
-            ->willReturn(true);
+                ->willReturn(true);
 
         $this->assertNotFalse($card->save());
     }
@@ -75,7 +81,7 @@ class CardTest extends \Codeception\Test\Unit
         (new LoginForm([
             'username' => 'bayer.hudson',
             'password' => 'password_0',
-        ]))->login();
+                ]))->login();
 
         $column = $this->make(Card::class, [
             'column_id' => 1,
@@ -95,7 +101,7 @@ class CardTest extends \Codeception\Test\Unit
         (new LoginForm([
             'username' => 'bayer.hudson',
             'password' => 'password_0',
-        ]))->login();
+                ]))->login();
 
         $column = $this->make(Card::class, [
             'column_id' => 1,
@@ -115,7 +121,7 @@ class CardTest extends \Codeception\Test\Unit
         (new LoginForm([
             'username' => 'test2.test',
             'password' => 'Test1234',
-        ]))->login();
+                ]))->login();
 
         $card = $this->make(Card::class, [
             'column_id' => 1,
@@ -135,7 +141,7 @@ class CardTest extends \Codeception\Test\Unit
         (new LoginForm([
             'username' => 'test2.test',
             'password' => 'Test1234',
-        ]))->login();
+                ]))->login();
 
         $card = $this->make(Card::class, [
             'column_id' => 1,
@@ -155,7 +161,7 @@ class CardTest extends \Codeception\Test\Unit
         (new LoginForm([
             'username' => 'bayer.hudson',
             'password' => 'password_0',
-        ]))->login();
+                ]))->login();
 
         $column = Card::findOne(1);
         $column->title = 'new name';
@@ -169,7 +175,7 @@ class CardTest extends \Codeception\Test\Unit
         (new LoginForm([
             'username' => 'bayer.hudson',
             'password' => 'password_0',
-        ]))->login();
+                ]))->login();
 
         $column = Card::findOne(1);
 
@@ -184,7 +190,7 @@ class CardTest extends \Codeception\Test\Unit
         (new LoginForm([
             'username' => 'bayer.hudson',
             'password' => 'password_0',
-        ]))->login();
+                ]))->login();
 
         $column = Card::findOne(2);
 
@@ -192,4 +198,37 @@ class CardTest extends \Codeception\Test\Unit
 
         $this->assertFalse($column->is_deleted);
     }
+
+    public function testArrageCardSameColumn()
+    {
+        (new LoginForm([
+            'username' => 'bayer.hudson',
+            'password' => 'password_0',
+                ]))->login();
+        CardRepository::reArrageByCardId(2, 0, 1);
+        $r = Card::find()->where(['column_id' => 1])->orderBy('order ASC')->asArray()->all();
+        $this->assertEquals($r[0]['id'], 2);
+        $this->assertEquals($r[0]['order'], 0);
+        $this->assertEquals($r[1]['id'], 1);
+        $this->assertEquals($r[1]['order'], 1);
+    }
+
+    public function testArrageCardToAnotherColumn()
+    {
+        (new LoginForm([
+            'username' => 'bayer.hudson',
+            'password' => 'password_0',
+                ]))->login();
+        CardRepository::reArrageByCardId(2, 2, 2);
+        $r = Card::find()->where(['column_id' => 2])->orderBy('order ASC')->asArray()->all();
+        $this->assertEquals($r[0]['id'], 3);
+        $this->assertEquals($r[0]['order'], 0);
+        $this->assertEquals($r[1]['id'], 4);
+        $this->assertEquals($r[1]['order'], 1);
+        $this->assertEquals($r[2]['id'], 2);
+        $this->assertEquals($r[2]['order'], 2);
+        $this->assertEquals($r[3]['id'], 5);
+        $this->assertEquals($r[3]['order'], 3);
+    }
+
 }

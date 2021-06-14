@@ -235,4 +235,26 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasMany(Board::class, ["id" => "board_id"])
             ->viaTable("user_board", ["user_id" => "id"]);
     }
+
+    public static function getEntitiesAndBoards($userId)
+    {
+        return Entity::find()
+            ->select(["id", "name", "uuid"])
+            ->where([
+                "in", "id", UserEntity::find()->select(["entity_id"])
+                    ->where([
+                        "user_id" => $userId,//Yii::$app->getUser()->getId(),
+                    ]),
+            ])
+            ->with([
+                "boards" => function ($query) use ($userId) {
+                    $query->where([
+                        "in", "id", UserBoard::find()->select(["board_id"])
+                            ->where([
+                                "user_id" => $userId,//Yii::$app->getUser()->getId(),
+                            ])
+                    ]);
+                }
+            ]);
+    }
 }

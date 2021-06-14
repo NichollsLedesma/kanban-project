@@ -10,7 +10,9 @@ use yii\widgets\ActiveForm;
 
 <div class="card-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+        'id' => 'card-form',
+    ]); ?>
 
     <!-- <?= $form->field($model, 'uuid')->textInput(['maxlength' => true]) ?> -->
 
