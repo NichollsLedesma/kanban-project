@@ -25,6 +25,7 @@ $this->registerCssFile(
 );
 
 $this->registerJsVar('channelName', $boardCode, View::POS_END);
+$this->registerJsVar('entityId', $entityId, View::POS_END);
 $this->registerJsVar('boardName', $boardName, View::POS_END);
 $this->registerJsVar('board_id', $boardUuid, View::POS_END);
 $this->registerJsVar('updateColumnOrderUrl', $updateColumnOrderUrl, View::POS_END);

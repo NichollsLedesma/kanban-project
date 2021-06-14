@@ -49,30 +49,24 @@ class KanbanController extends Controller
 
     public function actionIndex()
     {
-        $entities = Entity::find()
-                ->select(["id", "name", "uuid"])
-                ->where([
-                    "in", "id", UserEntity::find()->select(["entity_id"])
-                    ->where([
-                        "user_id" => Yii::$app->getUser()->getId(),
-                    ]),
-                ])
-                ->with([
-                    "boards" => function ($query) {
-                        $query->where([
-                            "in", "id", UserBoard::find()->select(["board_id"])
-                            ->where([
-                                "user_id" => Yii::$app->getUser()->getId(),
-                            ])
-                        ]);
-                    }
-                ])
-                ->all();
-
         return $this->render('index', [
-                    "entities" => $entities,
+            "entity" => null,
         ]);
     }
+
+    public function actionShowEntity($uuid)
+    {
+        $entityFound = Entity::find()->where(['uuid'=>$uuid])->limit(1)->one();
+        
+        if(!$entityFound){
+            return throw new NotFoundHttpException("Entity not found");
+        }
+        
+        return $this->render('index', [
+            "entity" => $entityFound,
+        ]);
+    }
+
 
     public function actionBoard($uuid)
     {
@@ -143,13 +137,14 @@ class KanbanController extends Controller
         $board = Board::find()->where(["uuid" => $uuid])->limit(1)->one();
 
         return $this->render('board', [
-                    'boardName' => $board->title,
-                    'members' => $board->users,
-                    'boardUuid' => $uuid,
-                    'boardColumns' => $boardColumns,
-                    'newCardModel' => $newCardModel ?? null,
-                    'newColumnModel' => $newColumnModel ?? null,
-                    'updateColumnModel' => $updateColumnModel ?? null,
+            'entityId' => $board->entity_id,
+            'boardName' => $board->title,
+            'members' => $board->users,
+            'boardUuid' => $uuid,
+            'boardColumns' => $boardColumns,
+            'newCardModel' => $newCardModel ?? null,
+            'newColumnModel' => $newColumnModel ?? null,
+            'updateColumnModel' => $updateColumnModel ?? null,
         ]);
     }
 
@@ -232,12 +227,11 @@ class KanbanController extends Controller
     public function actionMove()
     {
         $id = Yii::$app->queue->push(
-                new JobTest(
-                        [
+            new JobTest(
+                [
                     "message" => "Hi job"
-                        ]
-                )
+                ]
+            )
         );
     }
-
 }

@@ -50,7 +50,7 @@ function getCurrentColumnOrder() {
 }
 
 $(document).ready(function () {
-
+    $(`#entity_${entityId}>a>i`).addClass('fas');
     ////////////////////////////////////////////
     const wsbroker = "localhost";  // mqtt websocket enabled broker
     const wsport = 15675; // port for above
