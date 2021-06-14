@@ -19,15 +19,22 @@
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
-            <?php
-            echo \hail812\adminlte\widgets\Menu::widget([
+            <?= \hail812\adminlte\widgets\Menu::widget([
                 'items' => [
                     ['label' => 'Users', 'url' => ['/user/index'], 'icon' => 'fas fa-users'],
                     ['label' => 'Entities', 'url' => ['/entity/index'], 'icon' => 'fas fa-address-book'],
+
                     ['label' => '', 'header' => true],
                     ['label' => 'Login', 'url' => ['site/login'], 'icon' => 'sign-in-alt', 'visible' => Yii::$app->user->isGuest],
-                    ['label' => 'Logout', 'url' => ['site/logout'], 'icon' => 'sign-out-alt', 'visible' => !Yii::$app->user->isGuest, "options" => ["data-method" => "post"]],
+                    [
+                        'label' => 'Logout',
+                        'template'=>'<a class="nav-link" href="{url}" data-method="post">{icon}{label}</a>',
+                        'url' => ['site/logout'],
+                        'icon' => 'sign-out-alt',
+                        'visible' => !Yii::$app->user->isGuest,
+                    ]
                 ],
+
             ]);
             ?>
         </nav>
