@@ -143,6 +143,7 @@ class KanbanController extends Controller
         $board = Board::find()->where(["uuid" => $uuid])->limit(1)->one();
 
         return $this->render('board', [
+                    'ownerId' => $board->owner_id,
                     'boardName' => $board->title,
                     'members' => $board->users,
                     'boardUuid' => $uuid,

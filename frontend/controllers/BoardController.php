@@ -91,6 +91,27 @@ class BoardController extends Controller
 
     public function actionLeave($uuid)
     {
+        if (!$this->removeUser($uuid, Yii::$app->getUser()->getId())) {
+            return throw new NotFoundHttpException("Impossible to remove user from board.");
+        }
+
+        return $this->redirect(["kanban/index"]);
+    }
+
+    public function actionRemoveUser($uuid, $user_id)
+    {
+        $response = Yii::$app->response;
+        $response->format = \yii\web\Response::FORMAT_JSON;
+
+        if (!$this->removeUser($uuid, $user_id)) {
+            return throw new NotFoundHttpException("Impossible to remove user from board.");
+        }
+
+        $response->data = ['message' => 'User removed from the board'];
+    }
+
+    private function removeUser($uuid, $user_id)
+    {
         $board = Board::find()
             ->where(["uuid" => $uuid])
             ->limit(1)->one();
@@ -100,16 +121,14 @@ class BoardController extends Controller
         }
 
         $userBoard = UserBoard::find()->where([
-            "user_id" => Yii::$app->getUser()->getId(),
+            "user_id" => $user_id,
             "board_id" => $board->id,
         ])->limit(1)->one();
 
         if (!$userBoard) {
-            return throw new NotFoundHttpException("Relationshio user-board not found");
+            return throw new NotFoundHttpException("Relationship user-board not found");
         }
 
-        $userBoard->delete();
-
-        return $this->redirect(["kanban/index"]);
+        return $userBoard->delete();
     }
 }

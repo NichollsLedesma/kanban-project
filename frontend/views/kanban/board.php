@@ -86,35 +86,22 @@ $this->registerJsFile(
 <?php
 Modal::begin([
     "id" => "boardMenu",
-    "title" => "Board menu",
+    "title" => $boardName,
     "size" => Modal::SIZE_DEFAULT
 ]); ?>
-
-<div class="info">
-    <h3 class="float-left"><?= $boardName ?></h3>
-    <div class="ml-auto">
-        <?= Html::button('<i class="fas fa-window-close"></i>', [
-            "id" => "remove-board",
-            "class" => "btn btn-danger btn-remove ",
-        ]); ?>
-    </div>
-</div>
-<hr>
 
 <div class="members">
     <h4>Members</h4>
     <ul class="list-group">
         <?php foreach ($members as $member) { ?>
-            <li class="list-group-item">
+            <li class="list-group-item" id="list-item-<?= $member->id ?>">
                 <span class="float-left"><?= $member->username ?></span>
                 <span class="float-right">
-                    <? if (Yii::$app->getUser()->getId() === $member->id) {
-                        echo Html::a('<i class="fas fa-sign-out-alt"></i>', Url::to(['/board/leave/' . $boardUuid]), [
-                            'class' => 'btn btn-danger',
-                            'data' => [
-                                'confirm' => 'Are you sure you want to leave this board?',
-                                'method' => 'post',
-                            ],
+                    <? if ($ownerId !== $member->id) {
+                        echo Html::a('remove', Url::to(['/board/' . $boardUuid . '/user/' . $member->id]), [
+                            'id' => 'remove-user-board-' . $member->id,
+                            'class' => 'btn btn-danger remove-user-board',
+                            'data' => ['user' => $member->id]
                         ]);
                     } ?>
                 </span>
