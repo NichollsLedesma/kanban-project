@@ -59,6 +59,7 @@ return [
                 'board/create' => 'board/create',
                 'DELETE kanban/column/<uuid>' => 'kanban/archive-column',
                 'board/leave/<uuid>' => 'board/leave',
+                'DELETE board/<uuid>/user/<user_id>' => 'board/remove-user',
                 'board/update/<uuid>' => 'board/update',
                 'board/delete/<uuid>' => 'board/delete',
                 'kanban/card-update/<uuid>/<boardUuid>' => 'kanban/card-update'

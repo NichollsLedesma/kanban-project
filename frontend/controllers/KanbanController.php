@@ -138,6 +138,7 @@ class KanbanController extends Controller
 
         return $this->render('board', [
             'entityId' => $board->entity_id,
+            'ownerId' => $board->owner_id,
             'boardName' => $board->title,
             'members' => $board->users,
             'boardUuid' => $uuid,
