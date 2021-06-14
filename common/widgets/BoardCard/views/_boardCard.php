@@ -6,7 +6,7 @@ use yii\helpers\Url;
 <div class="card card-info card-outline task" id="card_<?= $id == '' ? 'new' : $id ?>" style="border-top-color: #<?= $color ?>">
 
     <div class="card-header">
-        <h5 class="card-title"><?= $title ?></h5>
+        <h5 class="card-title card-text-overflow"><?= $title ?></h5>
         <div class="card-tools">
             <a href="#" class="btn btn-tool btn-link"></a>
             <?php if (!$isForm): ?>
@@ -17,7 +17,7 @@ use yii\helpers\Url;
         </div>
     </div>
     <div class="card-body">
-        <p><?= $content ?></p>
+        <p class="card-text-overflow"><?= $content ?></p>
     </div>
     <?php if ($isForm): ?>
 

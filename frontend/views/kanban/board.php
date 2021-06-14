@@ -23,6 +23,9 @@ $boardColumnIdPrefix = "column-id_";
 $this->registerCssFile(
     Yii::$app->request->getBaseUrl() . '/css/column.css'
 );
+$this->registerCssFile(
+    Yii::$app->request->getBaseUrl() . '/css/card.css'
+);
 
 $this->registerJsVar('channelName', $boardCode, View::POS_END);
 $this->registerJsVar('entityId', $entityId, View::POS_END);

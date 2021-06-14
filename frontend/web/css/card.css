@@ -1,0 +1,6 @@
+.card-text-overflow{
+    text-overflow: ellipsis;
+    width: 265px;
+    overflow: hidden;
+    white-space: nowrap;
+}
