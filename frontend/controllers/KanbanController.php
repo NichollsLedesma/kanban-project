@@ -178,6 +178,14 @@ class KanbanController extends Controller
         return $column->delete();
     }
 
+    /**
+     * Card Update
+     * 
+     * @param type $uuid
+     * @param type $boardUuid
+     * @return type
+     * @throws NotFoundHttpException
+     */
     public function actionCardUpdate($uuid, $boardUuid)
     {
         if (!$this->request->isAjax) {

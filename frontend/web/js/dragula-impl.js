@@ -163,7 +163,8 @@ $(document).ready(function () {
     },
     select: (event, ui) => {
       const { id } = ui.item;
-      getInfoAndOpenModal(id);
+      $("#card_"+id+" a" ).trigger('click');
+//      getInfoAndOpenModal(id);
     },
   });
 
