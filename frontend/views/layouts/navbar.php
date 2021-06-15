@@ -3,10 +3,13 @@
 use thamtech\uuid\helpers\UuidHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\helpers\VarDumper;
 use yii\jui\AutoComplete;
 
-$hasUuid = !Yii::$app->getUser()->getIsGuest() && UuidHelper::isValid(explode("kanban/", Url::current())[1]);
-
+$uuid = Yii::$app->request->get("uuid"); 
+$hasUuid = !Yii::$app->getUser()->getIsGuest() &&
+    UuidHelper::isValid($uuid) &&
+    !strpos(Url::current(), "kanban/entity");
 ?>
 
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -63,8 +66,8 @@ $hasUuid = !Yii::$app->getUser()->getIsGuest() && UuidHelper::isValid(explode("k
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
-                        <!-- <i class="fas fa-th-large"></i> -->Show Menu
+                    <a class="nav-link" id="board-settings-sidebar" data-widget="control-sidebar" data-slide="true" data-uuid="<?= $uuid ?>" href="#" role="button">
+                        <!-- <i class="fas fa-th-large"></i> -->Settings
                     </a>
                 </li>
             <?php } ?>

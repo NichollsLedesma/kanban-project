@@ -52,6 +52,7 @@ return [
             'rules' => [
                 'kanban/index' => 'kanban/index',
                 'kanban/test/<card>' => 'kanban/test',
+                'kanban/entity/<uuid>' => 'kanban/show-entity',
                 'kanban/<uuid>/get/<query>' => 'kanban/get',
                 'kanban/get-one/<id>' => 'kanban/get-one',
                 'kanban/<uuid>/column/order' => 'kanban/update-column-order',
@@ -59,6 +60,7 @@ return [
                 'board/create' => 'board/create',
                 'DELETE kanban/column/<uuid>' => 'kanban/archive-column',
                 'board/leave/<uuid>' => 'board/leave',
+                'DELETE board/<uuid>/user/<user_id>' => 'board/remove-user',
                 'board/update/<uuid>' => 'board/update',
                 'board/delete/<uuid>' => 'board/delete',
                 'kanban/card-update/<uuid>/<boardUuid>' => 'kanban/card-update'

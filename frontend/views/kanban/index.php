@@ -6,23 +6,22 @@ $this->registerCssFile(
     Yii::$app->request->getBaseUrl() . '/css/kanban.css'
 );
 
-
 ?>
-<?php if (count($entities) === 0) { ?>
+<?php if ( isset($hasEntity) ) { ?>
     <p>You don't belong to any entity, please, contact to the admin to create board.</p>
 <?php } ?>
 
-<div class="accordion" id="accordionExample">
-    <?php foreach ($entities as $key => $entity) { ?>
+<?php if ($entity !== null) { ?>
+    <div class="accordion" id="accordion<?= $entity->id ?>">
         <div class="card">
-            <div class="card-header" id="heading<?= $key ?>">
+            <div class="card-header" id="heading<?= $entity->id ?>">
                 <h2 class="mb-0">
-                    <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapse<?= $key ?>" aria-expanded="true" aria-controls="collapse<?= $key ?>">
+                    <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapse<?= $entity->id ?>" aria-expanded="true" aria-controls="collapse<?= $entity->id ?>">
                         <h3 class="text-capitalize"><?= $entity->name ?></h3>
                     </button>
                 </h2>
             </div>
-            <div id="collapse<?= $key ?>" class="collapse show" aria-labelledby="heading<?= $key ?>" data-parent="#accordionExample">
+            <div id="collapse<?= $entity->id ?>" class="collapse show" aria-labelledby="heading<?= $entity->id ?>" data-parent="#accordion<?= $entity->id ?>">
                 <div class="card-body">
                     <?= ListBoardWidget::widget(
                         [
@@ -35,5 +34,5 @@ $this->registerCssFile(
             </div>
 
         </div>
-    <?php } ?>
-</div>
+    </div>
+<?php } ?>

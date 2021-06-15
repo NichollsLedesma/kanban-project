@@ -8,7 +8,6 @@ use yii\helpers\Url;
     <div class="card-header">
         <h5 class="card-title card-text-overflow"><?= $title ?></h5>
         <div class="card-tools">
-            <a href="#" class="btn btn-tool btn-link"></a>
             <?php if (!$isForm): ?>
                 <a href="<?= Url::toRoute(['/kanban/card-update', 'uuid' => $id, 'boardUuid' => $boardUuid]) ?>" data-pjax="0" class="btn btn-tool" data-toggle="modal" data-target="#cardModal" onclick="boardCardLoadContent(this)">
                     <i class="fas fa-pen"></i>

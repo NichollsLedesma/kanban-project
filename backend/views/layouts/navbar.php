@@ -29,12 +29,12 @@ use yii\jui\AutoComplete;
                 <?= Html::a('Login', ['/site/login'], ['class' => 'nav-link']) ?>
             </li>
         <?php } else { ?>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <?= Html::a('Users', ['/user/index'], ['class' => 'nav-link']) ?>
             </li>
             <li class="nav-item">
                 <?= Html::a('Entities', ['/entity/index'], ['class' => 'nav-link']) ?>
-            </li>
+            </li> -->
             <li class="nav-item">
                 <?= Html::a('<i class="fas fa-sign-out-alt"></i>', ['/site/logout'], ['data-method' => 'post', 'class' => 'nav-link']) ?>
             </li>
