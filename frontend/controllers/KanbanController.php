@@ -56,7 +56,18 @@ class KanbanController extends Controller
 
     public function actionShowEntity($uuid)
     {
-        $entityFound = Entity::find()->where(['uuid'=>$uuid])->limit(1)->one();
+        $entityFound = Entity::find()->where(['uuid'=>$uuid])
+        ->with([
+            "boards" => function ($query) {
+                $query->where([
+                    "in", "id", UserBoard::find()->select(["board_id"])
+                        ->where([
+                            "user_id" => Yii::$app->getUser()->getId(),
+                        ])
+                ]);
+            }
+        ])
+        ->limit(1)->one();
         
         if(!$entityFound){
             return throw new NotFoundHttpException("Entity not found");
