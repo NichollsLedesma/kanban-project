@@ -6,11 +6,10 @@ use yii\helpers\Url;
 use yii\helpers\VarDumper;
 use yii\jui\AutoComplete;
 
-$hasUuid = false;
-if (!Yii::$app->getUser()->getIsGuest()){
-    $uuid = explode("kanban/", Url::current())[1];
-    $hasUuid = !Yii::$app->getUser()->getIsGuest() && UuidHelper::isValid($uuid);
-}
+$uuid = Yii::$app->request->get("uuid"); 
+$hasUuid = !Yii::$app->getUser()->getIsGuest() &&
+    UuidHelper::isValid($uuid) &&
+    !strpos(Url::current(), "kanban/entity");
 ?>
 
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
