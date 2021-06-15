@@ -134,7 +134,7 @@ class Column extends \yii\db\ActiveRecord
         $doc = ElasticHelper::search(ElasticColumn::class, ["uuid" => $this->uuid]);
 
         if (!$doc) {
-            return  $this->createElasticDocument();
+            return  true;
         }
 
         $doc->setAttributes([
