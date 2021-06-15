@@ -9,7 +9,7 @@ class Checklist extends \yii\elasticsearch\ActiveRecord
 {
     public function attributes()
     {
-        return ['title', "uuid", "owner_id"];
+        return ['title', "uuid","card_id","owner_id"];
     }
 
     public function saving($data)

@@ -2,24 +2,27 @@
 
 namespace frontend\controllers;
 
+use Yii;
 use common\jobs\JobTest;
 use common\models\Board;
 use common\models\BoardRepository;
 use common\models\Card;
 use common\models\CardRepository;
+use common\models\Checklist;
+use common\models\ChecklistOption;
 use common\models\Column;
 use common\models\CreateColumnForm;
+use common\models\Entity;
 use common\models\UpdateColumnForm;
 use common\models\User;
+use common\models\UserBoard;
+use common\models\UserEntity;
 use common\models\elastic\Board as ElasticBoard;
 use common\models\elastic\Card as ElasticCard;
 use common\models\elastic\ElasticHelper;
-use common\models\Entity;
-use common\models\UserBoard;
-use common\models\UserEntity;
 use common\widgets\BoardCard\BoardCard;
 use frontend\models\CreateCardForm;
-use Yii;
+use frontend\models\CreateChecklistForm;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -184,6 +187,7 @@ class KanbanController extends Controller
 
     public function actionCardUpdate($uuid, $boardUuid)
     {
+
         if (!$this->request->isAjax) {
             throw new NotFoundHttpException('not found');
         }
@@ -191,6 +195,7 @@ class KanbanController extends Controller
         if ($userCardModel === null) {
             throw new NotFoundHttpException('card not found');
         }
+
         $deleteCardModel = new \frontend\models\DeleteCardForm();
         if ($this->request->isPost && $this->request->post('DeleteCardForm') && $deleteCardModel->load($this->request->post()) && $deleteCardModel->validate()) {
             $userCardModel->delete();
@@ -206,7 +211,19 @@ class KanbanController extends Controller
             Yii::$app->mqtt->sendMessage(Url::to(['kanban/board', 'uuid' => $boardUuid]), $obj);
             Yii::$app->session->setFlash('updated', true);
         }
-        return $this->renderAjax('_cardUpdate', ['model' => $userCardModel, 'deleteModel' => $deleteCardModel]);
+
+        $checkboxOptionModel = new \frontend\models\CreateChecklistOptionForm(['scenario' => ChecklistOption::SCENARIO_AJAX_CREATE]);
+        if ($this->request->isPost && $this->request->post('CreateChecklistOptionForm') && $checkboxOptionModel->load($this->request->post()) && $checkboxOptionModel->validate() && $checkboxOptionModel->createChecklistOption()) {
+        }
+
+        return $this->renderAjax(
+            '_cardUpdate',
+            [
+                'model' => $userCardModel,
+                'deleteModel' => $deleteCardModel,
+                'checklistModel' => $checklistModel ?? null,
+                'checklistOptionModel' => $checkboxOptionModel
+            ]);
     }
 
     public function actionGet($uuid)
@@ -240,4 +257,23 @@ class KanbanController extends Controller
         );
     }
 
+    public function actionTest($card)
+    {
+
+        $cardModel = CardRepository::getUserBoardCardByUuid(Yii::$app->user->id, $card);
+
+        $checklistModel = new CreateChecklistForm(['scenario' => Checklist::SCENARIO_AJAX_CREATE]);
+        $checklistModel->card_id = $cardModel->id;
+        if ($this->request->isPost && $checklistModel->load($this->request->post()) && $checklistModel->validate() && $checklistModel->createChecklist()) {
+            return true;
+        }
+
+        return $this->renderAjax(
+            '_newChecklist',
+            [
+                'model' => $checklistModel,
+                'card' => $card,
+            ]
+        );
+    }
 }

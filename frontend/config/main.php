@@ -51,6 +51,7 @@ return [
             'showScriptName' => false,
             'rules' => [
                 'kanban/index' => 'kanban/index',
+                'kanban/test/<card>' => 'kanban/test',
                 'kanban/<uuid>/get/<query>' => 'kanban/get',
                 'kanban/get-one/<id>' => 'kanban/get-one',
                 'kanban/<uuid>/column/order' => 'kanban/update-column-order',

@@ -1,10 +1,12 @@
 <?php
 
 use alexantr\colorpicker\ColorPicker;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\Url;
+use yii\web\View;
 use yii\widgets\ActiveForm;
 use yii\widgets\Pjax;
-use yii\web\View;
 
 /* @var $this View */
 $isDeleted = $model->is_deleted;
@@ -34,8 +36,21 @@ $isDeleted = $model->is_deleted;
         <?= $form->field($model, 'title')->textInput(['disabled' => $isDeleted]) ?>
         <?= $form->field($model, 'description')->textarea(['disabled' => $isDeleted]) ?>
         <?= $form->field($model, 'color')->widget(ColorPicker::class, ['options' => ['placeholder' => 'Color chooser', 'disabled' => $isDeleted]]) ?>
-        <?= Html::submitButton('save', ['class' => 'btn btn-primary', 'name' => 'save-card-button', 'disabled' => $isDeleted]) ?>
+        <p>
+            <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'save-card-button', 'disabled' => $isDeleted]) ?>
+        </p>
         <?php ActiveForm::end(); ?>
+        <?php if (count($model->checklists)>0): ?>
+            <h5>Checklist <?=$model->checklists[0]->title?></h1>
+            <?= Html::activeCheckboxList($model->checklists[0], 'checklistOptions', ArrayHelper::map($model->checklists[0]->checklistOptions, 'id', 'title')) ?>
+            <?php
+                $formCheckboxOption = ActiveForm::begin(['options' => ['data-pjax' => true]]);
+                echo $formCheckboxOption->field($checklistOptionModel, 'title')->textInput()->label(false);
+                echo $formCheckboxOption->field($checklistOptionModel, 'checklist_id')->hiddenInput(['value' => $model->checklists[0]->id, 'readOnly' => true])->label(false);
+                echo Html::submitButton('Add Task', ['class' => 'btn btn-primary']);
+            ActiveForm::end();
+            ?>
+        <?php endif ?>
     </div>
     <div class="col-md-4" style="padding-top: 15px; text-align: right">
         <p>
@@ -45,7 +60,14 @@ $isDeleted = $model->is_deleted;
             echo Html::submitButton('delete', ['class' => 'btn btn-danger', 'disabled' => $isDeleted, 'data' => [
                     'confirm' => 'Are you sure you want to delete this card?']]);
             ActiveForm::end();
-            ?> 
+            ?>
+        </p>
+        <p>
+            <?php if (count($model->checklists)<=0): ?>
+                <a href="<?= Url::toRoute(['/kanban/test', 'card' => $model->uuid]) ?>" data-pjax="0" class="btn btn-tool" data-toggle="modal" data-target="#checklistModal" onclick="boardCardLoadContent(this)">
+                    Add Checklist
+                </a>
+            <?php endif ?>
         </p>
     </div>
 </div>

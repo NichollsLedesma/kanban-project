@@ -48,6 +48,15 @@ $this->registerJsFile(
         'position' => View::POS_END
     ]
 );
+
+$this->registerJsFile(
+    Yii::$app->request->BaseUrl . '/js/checklist.js',
+    [
+        'depends' => "/js/dragula-impl.js",
+        'position' => View::POS_END
+    ]
+);
+
 ?>
 
 <div class="content-wrapper kanban m-0">
@@ -142,6 +151,14 @@ Modal::begin([
 Modal::begin([
     "id" => "cardModal",
     "title" => "",
+    "size" => Modal::SIZE_DEFAULT
+]);
+Modal::end();
+?>
+<?php
+Modal::begin([
+    "id" => "checklistModal",
+    "title" => "Add checklist",
     "size" => Modal::SIZE_DEFAULT
 ]);
 Modal::end();

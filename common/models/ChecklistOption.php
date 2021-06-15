@@ -2,8 +2,6 @@
 
 namespace common\models;
 
-use common\models\elastic\Checklist as ElasticChecklist;
-use common\models\elastic\ElasticHelper;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
@@ -16,7 +14,7 @@ use yii\helpers\VarDumper;
  *
  * @property int $id
  * @property string $uuid
- * @property int $card_id
+ * @property int $checklist_id
  * @property int $owner_id
  * @property string $title
  * @property int $created_by
@@ -26,7 +24,7 @@ use yii\helpers\VarDumper;
  * @property bool $is_deleted
  * @property int $deleted_at
  */
-class Checklist extends \yii\db\ActiveRecord
+class ChecklistOption extends \yii\db\ActiveRecord
 {
 
     const SCENARIO_AJAX_CREATE = 'ajax_create';
@@ -36,14 +34,14 @@ class Checklist extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'checklist';
+        return 'checklist_option';
     }
 
 
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_AJAX_CREATE] = ['title'];
+        $scenarios[self::SCENARIO_AJAX_CREATE] = ['checklist_id','title'];
         return $scenarios;
     }
 
@@ -71,11 +69,11 @@ class Checklist extends \yii\db\ActiveRecord
             ['uuid', 'string', 'max' => 36],
             ['uuid', 'unique'],
             ['uuid', 'thamtech\uuid\validators\UuidValidator'],
-            [['card_id', 'owner_id', 'title'], 'required'],
-            [['card_id', 'owner_id', 'order', 'created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
+            [['checklist_id', 'owner_id', 'title'], 'required'],
+            [['checklist_id', 'owner_id', 'created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
             [['title'], 'string', 'max' => 100],
             ['title', 'match', 'pattern' => '/^[A-Za-z !.]{1,100}$/'],
-            ['card_id', 'exist', 'targetClass' => Card::class, 'targetAttribute' => ['card_id' => 'id']],
+            ['checklist_id', 'exist', 'targetClass' => Checklist::class, 'targetAttribute' => ['checklist_id' => 'id']],
             ['owner_id', 'exist', 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
         ];
     }
@@ -88,7 +86,7 @@ class Checklist extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'uuid' => 'Uuid',
-            'card_id' => 'Card ID',
+            'checklist_id' => 'Checklist ID',
             'owner_id' => 'Owner ID',
             'title' => 'Title',
             'created_by' => 'Created By',
@@ -106,14 +104,9 @@ class Checklist extends \yii\db\ActiveRecord
         return $query->notDeleted();
     }
 
-    public function getCard()
+    public function getChecklist()
     {
-        return $this->hasOne(Card::class, ['id' => 'card_id']);
-    }
-
-    public function getChecklistOptions()
-    {
-        return $this->hasMany(ChecklistOption::class, ['checklist_id' => 'id']);
+        return $this->hasOne(Checklist::class, ['id' => 'checklist_id']);
     }
 
     public function beforeSave($insert)
@@ -125,48 +118,9 @@ class Checklist extends \yii\db\ActiveRecord
         return parent::beforeSave($insert);
     }
 
-    public function afterSave($insert, $changedAttributes)
-    {
-        if (YII_ENV_TEST) {
-            return true;
-        }
-
-        if ($insert) {
-            return $this->createElasticDocument();
-        }
-
-        $doc = ElasticHelper::search(ElasticCard::class, ["uuid" => $this->uuid]);
-
-        if (!$doc) {
-            return $this->createElasticDocument();
-        }
-
-        $doc->setAttributes([
-            'title' => $this->title,
-            'card_id' => $this->card_id,
-            'owner_id' => $this->owner_id,
-        ], false);
-        $doc->save();
-
-        return true;
-    }
-
-    private function createElasticDocument()
-    {
-        ElasticHelper::create(ElasticChecklist::class, [
-            "title" => $this->title,
-            "uuid" => $this->uuid,
-            'card_id' => $this->card_id,
-            "owner_id" => $this->owner_id,
-        ]);
-
-        return true;
-    }
 
     public function beforeSoftDelete()
     {
-        // ElasticHelper::remove(ElasticCard::class, ["uuid" => $this->uuid]);
-
         $this->deleted_at = time(); // log the deletion date
         return true;
     }

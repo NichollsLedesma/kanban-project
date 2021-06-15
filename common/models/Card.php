@@ -120,6 +120,11 @@ class Card extends \yii\db\ActiveRecord
         return $this->hasOne(Column::class, ['id' => 'column_id']);
     }
 
+    public function getChecklists()
+    {
+        return $this->hasMany(Checklist::class, ['card_id' => 'id']);
+    }
+
     public function beforeSave($insert)
     {
         /* data modifier, remove # from begin of color selector */
