@@ -3,6 +3,7 @@
 use thamtech\uuid\helpers\UuidHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\helpers\VarDumper;
 use yii\jui\AutoComplete;
 
 $hasUuid = false;
