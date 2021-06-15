@@ -229,11 +229,11 @@ class KanbanController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         $search = Yii::$app->request->get('query');
         $board = Board::find()->where(["uuid" => $uuid])->one();
-
+        
         if (!$board) {
             return [];
         }
-
+        
         return ElasticBoard::getFiltredCards($board->id, $search);
     }
 

@@ -29,15 +29,18 @@ class Board extends \yii\elasticsearch\ActiveRecord
     public static function getFiltredCards($board_id, $search)
     {
         $cards = Card::find()->query([
-            "bool" => [
-                "filter" => [
-                    'match' => ["title" => $search],
-                ],
+            'bool' => [
                 "must" => [
-                    'match' => ["board_id" => $board_id],
+                    'wildcard' => ["title" =>"*$search*"],
+                ],
+                "filter" => [
+                    "match" => ["board_id" => $board_id]
                 ],
             ]
-        ])->asArray()->all();
+        ])
+        ->source(["board_id", "title", "uuid","column_id"])
+        ->asArray()
+        ->all();
 
         return ArrayHelper::getColumn($cards, function ($card) {
             $source = $card["_source"];

@@ -58,7 +58,7 @@ $hasUuid = !Yii::$app->getUser()->getIsGuest() &&
                             ],
                             'clientOptions' => [
                                 'autoFill' => true,
-                                'minLength' => '2',
+                                'minLength' => '3',
                             ],
                         ]);
                         ?>
