@@ -131,4 +131,15 @@ class BoardController extends Controller
 
         return $userBoard->delete();
     }
+
+    public function actionGoBack($uuid)
+    {
+        $board = Board::find()->where(["uuid" => $uuid])->one();
+
+        if (!$board) {
+            return $this->redirect(["kanban/index"]);
+        }
+
+        return $this->redirect(["kanban/entity/" . $board->entity->uuid]);
+    }
 }

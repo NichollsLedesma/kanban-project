@@ -7,9 +7,7 @@ $this->registerCssFile(
 );
 
 ?>
-<?php if ( isset($hasEntity) ) { ?>
-    <p>You don't belong to any entity, please, contact to the admin to create board.</p>
-<?php } ?>
+
 
 <?php if ($entity !== null) { ?>
     <div class="accordion" id="accordion<?= $entity->id ?>">
