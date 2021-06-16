@@ -4,3 +4,7 @@
     overflow: hidden;
     white-space: nowrap;
 }
+
+label.checked{
+  text-decoration-line: line-through;
+}

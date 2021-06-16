@@ -44,7 +44,7 @@ $isDeleted = $model->is_deleted;
             <h5>Checklist <?=$model->checklists[0]->title?></h1>
             <?php
             foreach ($model->checklists[0]->checklistOptions as $option) {
-                echo Html::checkbox($option->title, $option->is_checked,['label' => $option->title, 'data-update-option-status-url' => Url::to(["/kanban/update-checklist-option-status", 'uuid' => $option->uuid])]);
+                echo Html::checkbox($option->title, $option->is_checked,['label' => $option->title, 'labelOptions'=>['class' => ($option->is_checked)?'checked':''], 'data-update-option-status-url' => Url::to(["/kanban/update-checklist-option-status", 'uuid' => $option->uuid])]);
                 echo '<br>';
             }
             ?>

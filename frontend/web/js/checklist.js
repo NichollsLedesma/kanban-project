@@ -23,6 +23,13 @@ $( document ).ready(function() {
             cache: false,
             type: 'PUT'
         });
+
+        if ($(this).parent().hasClass('checked')) {
+            $(this).parent().removeClass('checked');
+        }
+        else{
+            $(this).parent().addClass('checked');
+        }
     });
 
 });
