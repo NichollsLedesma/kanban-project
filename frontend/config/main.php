@@ -62,6 +62,7 @@ return [
                 'DELETE board/<uuid>/user/<user_id>' => 'board/remove-user',
                 'board/update/<uuid>' => 'board/update',
                 'board/delete/<uuid>' => 'board/delete',
+                'board/go-back/<uuid>' => 'board/go-back',
                 'kanban/card-update/<uuid>/<boardUuid>' => 'kanban/card-update'
             ],
         ],

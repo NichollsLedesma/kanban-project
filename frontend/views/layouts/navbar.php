@@ -6,8 +6,8 @@ use yii\helpers\Url;
 use yii\helpers\VarDumper;
 use yii\jui\AutoComplete;
 
-$uuid = Yii::$app->request->get("uuid"); 
-$hasUuid = !Yii::$app->getUser()->getIsGuest() &&
+$uuid = Yii::$app->request->get("uuid");
+$isOnBoard = !Yii::$app->getUser()->getIsGuest() &&
     UuidHelper::isValid($uuid) &&
     !strpos(Url::current(), "kanban/entity");
 ?>
@@ -20,14 +20,10 @@ $hasUuid = !Yii::$app->getUser()->getIsGuest() &&
             </li>
         <?php } ?>
 
-        <li class="nav-item d-none d-sm-inline-block">
-            <a href="<?= \yii\helpers\Url::home() ?>" class="nav-link">Home</a>
-        </li>
-
-        <?php if ($hasUuid) { ?>
-            <!-- <li class="nav-item d-none d-sm-inline-block">
-                    <a href="#" class="nav-link" data-toggle="modal" data-target="#boardMenu">Menu</a>
-                </li> -->
+        <?php if ($isOnBoard) { ?>
+            <li class="nav-item d-none d-sm-inline-block">
+                <?= Html::a('Home', ['board/go-back', "uuid" => $uuid], ['class' => 'nav-link']) ?>
+            </li>
             <li class="nav-item d-none d-sm-inline-block">
                 <input type="text" name="boardname" id="boardname" value="" class="form-control" autocomplete="off">
             </li>
@@ -43,7 +39,7 @@ $hasUuid = !Yii::$app->getUser()->getIsGuest() &&
                 <?= Html::a('Login', ['/site/login'], ['class' => 'nav-link']) ?>
             </li>
         <?php } else { ?>
-            <?php if ($hasUuid) { ?>
+            <?php if ($isOnBoard) { ?>
                 <li class="nav-item">
                     <!-- SEARCH FORM -->
                     <div class="form-inline ml-3">

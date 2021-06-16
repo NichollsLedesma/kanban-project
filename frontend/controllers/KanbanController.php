@@ -49,6 +49,14 @@ class KanbanController extends Controller
 
     public function actionIndex()
     {
+        $myQueryEntities = Yii::$app->getUser()->getIdentity()->getEntities();
+        
+        if ($myQueryEntities->count() > 0) {
+            return $this->redirect(["kanban/entity/" . $myQueryEntities->limit(1)->one()->uuid]);
+        }
+
+        Yii::$app->session->setFlash("warning", "You don't belong to any entity, please, contact to the admin to create board.");
+
         return $this->render('index', [
             "entity" => null,
         ]);
@@ -56,23 +64,23 @@ class KanbanController extends Controller
 
     public function actionShowEntity($uuid)
     {
-        $entityFound = Entity::find()->where(['uuid'=>$uuid])
-        ->with([
-            "boards" => function ($query) {
-                $query->where([
-                    "in", "id", UserBoard::find()->select(["board_id"])
-                        ->where([
-                            "user_id" => Yii::$app->getUser()->getId(),
-                        ])
-                ]);
-            }
-        ])
-        ->limit(1)->one();
-        
-        if(!$entityFound){
+        $entityFound = Entity::find()->where(['uuid' => $uuid])
+            ->with([
+                "boards" => function ($query) {
+                    $query->where([
+                        "in", "id", UserBoard::find()->select(["board_id"])
+                            ->where([
+                                "user_id" => Yii::$app->getUser()->getId(),
+                            ])
+                    ]);
+                }
+            ])
+            ->limit(1)->one();
+
+        if (!$entityFound) {
             return throw new NotFoundHttpException("Entity not found");
         }
-        
+
         return $this->render('index', [
             "entity" => $entityFound,
         ]);
@@ -229,11 +237,11 @@ class KanbanController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         $search = Yii::$app->request->get('query');
         $board = Board::find()->where(["uuid" => $uuid])->one();
-        
+
         if (!$board) {
             return [];
         }
-        
+
         return ElasticBoard::getFiltredCards($board->id, $search);
     }
 
