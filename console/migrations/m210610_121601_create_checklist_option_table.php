@@ -18,6 +18,7 @@ class m210610_121601_create_checklist_option_table extends Migration
             'checklist_id' => $this->integer()->notNull(),
             'owner_id' => $this->integer()->notNull(),
             'title' => $this->string(100)->notNull(),
+            'is_checked' => $this->boolean()->notNull()->defaultValue(false),
             'created_by' => $this->integer()->notNull(),
             'updated_by' => $this->integer()->notNull(),
             'created_at' => $this->integer()->notNull(),

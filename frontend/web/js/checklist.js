@@ -16,4 +16,13 @@ $( document ).ready(function() {
         });
     });
 
+    $(document).on("click", "input[type=checkbox]", function(event){
+        let updateOptionStatusUrl = $(this).attr('data-update-option-status-url');
+        $.ajax({
+            url: updateOptionStatusUrl,
+            cache: false,
+            type: 'PUT'
+        });
+    });
+
 });

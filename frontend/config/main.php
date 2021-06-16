@@ -51,7 +51,7 @@ return [
             'showScriptName' => false,
             'rules' => [
                 'kanban/index' => 'kanban/index',
-                'kanban/test/<card>' => 'kanban/test',
+                'kanban/create-checklist/<card>' => 'kanban/create-checklist',
                 'kanban/entity/<uuid>' => 'kanban/show-entity',
                 'kanban/<uuid>/get/<query>' => 'kanban/get',
                 'kanban/get-one/<id>' => 'kanban/get-one',
@@ -59,6 +59,7 @@ return [
                 'kanban/<uuid>' => 'kanban/board',
                 'board/create' => 'board/create',
                 'DELETE kanban/column/<uuid>' => 'kanban/archive-column',
+                'PUT kanban/checkbox/option/<uuid>' => 'kanban/update-checklist-option-status',
                 'board/leave/<uuid>' => 'board/leave',
                 'DELETE board/<uuid>/user/<user_id>' => 'board/remove-user',
                 'board/update/<uuid>' => 'board/update',

@@ -42,7 +42,12 @@ $isDeleted = $model->is_deleted;
         <?php ActiveForm::end(); ?>
         <?php if (count($model->checklists)>0): ?>
             <h5>Checklist <?=$model->checklists[0]->title?></h1>
-            <?= Html::activeCheckboxList($model->checklists[0], 'checklistOptions', ArrayHelper::map($model->checklists[0]->checklistOptions, 'id', 'title')) ?>
+            <?php
+            foreach ($model->checklists[0]->checklistOptions as $option) {
+                echo Html::checkbox($option->title, $option->is_checked,['label' => $option->title, 'data-update-option-status-url' => Url::to(["/kanban/update-checklist-option-status", 'uuid' => $option->uuid])]);
+                echo '<br>';
+            }
+            ?>
             <?php
                 $formCheckboxOption = ActiveForm::begin(['options' => ['data-pjax' => true]]);
                 echo $formCheckboxOption->field($checklistOptionModel, 'title')->textInput()->label(false);
@@ -64,7 +69,7 @@ $isDeleted = $model->is_deleted;
         </p>
         <p>
             <?php if (count($model->checklists)<=0): ?>
-                <a href="<?= Url::toRoute(['/kanban/test', 'card' => $model->uuid]) ?>" data-pjax="0" class="btn btn-tool" data-toggle="modal" data-target="#checklistModal" onclick="boardCardLoadContent(this)">
+                <a href="<?= Url::toRoute(['/kanban/create-checklist', 'card' => $model->uuid]) ?>" data-pjax="0" class="btn btn-tool" data-toggle="modal" data-target="#checklistModal" onclick="boardCardLoadContent(this)">
                     Add Checklist
                 </a>
             <?php endif ?>

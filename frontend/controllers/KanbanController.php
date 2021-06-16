@@ -203,6 +203,8 @@ class KanbanController extends Controller
     public function actionCardUpdate($uuid, $boardUuid)
     {
 
+        // var_dump($this->request->post());
+
         if (!$this->request->isAjax) {
             throw new NotFoundHttpException('not found');
         }
@@ -246,11 +248,11 @@ class KanbanController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         $search = Yii::$app->request->get('query');
         $board = Board::find()->where(["uuid" => $uuid])->one();
-        
+
         if (!$board) {
             return [];
         }
-        
+
         return ElasticBoard::getFiltredCards($board->id, $search);
     }
 
@@ -272,7 +274,7 @@ class KanbanController extends Controller
         );
     }
 
-    public function actionTest($card)
+    public function actionCreateChecklist($card)
     {
         $cardModel = CardRepository::getUserBoardCardByUuid(Yii::$app->user->id, $card);
 
@@ -289,5 +291,19 @@ class KanbanController extends Controller
                 'card' => $card,
             ]
         );
+    }
+
+    public function actionUpdateChecklistOptionStatus($uuid)
+    {
+        $option = ChecklistOption::find()->where(['uuid' => $uuid])->limit(1)->one();
+
+        if (!$option) {
+            return false;
+        }
+
+        $option->is_checked = ($option->is_checked) ? false : true;
+        $option->save();
+
+        return true;
     }
 }
