@@ -149,14 +149,13 @@ class Board extends \yii\db\ActiveRecord
         $doc = ElasticHelper::search(ElasticBoard::class, ["uuid" => $this->uuid]);
 
         if (!$doc) {
-            return  $this->createElasticDocument();
+            return  true; //$this->createElasticDocument();
         }
 
         $doc->setAttributes([
             'title' => $this->title,
         ], false);
         $doc->save();
-
 
         return true;
     }

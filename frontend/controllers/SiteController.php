@@ -89,13 +89,35 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        if(Yii::$app->getUser()->getIsGuest()){
+        if (Yii::$app->getUser()->getIsGuest()) {
             $this->layout = "blank";
             return $this->render('index');
         }
-        
+
         return $this->redirect('kanban');
     }
+
+    // public function actionTest()
+    // {
+    //     $word = "reprehende";
+    //     $board_id = 6;
+
+    //     $docs = ElasticCard::find()->query([
+    //         'bool' => [
+    //             "must" => [
+    //                 'wildcard' => ["title" =>"*$word*"],
+    //             ],
+    //             "filter" => [
+    //                 "match" => ["board_id" => $board_id]
+    //             ],
+
+    //         ]
+    //     ])
+    //         ->source(["board_id", "title", "uuid","column_id"])
+    //         ->all();
+    //     VarDumper::dump($docs, $depth = 10, $highlight = true);
+    //     die;
+    // }
 
     /**
      * Logs in a user.

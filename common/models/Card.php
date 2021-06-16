@@ -152,7 +152,7 @@ class Card extends \yii\db\ActiveRecord
         $doc = ElasticHelper::search(ElasticCard::class, ["uuid" => $this->uuid]);
 
         if (!$doc) {
-            return $this->createElasticDocument();
+            return  true;
         }
 
         $doc->setAttributes([
