@@ -5,6 +5,12 @@
     white-space: nowrap;
 }
 
+.update-card-btn{
+	position: absolute;
+    right: -149px;
+    top: 90%;
+}
+
 label.checked{
   text-decoration-line: line-through;
 }

@@ -37,7 +37,14 @@ $isDeleted = $model->is_deleted;
         <?= $form->field($model, 'description')->textarea(['disabled' => $isDeleted]) ?>
         <?= $form->field($model, 'color')->widget(ColorPicker::class, ['options' => ['placeholder' => 'Color chooser', 'disabled' => $isDeleted]]) ?>
         <p>
-            <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'save-card-button', 'disabled' => $isDeleted]) ?>
+            <?php if (count($model->checklists)<=0): ?>
+                <a href="<?= Url::toRoute(['/kanban/create-checklist', 'card' => $model->uuid]) ?>" data-pjax="0" class="btn btn-tool" data-toggle="modal" data-target="#checklistModal" onclick="boardCardLoadContent(this)">
+                    Add Checklist
+                </a>
+            <?php endif ?>
+        </p>
+        <p>
+            <?= Html::submitButton('Save', ['class' => 'btn btn-primary update-card-btn', 'name' => 'save-card-button', 'disabled' => $isDeleted]) ?>
         </p>
         <?php ActiveForm::end(); ?>
         <?php if (count($model->checklists)>0): ?>
@@ -62,17 +69,10 @@ $isDeleted = $model->is_deleted;
             <?php
             $formDelete = ActiveForm::begin(['id' => 'delete-card-form-' . $model->uuid, 'options' => ['data-pjax' => true]]);
             echo $formDelete->field($deleteModel, 'cardId')->hiddenInput(['value' => $model->uuid, 'readOnly' => true])->label(false);
-            echo Html::submitButton('delete', ['class' => 'btn btn-danger', 'disabled' => $isDeleted, 'data' => [
+            echo Html::submitButton('Delete', ['class' => 'btn btn-danger', 'disabled' => $isDeleted, 'data' => [
                     'confirm' => 'Are you sure you want to delete this card?']]);
             ActiveForm::end();
             ?>
-        </p>
-        <p>
-            <?php if (count($model->checklists)<=0): ?>
-                <a href="<?= Url::toRoute(['/kanban/create-checklist', 'card' => $model->uuid]) ?>" data-pjax="0" class="btn btn-tool" data-toggle="modal" data-target="#checklistModal" onclick="boardCardLoadContent(this)">
-                    Add Checklist
-                </a>
-            <?php endif ?>
         </p>
     </div>
 </div>
