@@ -60,6 +60,7 @@ return [
                 'board/create' => 'board/create',
                 'DELETE kanban/column/<uuid>' => 'kanban/archive-column',
                 'PUT kanban/checkbox/option/<uuid>' => 'kanban/update-checklist-option-status',
+                'DELETE kanban/checkbox/option/<uuid>' => 'kanban/delete-checklist-option',
                 'board/leave/<uuid>' => 'board/leave',
                 'DELETE board/<uuid>/user/<user_id>' => 'board/remove-user',
                 'board/update/<uuid>' => 'board/update',

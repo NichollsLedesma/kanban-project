@@ -315,4 +315,17 @@ class KanbanController extends Controller
 
         return true;
     }
+
+    public function actionDeleteChecklistOption($uuid)
+    {
+        $option = ChecklistOption::find()->where(['uuid' => $uuid])->limit(1)->one();
+
+        if (!$option) {
+            return false;
+        }
+
+        $option->delete();
+
+        return true;
+    }
 }

@@ -32,4 +32,17 @@ $( document ).ready(function() {
         }
     });
 
+     $(document).on("click", ".delete-option-btn", function(event){
+        let checkboxOptionContainer = $(this).parent();
+        let deleteOptionUrl = checkboxOptionContainer.attr('data-delete-option-url');
+        alert(deleteOptionUrl);
+        $.ajax({
+            url: deleteOptionUrl,
+            cache: false,
+            type: 'DELETE'
+        }).done(function() {
+            checkboxOptionContainer.remove();
+        });
+    });
+
 });
