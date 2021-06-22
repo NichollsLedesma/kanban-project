@@ -239,6 +239,7 @@ class KanbanController extends Controller
 
         $checkboxOptionModel = new \frontend\models\CreateChecklistOptionForm(['scenario' => ChecklistOption::SCENARIO_AJAX_CREATE]);
         if ($this->request->isPost && $this->request->post('CreateChecklistOptionForm') && $checkboxOptionModel->load($this->request->post()) && $checkboxOptionModel->validate() && $checkboxOptionModel->createChecklistOption()) {
+            $checkboxOptionModel->title = "";
         }
 
         return $this->renderAjax(
