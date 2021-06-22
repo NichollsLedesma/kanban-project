@@ -18,7 +18,7 @@ class MqttComponent extends Component
 
     public function __construct($config = []) {
         $this->host = $config['host'] ?? 'rabbitmq';
-        $this->host = $config['port'] ?? 1883;
+        $this->port = $config['port'] ?? 1883;
         parent::__construct($config);
     }
 
